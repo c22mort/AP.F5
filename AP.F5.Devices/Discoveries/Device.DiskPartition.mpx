@@ -27,7 +27,7 @@
         <!-- AP.F5.Discovery.Device.DiskPartition -->
         <DisplayString ElementID="AP.F5.Discovery.Device.DiskPartition">
           <Name>F5 Device Disk Partition Discovery</Name>
-          <Description>Discovers Disk Partition Device Fans</Description>
+          <Description>Discovers Device Disk Partitions</Description>
         </DisplayString>
 
       </DisplayStrings>
