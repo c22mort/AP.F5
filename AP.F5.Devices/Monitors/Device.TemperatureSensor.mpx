@@ -72,7 +72,7 @@
           <Description>
             F5 Device : {0}
 
-            TempSensor {1} has changed to {2}
+            TempSensor {1} has changed to {2} Degrees ­C
           </Description>
         </DisplayString>
         <DisplayString ElementID="AP.F5.Monitor.Device.TempSensor.Health" SubElementID="TempGood">
