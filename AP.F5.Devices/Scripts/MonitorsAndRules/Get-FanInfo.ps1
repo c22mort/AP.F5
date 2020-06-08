@@ -243,7 +243,7 @@ function BulkGet-SnmpV3
     } Catch {
 		# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_INFO,$message)
+   			$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_INFO,$message)
     }                   
 }
 
@@ -286,8 +286,20 @@ $FanCount = 0
 If ($SNMPVersion -eq "3") {
 	Try {
 
+		# Get Count of Fans
 		[int]$FanCount = (Get-SnmpV3 $connection $sysChassisFanNumber).Data.ToInt32()
-		$FanStatus = BulkGet-SnmpV3 $connection $CpuCount $sysChassisFanStatus
+		# Get Status of Fans (SNMP3 0 based array)
+		$FanStatus = BulkGet-SnmpV3 $connection $FanCount $sysChassisFanStatus
+		For ($i=0; $i -lt $FanCount;$i++){
+			[int]$index = $i + 1
+			$message = "Created Fan Info Property Bag for Fan-"+ $index + "`r`n"
+			$message = $message + "Fan Status : " + $FanStatus[$i].Data.ToInt32()
+			Log-DebugEvent $SCRIPT_PROPERTYBAG_CREATED $message
+			$bag = $api.CreatePropertyBag()
+			$bag.AddValue("Index", [int]$index)
+			$bag.AddValue("Status", $FanStatus[$i].Data.ToInt32())
+			$bag
+		}
 
 	} Catch {
 		# Log Finished Message
@@ -297,24 +309,24 @@ If ($SNMPVersion -eq "3") {
 } else {
 	Try {
 
-
+		# Get Count of Fans
 		[int]$FanCount = (Get-SnmpV2 $connection $sysChassisFanNumber).Data.ToInt32()
+		# Get Status of Fans (SNMP2 1 based array)
 		$FanStatus = Walk-SnmpV2 $connection $sysChassisFanStatus
-
+		For ($i=1; $i -le $FanCount;$i++){
+			$message = "Created Fan Info Property Bag for Fan-"+ $i + "`r`n"
+			$message = $message + "Fan Status : " + $FanStatus[$i].Data.ToInt32()
+			Log-DebugEvent $SCRIPT_PROPERTYBAG_CREATED $message
+			$bag = $api.CreatePropertyBag()
+			$bag.AddValue("Index", [int]$i)
+			$bag.AddValue("Status", $FanStatus[$i].Data.ToInt32())
+			$bag
+		}
 	} Catch {
 		# Log error Message
 		$message = "SNMPv2 Error : " + $Error + " : " + $_
 		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_ERROR,$message)	
 	}
-}
-
-For ($i=1; $i -le $psuCount;$i++){
-	Log-DebugEvent $SCRIPT_EVENT "Fan Status : " 	$FanStatus[$i].Data
-	Log-DebugEvent $SCRIPT_PROPERTYBAG_CREATED "Created Fan Info Property Bag"
-	$bag = $api.CreatePropertyBag()
-	$bag.AddValue("Index", [int]$i)
-	$bag.AddValue("Status", $FanStatus[$i].Data.ToInt32())
-	$bag
 }
 
 # Get End Time For Script

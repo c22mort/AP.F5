@@ -1,8 +1,8 @@
 ﻿#==================================================================================
-# Script: 	Get-PowerSupplyInfo.ps1
+# Script: 	Get-ProcessorInfo.ps1
 # Date:		05/06/20
 # Author: 	Andi Patrick
-# Purpose:	Gets F5 Device Power Supply Info via SNMP returns all as Property Bag
+# Purpose:	Gets F5 Device Processor Info via SNMP returns all as Property Bag
 #==================================================================================
 
 # Get the named parameters
@@ -28,16 +28,16 @@ $StartTime = (GET-DATE)
 $Timeout = 10000
 
 #Constants used for event logging
-$SCRIPT_NAME			= 'Get-PowerSupplyInfo.ps1'
+$SCRIPT_NAME			= 'Get-ProcessorInfo.ps1'
 $EVENT_LEVEL_ERROR 		= 1
 $EVENT_LEVEL_WARNING 	= 2
 $EVENT_LEVEL_INFO 		= 4
 
-$SCRIPT_STARTED				= 14646
-$SCRIPT_PROPERTYBAG_CREATED	= 14647
-$SCRIPT_EVENT				= 14648
-$SCRIPT_ENDED				= 14649
-$SCRIPT_ERROR				= 14650
+$SCRIPT_STARTED				= 14641
+$SCRIPT_PROPERTYBAG_CREATED	= 14642
+$SCRIPT_EVENT				= 14643
+$SCRIPT_ENDED				= 14644
+$SCRIPT_ERROR				= 14645
 
 #==================================================================================
 # Function:	Get-SnmpV2
@@ -267,7 +267,7 @@ function Log-DebugEvent
 $api = New-Object -comObject 'MOM.ScriptAPI'
 
 # Log Startup Message
-Log-DebugEvent $SCRIPT_STARTED "Collecting Power Supply Info from F5 Device"
+Log-DebugEvent $SCRIPT_STARTED "Collecting Processor Info from F5 Device"
 
 # Load SharpSNMPLib
 [void][reflection.assembly]::LoadFrom( (Resolve-Path $SharpSnmpLocation) )
@@ -276,19 +276,30 @@ $walkMode = [Lextm.SharpSnmpLib.Messaging.WalkMode]::WithinSubtree
 # Create endpoint for SNMP server
 $connection = New-Object System.Net.IpEndPoint ([System.Net.IPAddress]::Parse($SNMPAddress), $PortNumber)
 
-# bigipTrafficMgmt.bigipSystem.sysPlatform.sysChassis.sysChassisPowerSupply.sysChassisPowerSupplyNumber
-$sysChassisPowerSupplyNumber = New-Object Lextm.SharpSnmpLib.ObjectIdentifier(".1.3.6.1.4.1.3375.2.1.3.2.2.1.0")
-# bigipTrafficMgmt.bigipSystem.sysPlatform.sysChassis.sysChassisPowerSupply.sysChassisPowerSupplyTable.sysChassisPowerSupplyEntry.sysChassisPowerSupplyStatus
-$sysChassisPowerSupplyStatus = New-Object Lextm.SharpSnmpLib.ObjectIdentifier(".1.3.6.1.4.1.3375.2.1.3.2.2.2.1.2")
+# bigipTrafficMgmt.bigipSystem.sysHostInfoStat.sysMultiHostCpu.sysMultiHostCpuNumber
+$sysMultiHostCpuNumber = New-Object Lextm.SharpSnmpLib.ObjectIdentifier(".1.3.6.1.4.1.3375.2.1.7.5.1.0")
+# bigipTrafficMgmt.bigipSystem.sysHostInfoStat.sysMultiHostCpu.sysMultiHostCpuTable.sysMultiHostCpuEntry.sysMultiHostCpuUsageRatio5m
+$sysMultiHostCpuUsageRatio5m = New-Object Lextm.SharpSnmpLib.ObjectIdentifier(".1.3.6.1.4.1.3375.2.1.7.5.2.1.35")
 
 # Get SNMP Data (Version Dependant)
-$PsuCount = 0
+$CpuCount = 0
 If ($SNMPVersion -eq "3") {
 	Try {
 
-		[int]$PsuCount = (Get-SnmpV3 $connection $sysChassisPowerSupplyNumber).Data.ToInt32()
-		$PsuStatus = BulkGet-SnmpV3 $connection $CpuCount $sysChassisPowerSupplyStatus
-
+		# Get Count of Processors
+		[int]$CpuCount = (Get-SnmpV3 $connection $sysMultiHostCpuNumber).Data.ToInt32()
+		# Get Processor Usage (SNMPv3 0 Based Array)
+		$CpuUsage = BulkGet-SnmpV3 $connection $CpuCount $sysMultiHostCpuUsageRatio5m
+		For ($i=0; $i -lt $CpuCount;$i++){
+			[int]$index = $i + 1
+			$message = "Created Processor Info Property Bag for CPU-"+ $index + "`r`n"
+			$message = $message + "CPU Usage : " + $CpuUsage[$i].Data.ToUInt32()
+			Log-DebugEvent $SCRIPT_PROPERTYBAG_CREATED $message
+			$bag = $api.CreatePropertyBag()
+			$bag.AddValue("Index", [int]$index)
+			$bag.AddValue("UsedPercentage", $CpuUsage[$i].Data.ToUInt32())
+			$bag
+		}
 	} Catch {
 		# Log Finished Message
 		$message = "SNMPv3 Error : " + $_
@@ -297,9 +308,19 @@ If ($SNMPVersion -eq "3") {
 } else {
 	Try {
 
-
-		[int]$PsuCount = (Get-SnmpV2 $connection $sysChassisPowerSupplyNumber).Data.ToInt32()
-		$PsuStatus = Walk-SnmpV2 $connection $sysChassisPowerSupplyStatus
+		# Get Count of Processors
+		[int]$CpuCount = (Get-SnmpV2 $connection $sysMultiHostCpuNumber).Data.ToInt32()
+		# Get Processor Usage (SNMPv2 1 Based Array)
+		$CpuUsage = Walk-SnmpV2 $connection $sysMultiHostCpuUsageRatio5m
+		For ($i=1; $i -le $CpuCount;$i++){
+			$message = "Created Processor Info Property Bag for CPU-"+ $i + "`r`n"
+			$message = $message + "CPU Usage : " + $CpuUsage[$i].Data.ToUInt32()
+			Log-DebugEvent $SCRIPT_PROPERTYBAG_CREATED $message
+			$bag = $api.CreatePropertyBag()
+			$bag.AddValue("Index", [int]$i)
+			$bag.AddValue("UsedPercentage", $CpuUsage[$i].Data.ToUInt32())
+			$bag
+		}
 
 	} Catch {
 		# Log error Message
@@ -308,14 +329,6 @@ If ($SNMPVersion -eq "3") {
 	}
 }
 
-For ($i=1; $i -le $psuCount;$i++){
-	Log-DebugEvent $SCRIPT_EVENT "Power Supply Status : " 	$PsuStatus[$i].Data
-	Log-DebugEvent $SCRIPT_PROPERTYBAG_CREATED "Created Power Supply Info Property Bag"
-	$bag = $api.CreatePropertyBag()
-	$bag.AddValue("Index", [int]$i)
-	$bag.AddValue("Status", $PsuStatus[$i].Data.ToInt32())
-	$bag
-}
 
 # Get End Time For Script
 $EndTime = (GET-DATE)

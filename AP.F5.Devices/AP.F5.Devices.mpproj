@@ -142,6 +142,9 @@
     <Compile Include="DataSources\MonitorsAndRules\Device.Processor.mpx">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DataSources\MonitorsAndRules\Device.TemperatureSensor.mpx">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Discoveries\Device.DiskPartition.mpx">
       <SubType>Code</SubType>
     </Compile>

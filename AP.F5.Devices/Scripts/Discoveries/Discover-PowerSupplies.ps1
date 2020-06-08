@@ -196,8 +196,7 @@ Try {
 		# Create a New F5 Device Power Supply Instance
 		$instance = $DiscoveryData.CreateClassInstance("$MPElement[Name='AP.F5.Device.PowerSupply']$")
 		$instance.AddProperty("$MPElement[Name='AP.F5.Device']/SerialNumber$", $DeviceKey)
-		$index = $i - 1
-		$instance.AddProperty("$MPElement[Name='AP.F5.Device.PowerSupply']/Index$", $index)
+		$instance.AddProperty("$MPElement[Name='AP.F5.Device.PowerSupply']/Index$", $i)
 		$instance.AddProperty("$MPElement[Name='System!System.Entity']/DisplayName$", "PSU-" + $i)	
 	
 		# Add to Discovery Data

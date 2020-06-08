@@ -23,7 +23,7 @@
         <Configuration>
           <IntervalSeconds>300</IntervalSeconds>
           <SyncTime />
-          <Debug>false</Debug>
+          <Debug>true</Debug>
           <SNMPAddress>$Target/Host/Property[Type="AP.F5.Device"]/SNMPAddress$</SNMPAddress>
           <SNMPPort>$Target/Host/Property[Type="AP.F5.Device"]/SNMPPort$</SNMPPort>
           <SNMPVersion>$Target/Host/Property[Type="AP.F5.Device"]/SNMPVersion$</SNMPVersion>

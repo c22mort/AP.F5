@@ -286,9 +286,20 @@ $PsuCount = 0
 If ($SNMPVersion -eq "3") {
 	Try {
 
+		# Get Count of Power Supplies
 		[int]$PsuCount = (Get-SnmpV3 $connection $sysChassisPowerSupplyNumber).Data.ToInt32()
-		$PsuStatus = BulkGet-SnmpV3 $connection $CpuCount $sysChassisPowerSupplyStatus
-
+		# Get Status of Power Supplies (SNMP3 0 based array)
+		$PsuStatus = BulkGet-SnmpV3 $connection $PsuCount $sysChassisPowerSupplyStatus
+		For ($i=0; $i -lt $psuCount;$i++){
+			[int]$index = $i + 1
+			$message = "Created Power Supply Info Property Bag for PSU-"+ $index + "`r`n"
+			$message = $message + "Power Supply Status : " + $PsuStatus[$i].Data.ToInt32()
+			Log-DebugEvent $SCRIPT_PROPERTYBAG_CREATED $message
+			$bag = $api.CreatePropertyBag()
+			$bag.AddValue("Index", [int]$index)
+			$bag.AddValue("Status", $PsuStatus[$i].Data.ToInt32())
+			$bag
+		}
 	} Catch {
 		# Log Finished Message
 		$message = "SNMPv3 Error : " + $_
@@ -300,7 +311,15 @@ If ($SNMPVersion -eq "3") {
 
 		[int]$PsuCount = (Get-SnmpV2 $connection $sysChassisPowerSupplyNumber).Data.ToInt32()
 		$PsuStatus = Walk-SnmpV2 $connection $sysChassisPowerSupplyStatus
-
+		For ($i=1; $i -le $psuCount;$i++){
+			$message = "Created Power Supply Info Property Bag for PSU-"+ $i + "`r`n"
+			$message = $message + "Power Supply Status : " + $PsuStatus[$i].Data.ToInt32()
+			Log-DebugEvent $SCRIPT_PROPERTYBAG_CREATED $message
+			$bag = $api.CreatePropertyBag()
+			$bag.AddValue("Index", [int]$i)
+			$bag.AddValue("Status", $PsuStatus[$i].Data.ToInt32())
+			$bag
+		}
 	} Catch {
 		# Log error Message
 		$message = "SNMPv2 Error : " + $Error + " : " + $_
@@ -308,14 +327,7 @@ If ($SNMPVersion -eq "3") {
 	}
 }
 
-For ($i=1; $i -le $psuCount;$i++){
-	Log-DebugEvent $SCRIPT_EVENT "Power Supply Status : " 	$PsuStatus[$i].Data
-	Log-DebugEvent $SCRIPT_PROPERTYBAG_CREATED "Created Power Supply Info Property Bag"
-	$bag = $api.CreatePropertyBag()
-	$bag.AddValue("Index", [int]$i)
-	$bag.AddValue("Status", $PsuStatus[$i].Data.ToInt32())
-	$bag
-}
+
 
 # Get End Time For Script
 $EndTime = (GET-DATE)

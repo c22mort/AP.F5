@@ -196,8 +196,7 @@ Try {
 		# Create a New F5 Device Fan Instance
 		$instance = $DiscoveryData.CreateClassInstance("$MPElement[Name='AP.F5.Device.Fan']$")
 		$instance.AddProperty("$MPElement[Name='AP.F5.Device']/SerialNumber$", $DeviceKey)
-		$index = $i - 1
-		$instance.AddProperty("$MPElement[Name='AP.F5.Device.Fan']/Index$", $index)
+		$instance.AddProperty("$MPElement[Name='AP.F5.Device.Fan']/Index$", $i)
 		$instance.AddProperty("$MPElement[Name='System!System.Entity']/DisplayName$", "Fan-" + $i)	
 
 		# Add to Discovery Data

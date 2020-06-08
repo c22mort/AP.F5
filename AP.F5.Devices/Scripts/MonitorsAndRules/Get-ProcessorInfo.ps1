@@ -286,9 +286,20 @@ $CpuCount = 0
 If ($SNMPVersion -eq "3") {
 	Try {
 
+		# Get Count of Processors
 		[int]$CpuCount = (Get-SnmpV3 $connection $sysMultiHostCpuNumber).Data.ToInt32()
+		# Get Processor Usage (SNMPv3 0 Based Array)
 		$CpuUsage = BulkGet-SnmpV3 $connection $CpuCount $sysMultiHostCpuUsageRatio5m
-
+		For ($i=0; $i -lt $CpuCount;$i++){
+			[int]$index = $i + 1
+			$message = "Created Processor Info Property Bag for CPU-"+ $index + "`r`n"
+			$message = $message + "CPU Usage : " + $CpuUsage[$i].Data.ToUInt32()
+			Log-DebugEvent $SCRIPT_PROPERTYBAG_CREATED $message
+			$bag = $api.CreatePropertyBag()
+			$bag.AddValue("Index", [int]$index)
+			$bag.AddValue("UsedPercentage", $CpuUsage[$i].Data.ToUInt32())
+			$bag
+		}
 	} Catch {
 		# Log Finished Message
 		$message = "SNMPv3 Error : " + $_
@@ -297,9 +308,19 @@ If ($SNMPVersion -eq "3") {
 } else {
 	Try {
 
-
+		# Get Count of Processors
 		[int]$CpuCount = (Get-SnmpV2 $connection $sysMultiHostCpuNumber).Data.ToInt32()
+		# Get Processor Usage (SNMPv2 1 Based Array)
 		$CpuUsage = Walk-SnmpV2 $connection $sysMultiHostCpuUsageRatio5m
+		For ($i=1; $i -le $CpuCount;$i++){
+			$message = "Created Processor Info Property Bag for CPU-"+ $i + "`r`n"
+			$message = $message + "CPU Usage : " + $CpuUsage[$i].Data.ToUInt32()
+			Log-DebugEvent $SCRIPT_PROPERTYBAG_CREATED $message
+			$bag = $api.CreatePropertyBag()
+			$bag.AddValue("Index", [int]$i)
+			$bag.AddValue("UsedPercentage", $CpuUsage[$i].Data.ToUInt32())
+			$bag
+		}
 
 	} Catch {
 		# Log error Message
@@ -308,14 +329,6 @@ If ($SNMPVersion -eq "3") {
 	}
 }
 
-For ($i=1; $i -le $CpuCount;$i++){
-	Log-DebugEvent $SCRIPT_EVENT "CPU Usage Percentage : " 	$CpuUsage[$i].Data.ToUInt32()
-	Log-DebugEvent $SCRIPT_PROPERTYBAG_CREATED "Created Processor Info Property Bag"
-	$bag = $api.CreatePropertyBag()
-	$bag.AddValue("Index", [int]$i)
-	$bag.AddValue("UsedPercentage", $CpuUsage[$i].Data.ToUInt32())
-	$bag
-}
 
 # Get End Time For Script
 $EndTime = (GET-DATE)

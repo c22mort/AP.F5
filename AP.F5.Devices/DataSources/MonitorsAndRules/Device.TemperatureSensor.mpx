@@ -4,9 +4,9 @@
 
 
       <!-- FILTERED MONITOR DATASOURCES -->
-      <!-- AP.F5.DataSource.Monitor.Device.FanInfo.Filtered -->
-      <!-- AP.F5.DataSource.Monitor.Device.FanInfo, Filters results by Fan Index -->
-      <DataSourceModuleType ID="AP.F5.DataSource.Monitor.Device.FanInfo.Filtered" Accessibility="Public" Batching="false">
+      <!-- AP.F5.DataSource.Monitor.Device.TempSensorInfo.Filtered -->
+      <!-- AP.F5.DataSource.Monitor.Device.TempSensorInfo, Filters results by TempSensor Index -->
+      <DataSourceModuleType ID="AP.F5.DataSource.Monitor.Device.TempSensorInfo.Filtered" Accessibility="Public" Batching="false">
         <Configuration>
           <IncludeSchemaTypes>
             <SchemaType>Windows!Microsoft.Windows.PowerShellSchema</SchemaType>
@@ -25,7 +25,7 @@
           <xsd:element minOccurs="1" name="SNMPv3PrivPassword" type="xsd:string"/>
           <xsd:element minOccurs="1" name="SNMPv3ContextName" type="xsd:string"/>
           <xsd:element minOccurs="1" name="TimeoutSeconds" type="xsd:integer"/>
-          <xsd:element minOccurs="1" name="FanIndex" type="xsd:integer"/>
+          <xsd:element minOccurs="1" name="TempSensorIndex" type="xsd:integer"/>
         </Configuration>
         <OverrideableParameters>
           <OverrideableParameter ID="IntervalSeconds" Selector="$Config/IntervalSeconds$" ParameterType="int"/>
@@ -35,7 +35,7 @@
         <ModuleImplementation>
           <Composite>
             <MemberModules>
-              <DataSource ID="Script" TypeID="AP.F5.DataSource.Monitor.Device.FanInfo">
+              <DataSource ID="Script" TypeID="AP.F5.DataSource.Monitor.Device.TempSensorInfo">
                 <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
                 <SyncTime>$Config/SyncTime$</SyncTime>
                 <Debug>$Config/Debug$</Debug>
@@ -51,7 +51,7 @@
                 <SNMPv3ContextName>$Config/SNMPv3ContextName$</SNMPv3ContextName>
                 <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
               </DataSource>
-              <ConditionDetection ID="FilterFanIndex" TypeID="System!System.ExpressionFilter">
+              <ConditionDetection ID="FilterTempSensorIndex" TypeID="System!System.ExpressionFilter">
                 <Expression>
                   <SimpleExpression>
                     <ValueExpression>
@@ -59,14 +59,14 @@
                     </ValueExpression>
                     <Operator>Equal</Operator>
                     <ValueExpression>
-                      <Value Type="Integer">$Config/FanIndex$</Value>
+                      <Value Type="Integer">$Config/TempSensorIndex$</Value>
                     </ValueExpression>
                   </SimpleExpression>
                 </Expression>
               </ConditionDetection>
             </MemberModules>
             <Composition>
-              <Node ID="FilterFanIndex">
+              <Node ID="FilterTempSensorIndex">
                 <Node ID="Script" />
               </Node>
             </Composition>
@@ -76,9 +76,9 @@
       </DataSourceModuleType>
 
       <!-- MONITOR DATA SOURCES -->
-      <!-- AP.F5.DataSource.Monitor.Device.FanInfo -->
-      <!-- Calls AP.F5.Probe.Device.FanInfo wraps it with a scheduler -->
-      <DataSourceModuleType ID="AP.F5.DataSource.Monitor.Device.FanInfo" Accessibility="Public" Batching="false">
+      <!-- AP.F5.DataSource.Monitor.Device.TempSensorInfo -->
+      <!-- Calls AP.F5.Probe.Device.TempSensorInfo wraps it with a scheduler -->
+      <DataSourceModuleType ID="AP.F5.DataSource.Monitor.Device.TempSensorInfo" Accessibility="Public" Batching="false">
         <Configuration>
           <IncludeSchemaTypes>
             <SchemaType>Windows!Microsoft.Windows.PowerShellSchema</SchemaType>
@@ -110,7 +110,7 @@
                 <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
                 <SyncTime>$Config/SyncTime$</SyncTime>
               </DataSource>
-              <ProbeAction ID="PSScript" TypeID="AP.F5.Probe.Device.FanInfo">
+              <ProbeAction ID="PSScript" TypeID="AP.F5.Probe.Device.TempSensorInfo">
                 <Debug>$Config/Debug$</Debug>
                 <SNMPAddress>$Config/SNMPAddress$</SNMPAddress>
                 <SNMPPort>$Config/SNMPPort$</SNMPPort>
@@ -136,9 +136,9 @@
       </DataSourceModuleType>
 
       <!-- PROBES -->
-      <!-- AP.F5.Probe.Device.FanInfo -->
-      <!-- Runs script to Return Device Fan Info in a property bag-->
-      <ProbeActionModuleType ID="AP.F5.Probe.Device.FanInfo" Accessibility="Public" Batching="false">
+      <!-- AP.F5.Probe.Device.TempSensorInfo -->
+      <!-- Runs script to Return Device TempSensor Info in a property bag-->
+      <ProbeActionModuleType ID="AP.F5.Probe.Device.TempSensorInfo" Accessibility="Public" Batching="false">
         <Configuration>
           <IncludeSchemaTypes>
             <SchemaType>Windows!Microsoft.Windows.PowerShellSchema</SchemaType>
@@ -233,13 +233,13 @@
 
     <MonitorTypes>
 
-      <!-- AP.F5.UnitMonitor.Device.FanHealth -->
-      <!-- Uses SNMP via Powershell to Get Health of Device Fan -->
-      <UnitMonitorType ID="AP.F5.UnitMonitor.Device.FanHealth" Accessibility="Public">
+      <!-- AP.F5.UnitMonitor.Device.TempSensorHealth -->
+      <!-- Uses SNMP via Powershell to Get Health of Device TempSensor -->
+      <UnitMonitorType ID="AP.F5.UnitMonitor.Device.TempSensorHealth" Accessibility="Public">
         <MonitorTypeStates>
-          <MonitorTypeState ID="FanGood" NoDetection="false"/>
-          <MonitorTypeState ID="FanBad" NoDetection="false"/>
-          <MonitorTypeState ID="FanNotPresent" NoDetection="false"/>
+          <MonitorTypeState ID="TempGood" NoDetection="false"/>
+          <MonitorTypeState ID="TempWarning" NoDetection="false"/>
+          <MonitorTypeState ID="TempCritical" NoDetection="false"/>
         </MonitorTypeStates>
         <Configuration>
           <xsd:element minOccurs="1" name="IntervalSeconds" type="xsd:integer"/>
@@ -256,16 +256,20 @@
           <xsd:element minOccurs="1" name="SNMPv3PrivPassword" type="xsd:string"/>
           <xsd:element minOccurs="1" name="SNMPv3ContextName" type="xsd:string"/>
           <xsd:element minOccurs="1" name="TimeoutSeconds" type="xsd:integer"/>
-          <xsd:element minOccurs="1" name="FanIndex" type="xsd:integer"/>
+          <xsd:element minOccurs="1" name="TempSensorIndex" type="xsd:integer"/>
+          <xsd:element minOccurs="1" name="WarningTemp" type="xsd:unsignedInt"/>
+          <xsd:element minOccurs="1" name="CriticalTemp" type="xsd:unsignedInt"/>
         </Configuration>
         <OverrideableParameters>
           <OverrideableParameter ID="IntervalSeconds" Selector="$Config/IntervalSeconds$" ParameterType="int"/>
           <OverrideableParameter ID="SyncTime" Selector="$Config/SyncTime$" ParameterType="string"/>
           <OverrideableParameter ID="Debug" Selector="$Config/Debug$" ParameterType="bool"/>
+          <OverrideableParameter ID="WarningTemp" Selector="$Config/WarningTemp$" ParameterType="int"/>
+          <OverrideableParameter ID="CriticalTemp" Selector="$Config/CriticalTemp$" ParameterType="int"/>
         </OverrideableParameters>
         <MonitorImplementation>
           <MemberModules>
-            <DataSource ID="DS" TypeID="AP.F5.DataSource.Monitor.Device.FanInfo.Filtered">
+            <DataSource ID="DS" TypeID="AP.F5.DataSource.Monitor.Device.TempSensorInfo.Filtered">
               <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
               <SyncTime>$Config/SyncTime$</SyncTime>
               <Debug>$Config/Debug$</Debug>
@@ -280,9 +284,9 @@
               <SNMPv3PrivPassword>$Config/SNMPv3PrivPassword$</SNMPv3PrivPassword>
               <SNMPv3ContextName>$Config/SNMPv3ContextName$</SNMPv3ContextName>
               <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
-              <FanIndex>$Config/FanIndex$</FanIndex>
+              <TempSensorIndex>$Config/TempSensorIndex$</TempSensorIndex>
             </DataSource>
-            <ProbeAction ID="Probe" TypeID="AP.F5.Probe.Device.FanInfo">
+            <ProbeAction ID="Probe" TypeID="AP.F5.Probe.Device.TempSensorInfo">
               <Debug>$Config/Debug$</Debug>
               <SNMPAddress>$Config/SNMPAddress$</SNMPAddress>
               <SNMPPort>$Config/SNMPPort$</SNMPPort>
@@ -296,63 +300,79 @@
               <SNMPv3ContextName>$Config/SNMPv3ContextName$</SNMPv3ContextName>
               <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
             </ProbeAction>
-            <ConditionDetection ID="FanGoodFilter" TypeID="System!System.ExpressionFilter">
+            <ConditionDetection ID="TempHealthyFilter" TypeID="System!System.ExpressionFilter">
               <Expression>
                 <SimpleExpression>
                   <ValueExpression>
-                    <XPathQuery Type="Integer">Property[@Name='Status']</XPathQuery>
+                    <XPathQuery Type="Integer">Property[@Name='Temperature']</XPathQuery>
                   </ValueExpression>
-                  <Operator>Equal</Operator>
+                  <Operator>Less</Operator>
                   <ValueExpression>
-                    <Value Type="Integer">1</Value>
+                    <Value Type="Integer">$Config/WarningTemp$</Value>
                   </ValueExpression>
                 </SimpleExpression>
               </Expression>
             </ConditionDetection>
-            <ConditionDetection ID="FanBadFilter" TypeID="System!System.ExpressionFilter">
+            <ConditionDetection ID="TempWarningFilter" TypeID="System!System.ExpressionFilter">
               <Expression>
-                <SimpleExpression>
-                  <ValueExpression>
-                    <XPathQuery Type="Integer">Property[@Name='Status']</XPathQuery>
-                  </ValueExpression>
-                  <Operator>Equal</Operator>
-                  <ValueExpression>
-                    <Value Type="Integer">0</Value>
-                  </ValueExpression>
-                </SimpleExpression>
+                <And>
+                  <Expression>
+                    <SimpleExpression>
+                      <ValueExpression>
+                        <XPathQuery Type="Integer">Property[@Name='Temperature']</XPathQuery>
+                      </ValueExpression>
+                      <Operator>Greater</Operator>
+                      <ValueExpression>
+                        <Value Type="Integer">$Config/WarningTemp$</Value>
+                      </ValueExpression>
+                    </SimpleExpression>
+                  </Expression>
+                  <Expression>
+                    <SimpleExpression>
+                      <ValueExpression>
+                        <XPathQuery Type="Integer">Property[@Name='Temperature']</XPathQuery>
+                      </ValueExpression>
+                      <Operator>LessEqual</Operator>
+                      <ValueExpression>
+                        <Value Type="Integer">$Config/CriticalTemp$</Value>
+                      </ValueExpression>
+                    </SimpleExpression>
+                  </Expression>
+                </And>
               </Expression>
             </ConditionDetection>
-            <ConditionDetection ID="FanNotPresentFilter" TypeID="System!System.ExpressionFilter">
+            <ConditionDetection ID="TempCriticalFilter" TypeID="System!System.ExpressionFilter">
               <Expression>
                 <SimpleExpression>
                   <ValueExpression>
-                    <XPathQuery Type="Integer">Property[@Name='Status']</XPathQuery>
+                    <XPathQuery Type="Integer">Property[@Name='Temperature']</XPathQuery>
                   </ValueExpression>
-                  <Operator>Equal</Operator>
+                  <Operator>Greater</Operator>
                   <ValueExpression>
-                    <Value Type="Integer">2</Value>
+                    <Value Type="Integer">$Config/CriticalTemp$</Value>
                   </ValueExpression>
                 </SimpleExpression>
               </Expression>
             </ConditionDetection>
           </MemberModules>
           <RegularDetections>
-            <RegularDetection MonitorTypeStateID="FanGood">
-              <Node ID="FanGoodFilter">
+            <RegularDetection MonitorTypeStateID="TempGood">
+              <Node ID="TempHealthyFilter">
                 <Node ID="DS" />
               </Node>
             </RegularDetection>
-            <RegularDetection MonitorTypeStateID="FanNotPresent">
-              <Node ID="FanNotPresentFilter">
+            <RegularDetection MonitorTypeStateID="TempWarning">
+              <Node ID="TempWarningFilter">
                 <Node ID="DS" />
               </Node>
             </RegularDetection>
-            <RegularDetection MonitorTypeStateID="FanBad">
-              <Node ID="FanBadFilter">
+            <RegularDetection MonitorTypeStateID="TempCritical">
+              <Node ID="TempCriticalFilter">
                 <Node ID="DS" />
               </Node>
             </RegularDetection>
           </RegularDetections>
+
         </MonitorImplementation>
       </UnitMonitorType>
 
@@ -364,70 +384,77 @@
 
       <DisplayStrings>
 
-        <!-- AP.F5.DataSource.Monitor.Device.FanInfo.Filtered -->
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.FanInfo.Filtered">
-          <Name>Filtered Fan Info Monitor DataSource</Name>
-          <Description>Runs AP.F5.DataSource.Monitor.Device.FanInfo, filters out the Fan needed</Description>
+        <!-- AP.F5.DataSource.Monitor.Device.TempSensorInfo.Filtered -->
+        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.TempSensorInfo.Filtered">
+          <Name>Filtered Temperature Sensor Info Monitor DataSource</Name>
+          <Description>Runs AP.F5.DataSource.Monitor.Device.TempSensorInfo, filters out the Power Supply needed</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.FanInfo.Filtered" SubElementID="IntervalSeconds">
+        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.TempSensorInfo.Filtered" SubElementID="IntervalSeconds">
           <Name>Interval Seconds</Name>
           <Description>Frequency in seconds that module is run.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.FanInfo.Filtered" SubElementID="SyncTime">
+        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.TempSensorInfo.Filtered" SubElementID="SyncTime">
           <Name>Synchronisation Time</Name>
           <Description>Offset that this module is started from.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.FanInfo.Filtered" SubElementID="Debug">
+        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.TempSensorInfo.Filtered" SubElementID="Debug">
           <Name>Debug</Name>
           <Description>Debug Flag, if true then additional info is posted to event log.</Description>
         </DisplayString>
 
-        <!-- AP.F5.DataSource.Monitor.Device.FanInfo -->
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.FanInfo">
-          <Name>Fan Info Monitor DataSource</Name>
-          <Description>Wraps Fan Info Probe in scheduler and returns as PropertyBag for Monitors</Description>
+        <!-- AP.F5.DataSource.Monitor.Device.TempSensorInfo -->
+        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.TempSensorInfo">
+          <Name>Temperature Sensor Info Monitor DataSource</Name>
+          <Description>Wraps Power Supply Info Probe in scheduler and returns as PropertyBag for Monitors</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.FanInfo" SubElementID="IntervalSeconds">
+        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.TempSensorInfo" SubElementID="IntervalSeconds">
           <Name>Interval Seconds</Name>
           <Description>Frequency in seconds that module is run.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.FanInfo" SubElementID="SyncTime">
+        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.TempSensorInfo" SubElementID="SyncTime">
           <Name>Synchronisation Time</Name>
           <Description>Offset that this module is started from.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.FanInfo" SubElementID="Debug">
+        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.TempSensorInfo" SubElementID="Debug">
           <Name>Debug</Name>
           <Description>Debug Flag, if true then additional info is posted to event log.</Description>
         </DisplayString>
 
-        <!-- AP.F5.Probe.Device.FanInfo -->
-        <DisplayString ElementID="AP.F5.Probe.Device.FanInfo">
-          <Name>Powershell Fan Probe</Name>
-          <Description>Runs Powershell SNMP Script to collect Fan Info</Description>
+        <!-- AP.F5.Probe.Device.TempSensorInfo -->
+        <DisplayString ElementID="AP.F5.Probe.Device.TempSensorInfo">
+          <Name>Powershell Temperature Sensor Probe</Name>
+          <Description>Runs Powershell SNMP Script to collect Power Supply Info</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.Probe.Device.FanInfo" SubElementID="Debug">
+        <DisplayString ElementID="AP.F5.Probe.Device.TempSensorInfo" SubElementID="Debug">
           <Name>Debug</Name>
           <Description>Debug Flag, if true then additional info is posted to event log.</Description>
         </DisplayString>
 
-        <!-- AP.F5.UnitMonitor.Device.FanHealth -->
-        <DisplayString ElementID="AP.F5.UnitMonitor.Device.FanHealth">
-          <Name>Device Fan Health Monitor</Name>
-          <Description>Compares used Fan Percentage against given thresholds</Description>
+        <!-- AP.F5.UnitMonitor.Device.TempSensorHealth -->
+        <DisplayString ElementID="AP.F5.UnitMonitor.Device.TempSensorHealth">
+          <Name>Device Temperature Sensor Health Monitor</Name>
+          <Description>Compares used Power Supply Percentage against given thresholds</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.UnitMonitor.Device.FanHealth" SubElementID="IntervalSeconds">
+        <DisplayString ElementID="AP.F5.UnitMonitor.Device.TempSensorHealth" SubElementID="IntervalSeconds">
           <Name>Interval Seconds</Name>
           <Description>Frequency in seconds that module is run.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.UnitMonitor.Device.FanHealth" SubElementID="SyncTime">
+        <DisplayString ElementID="AP.F5.UnitMonitor.Device.TempSensorHealth" SubElementID="SyncTime">
           <Name>Synchronisation Time</Name>
           <Description>Offset that this module is started from.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.UnitMonitor.Device.FanHealth" SubElementID="Debug">
+        <DisplayString ElementID="AP.F5.UnitMonitor.Device.TempSensorHealth" SubElementID="Debug">
           <Name>Debug</Name>
           <Description>Debug Flag, if true then additional info is posted to event log.</Description>
         </DisplayString>
-
+        <DisplayString ElementID="AP.F5.UnitMonitor.Device.TempSensorHealth" SubElementID="WarningTemp">
+          <Name>Warning Temperature</Name>
+          <Description>Warning temperature threshold in Degrees Centigrade.</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.UnitMonitor.Device.TempSensorHealth" SubElementID="CriticalTemp">
+          <Name>Critical Temperature</Name>
+          <Description>Critical temperature threshold in Degrees Centigrade.</Description>
+        </DisplayString>
       </DisplayStrings>
 
     </LanguagePack>
