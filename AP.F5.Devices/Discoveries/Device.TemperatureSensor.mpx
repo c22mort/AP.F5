@@ -1,0 +1,49 @@
+﻿<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Monitoring>
+    <Discoveries>
+
+      <!-- AP.F5.Discovery.Device.TempSensor -->
+      <Discovery ID="AP.F5.Discovery.Device.TempSensor" Target="AP.F5.Device" Enabled="true" ConfirmDelivery="false" Remotable="true" Priority="Normal">
+        <Category>Discovery</Category>
+        <DiscoveryTypes>
+          <DiscoveryClass TypeID="AP.F5.Device.TempSensor" />
+          <DiscoveryRelationship TypeID="AP.F5.Device.Hosts.TempSensors" />
+        </DiscoveryTypes>
+        <DataSource ID="DS" TypeID="AP.F5.DataSource.Discovery.Device.TempSensor">
+          <IntervalSeconds>300</IntervalSeconds>
+          <SyncTime>00:01</SyncTime>
+          <Debug>false</Debug>
+          <TimeoutSeconds>60</TimeoutSeconds>
+          <IPAddress>$Target/Property[Type="AP.F5.Device"]/SNMPAddress$</IPAddress>
+        </DataSource>
+      </Discovery>
+
+    </Discoveries>
+  </Monitoring>
+  <LanguagePacks>
+    <LanguagePack ID="ENU" IsDefault="true">
+      <DisplayStrings>
+
+        <!-- AP.F5.Discovery.Device.TempSensor -->
+        <DisplayString ElementID="AP.F5.Discovery.Device.TempSensor">
+          <Name>F5 Device Temperature Sensor Discovery</Name>
+          <Description>Discovers F5 Device Temperature Sensors</Description>
+        </DisplayString>
+
+      </DisplayStrings>
+      <KnowledgeArticles>
+
+        <!-- AP.F5.Discovery.Device.TempSensor -->
+        <KnowledgeArticle ElementID="AP.F5.Discovery.Device.TempSensor">
+          <MamlContent>
+            <section xmlns="http://schemas.microsoft.com/maml/2004/10">
+              <title>F5 Temperature Sensor Discovery</title>
+              <para>Uses SNMP via a Powershell script to discover all Temperature Sensors on a given F5 Device!</para>
+            </section>
+          </MamlContent>
+        </KnowledgeArticle>
+
+      </KnowledgeArticles>
+    </LanguagePack>
+  </LanguagePacks>
+</ManagementPackFragment>

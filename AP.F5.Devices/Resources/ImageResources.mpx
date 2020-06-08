@@ -1,0 +1,26 @@
+﻿<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Categories>
+    <Category ID="AP.F5.Device.Category.Diagram.Icon" Target="SNL!System.NetworkManagement.LoadBalancer.DiagramIcon" Value="System!System.Internal.ManagementPack.Images.DiagramIcon" />
+		<Category ID="AP.F5.Device.PowerSupply.Category.Diagram.Icon" Target="SNL!System.NetworkManagement.PowerSupply.DiagramIcon" Value="System!System.Internal.ManagementPack.Images.DiagramIcon" />
+    <Category ID="AP.F5.Device.Processor.Category.Diagram.Icon" Target="SNL!System.NetworkManagement.Processor.DiagramIcon" Value="System!System.Internal.ManagementPack.Images.DiagramIcon" />
+    <Category ID="AP.F5.Device.Memory.Category.Diagram.Icon" Target="SNL!System.NetworkManagement.Memory.DiagramIcon" Value="System!System.Internal.ManagementPack.Images.DiagramIcon" />
+    <Category ID="AP.F5.Device.Fan.Category.Diagram.Icon" Target="SNL!System.NetworkManagement.Fan.DiagramIcon" Value="System!System.Internal.ManagementPack.Images.DiagramIcon" />
+    <Category ID="AP.F5.Device.DiskPartition.Category.Diagram.Icon" Target="SNL!System.NetworkManagement.Disk.DiagramIcon" Value="System!System.Internal.ManagementPack.Images.DiagramIcon" />
+    <Category ID="AP.F5.Device.TempSensor.Category.Diagram.Icon" Target="AP.F5.Device.TempSensor.Diagram.Icon" Value="System!System.Internal.ManagementPack.Images.DiagramIcon" />
+    <Category ID="AP.F5.ResourcePool.Category.Diagram.Icon" Target="SC!Microsoft.SystemCenter.ManagementServiceRuntimePool" Value="System!System.Internal.ManagementPack.Images.DiagramIcon" />
+  </Categories>
+  <Presentation>
+    <ImageReferences>
+      <ImageReference ElementID="AP.F5.Device" ImageID="SNL!System.NetworkManagement.LoadBalancer.DiagramIcon"/>
+			<ImageReference ElementID="AP.F5.Device.PowerSupply" ImageID="SNL!System.NetworkManagement.PowerSupply.DiagramIcon"/>
+      <ImageReference ElementID="AP.F5.Device.Processor" ImageID="SNL!System.NetworkManagement.Processor.DiagramIcon"/>
+      <ImageReference ElementID="AP.F5.Device.Memory" ImageID="SNL!System.NetworkManagement.Memory.DiagramIcon"/>
+      <ImageReference ElementID="AP.F5.Device.Fan" ImageID="SNL!System.NetworkManagement.Fan.DiagramIcon"/>
+      <ImageReference ElementID="AP.F5.Device.DiskPartition" ImageID="SNL!System.NetworkManagement.Disk.DiagramIcon"/>
+      <ImageReference ElementID="AP.F5.Device.TempSensor" ImageID="AP.F5.Device.TempSensor.Diagram.Icon"/>
+    </ImageReferences>
+  </Presentation>
+  <Resources>
+    <Image ID="AP.F5.Device.TempSensor.Diagram.Icon" FileName="TemperatureSensor-80.png" Accessibility="Public" HasNullStream="false" />
+  </Resources>
+</ManagementPackFragment>

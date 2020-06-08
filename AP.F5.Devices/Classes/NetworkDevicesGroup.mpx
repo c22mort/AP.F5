@@ -1,0 +1,52 @@
+﻿<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <TypeDefinitions>
+    <EntityTypes>
+      <ClassTypes>
+
+				<!-- AP.F5.NetworkDevicesGroup -->
+        <ClassType ID="AP.F5.NetworkDevicesGroup" Base="System!System.Group" Accessibility="Public" Abstract="false" Hosted="false" Singleton="true" />         
+      
+      </ClassTypes>
+
+			<RelationshipTypes>
+
+				<!-- AP.F5.Root.Contains.NetworkDevicesGroup -->
+				<RelationshipType ID="AP.F5.Root.Contains.NetworkDevicesGroup" Base="System!System.Containment" Abstract="false" Accessibility="Public">
+					<Source ID="Source" Type="AP.F5.Root"/>
+					<Target ID="Target" Type="AP.F5.NetworkDevicesGroup"/>
+				</RelationshipType>
+
+				<!-- AP.F5.NetworkDevicesGroup.Contains.Nodes -->
+				<RelationshipType ID="AP.F5.NetworkDevicesGroup.Contains.Nodes" Base="System!System.Containment" Abstract="false" Accessibility="Public">
+					<Source ID="Source" Type="AP.F5.NetworkDevicesGroup"/>
+					<Target ID="Target" Type="SNL!System.NetworkManagement.Node"/>
+				</RelationshipType>
+
+			</RelationshipTypes>
+    </EntityTypes>
+  </TypeDefinitions>
+  <LanguagePacks>
+    <LanguagePack ID="ENU" IsDefault="true">
+      <DisplayStrings>
+
+				<!-- AP.F5.NetworkDevicesGroup -->
+				<DisplayString ElementID="AP.F5.NetworkDevicesGroup">
+          <Name>F5 Network Devices Group</Name>
+          <Description>All Network Management Nodes</Description>
+        </DisplayString>
+
+				<!-- AP.F5.Root.Contains.NetworkDevicesGroup -->
+				<DisplayString ElementID="AP.F5.Root.Contains.NetworkDevicesGroup">
+					<Name>F5 Network Devices Group Hosting</Name>
+					<Description>Describes The Hosting Relationship Between Root and Network Device Group</Description>
+				</DisplayString>
+
+				<!-- AP.F5.NetworkDevicesGroup.Contains.Nodes -->
+				<DisplayString ElementID="AP.F5.NetworkDevicesGroup.Contains.Nodes">
+					<Name>F5 Network Devices Node Containment</Name>
+					<Description>Describes The Containment Relationship Between Network Device Group and Nodes</Description>
+				</DisplayString>
+			</DisplayStrings>
+    </LanguagePack>
+  </LanguagePacks>
+</ManagementPackFragment>

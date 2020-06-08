@@ -1,0 +1,47 @@
+﻿<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <TypeDefinitions>
+    <EntityTypes>
+      <ClassTypes>
+
+				<!-- AP.F5.Device.PowerSupply -->
+				<ClassType ID="AP.F5.Device.PowerSupply" Base="System!System.LogicalEntity" Accessibility="Public" Abstract="false" Hosted="true" Singleton="false">
+					<Property ID="Index" Key="true" Type="int" />
+				</ClassType>
+      				
+      </ClassTypes>
+
+			<!-- Relationships -->
+			<RelationshipTypes>
+				<!-- Power Supplies Group -> Power Supply Hosting Relationship-->
+				<RelationshipType ID="AP.F5.Device.Hosts.PowerSupplies" Accessibility="Public" Abstract="false" Base="System!System.Hosting">
+					<Source ID="Source" Type="AP.F5.Device" />
+					<Target ID="Target" Type="AP.F5.Device.PowerSupply" />
+				</RelationshipType>
+			</RelationshipTypes>
+			
+    </EntityTypes>
+  </TypeDefinitions>
+  <LanguagePacks>
+    <LanguagePack ID="ENU" IsDefault="true">
+      <DisplayStrings>
+
+				<!-- AP.F5.Device.PowerSupply -->
+				<DisplayString ElementID="AP.F5.Device.PowerSupply">
+					<Name>Power Supply</Name>
+					<Description>F5 Device Power Supply</Description>
+				</DisplayString>
+				<DisplayString ElementID="AP.F5.Device.PowerSupply" SubElementID="Index">
+					<Name>Index</Name>
+					<Description>Index of Power Supply</Description>
+				</DisplayString>
+
+				<!-- AP.F5.Device.Hosts.PowerSupplies -->
+				<DisplayString ElementID="AP.F5.Device.Hosts.PowerSupplies">
+					<Name>F5 Device Hosts Power Supplies</Name>
+					<Description>Defines Hosting Relationship Between F5 Device and Power Supplies</Description>
+				</DisplayString>
+				
+      </DisplayStrings>
+    </LanguagePack>
+  </LanguagePacks>
+</ManagementPackFragment>

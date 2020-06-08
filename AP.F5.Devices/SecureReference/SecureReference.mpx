@@ -1,0 +1,33 @@
+﻿<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<TypeDefinitions>
+		<SecureReferences>
+
+			<!-- AP.F5.Login.SNMPv3 -->
+			<SecureReference ID="AP.F5.Login.SNMPv3" Accessibility="Public" Context="System!System.Entity" Comment="Don't Forget To Assign Network Device Discovery Account" />
+
+      <!-- AP.F5.Login.SNMPv2 -->
+      <SecureReference ID="AP.F5.Login.SNMPv2" Accessibility="Public" Context="System!System.Entity" Comment="Don't Forget To Assign Network Device Discovery Account" />
+
+    </SecureReferences>
+	</TypeDefinitions>
+
+	<LanguagePacks>
+		<LanguagePack ID="ENU" IsDefault="true">
+			<DisplayStrings>
+
+				<!-- AP.F5.Login.SNMPv3 -->
+				<DisplayString ElementID="AP.F5.Login.SNMPv3">
+					<Name>AP.F5 Device Login (SNMPv3)</Name>
+					<Description>Holds SNMPv3 Logins for AP F5 Management Packs</Description>
+				</DisplayString>
+
+        <!-- AP.F5.Login.SNMPv2 -->
+        <DisplayString ElementID="AP.F5.Login.SNMPv2">
+          <Name>AP.F5 Device Login (SNMPv2)</Name>
+          <Description>Holds SNMPv2 Logins for AP F5 Management Packs</Description>
+        </DisplayString>
+
+      </DisplayStrings>
+		</LanguagePack>
+	</LanguagePacks>
+</ManagementPackFragment>
