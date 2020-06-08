@@ -190,13 +190,12 @@ Try {
 	# Create Discovery Data Object
 	$DiscoveryData = $api.CreateDiscoveryData(0, $sourceId,  $managedEntityId)
 	
-	For($i=0; $i -lt $CpuCount; $i++) {
+	For($i=1; $i -le $CpuCount; $i++) {
 
 		# Create a New F5 Device CPU Instance
 		$instance = $DiscoveryData.CreateClassInstance("$MPElement[Name='AP.F5.Device.Processor']$")
 		$instance.AddProperty("$MPElement[Name='AP.F5.Device']/SerialNumber$", $DeviceKey)
-		$index = $i+1
-		$instance.AddProperty("$MPElement[Name='AP.F5.Device.Processor']/Index$", $index)
+		$instance.AddProperty("$MPElement[Name='AP.F5.Device.Processor']/Index$", $i)
 		$instance.AddProperty("$MPElement[Name='System!System.Entity']/DisplayName$", "CPU-" + $i)	
 
 		# Add to Discovery Data
