@@ -163,8 +163,8 @@
           <Composite>
             <MemberModules>
               <ProbeAction ID="PSScript" TypeID="Windows!Microsoft.Windows.PowerShellPropertyBagTriggerOnlyProbe">
-                <ScriptName>Get-FanInfo.ps1</ScriptName>
-                <ScriptBody>$IncludeFileContent/Scripts/MonitorsAndRules/Get-FanInfo.ps1$</ScriptBody>
+                <ScriptName>Get-TempSensorInfo.ps1</ScriptName>
+                <ScriptBody>$IncludeFileContent/Scripts/MonitorsAndRules/Get-TempSensorInfo.ps1$</ScriptBody>
                 <SnapIns />
                 <Parameters>
                   <Parameter>

@@ -1,0 +1,101 @@
+﻿<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Monitoring>
+    <Monitors>
+
+      <!-- AP.F5.Monitor.Device.TempSensor.Health -->
+      <UnitMonitor ID="AP.F5.Monitor.Device.TempSensor.Health" Accessibility="Public" Enabled="true" Target="AP.F5.Device.TempSensor" ParentMonitorID="Health!System.Health.PerformanceState" Remotable="true" Priority="Normal" TypeID="AP.F5.UnitMonitor.Device.TempSensorHealth" ConfirmDelivery="false">
+        <Category>AvailabilityHealth</Category>
+        <AlertSettings AlertMessage="AP.F5.Monitor.Device.Fan.Health.AlertMessage">
+          <AlertOnState>Error</AlertOnState>
+          <AutoResolve>true</AutoResolve>
+          <AlertPriority>Normal</AlertPriority>
+          <AlertSeverity>MatchMonitorHealth</AlertSeverity>
+          <AlertParameters>
+            <AlertParameter1>$Target/Host/Property[Type="AP.F5.Device"]/DeviceName$</AlertParameter1>
+            <AlertParameter2>$Data/Context/Property[@Name='Index']$</AlertParameter2>
+            <AlertParameter3>$Data/Context/Property[@Name='Temperature']$</AlertParameter3>
+          </AlertParameters>
+        </AlertSettings>
+        <OperationalStates>
+          <OperationalState ID="TempGood" MonitorTypeStateID="TempGood" HealthState="Success" />
+          <OperationalState ID="TempWarning" MonitorTypeStateID="TempWarning" HealthState="Warning" />
+          <OperationalState ID="TempCritical" MonitorTypeStateID="TempCritical" HealthState="Error" />
+        </OperationalStates>
+        <Configuration>
+          <IntervalSeconds>300</IntervalSeconds>
+          <SyncTime />
+          <Debug>false</Debug>
+          <SNMPAddress>$Target/Host/Property[Type="AP.F5.Device"]/SNMPAddress$</SNMPAddress>
+          <SNMPPort>$Target/Host/Property[Type="AP.F5.Device"]/SNMPPort$</SNMPPort>
+          <SNMPVersion>$Target/Host/Property[Type="AP.F5.Device"]/SNMPVersion$</SNMPVersion>
+          <SNMPCommunity>$RunAs[Name="AP.F5.Login.SNMPv2"]/CommunityString$</SNMPCommunity>
+          <SNMPv3UserName>$RunAs[Name="AP.F5.Login.SNMPv3"]/UserName$</SNMPv3UserName>
+          <SNMPv3AuthProtocol>$RunAs[Name="AP.F5.Login.SNMPv3"]/AuthenticationProtocol$</SNMPv3AuthProtocol>
+          <SNMPv3AuthPassword>$RunAs[Name="AP.F5.Login.SNMPv3"]/AuthenticationKey$</SNMPv3AuthPassword>
+          <SNMPv3PrivProtocol>$RunAs[Name="AP.F5.Login.SNMPv3"]/PrivacyProtocol$</SNMPv3PrivProtocol>
+          <SNMPv3PrivPassword>$RunAs[Name="AP.F5.Login.SNMPv3"]/PrivacyKey$</SNMPv3PrivPassword>
+          <SNMPv3ContextName>$RunAs[Name="AP.F5.Login.SNMPv3"]/ContextName$</SNMPv3ContextName>
+          <TimeoutSeconds>60</TimeoutSeconds>
+          <TempSensorIndex>$Target/Property[Type="AP.F5.Device.TempSensor"]/Index$</TempSensorIndex>
+          <WarningTemp>27</WarningTemp>
+          <CriticalTemp>32</CriticalTemp>
+        </Configuration>
+      </UnitMonitor>
+
+      <!-- AP.F5.Monitor.Device.TempSensor.RollUp -->
+      <DependencyMonitor ID="AP.F5.Monitor.Device.TempSensor.RollUp" Accessibility="Public" Enabled="true" Target="AP.F5.Device" ParentMonitorID="Health!System.Health.PerformanceState" Remotable="true" Priority="Normal" RelationshipType="AP.F5.Device.Hosts.TempSensors" MemberMonitor="AP.F5.Monitor.Device.TempSensor.Health">
+        <Category>AvailabilityHealth</Category>
+        <Algorithm>WorstOf</Algorithm>
+      </DependencyMonitor>
+
+    </Monitors>
+
+  </Monitoring>
+
+  <Presentation>
+    <StringResources>
+      <StringResource ID="AP.F5.Monitor.Device.TempSensor.Health.AlertMessage" />
+    </StringResources>
+  </Presentation>
+
+  <LanguagePacks>
+    <LanguagePack ID="ENU" IsDefault="true">
+      <DisplayStrings>
+
+        <!-- AP.F5.Monitor.Device.TempSensor.Health -->
+        <DisplayString ElementID="AP.F5.Monitor.Device.TempSensor.Health">
+          <Name>Monitor TempSensor Health</Name>
+          <Description>Monitors TempSensor Health using SNMP</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.Monitor.Device.TempSensor.Health.AlertMessage">
+          <Name>F5 TempSensor has changed State</Name>
+          <Description>
+            F5 Device : {0}
+
+            TempSensor {1} has changed to {2}
+          </Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.Monitor.Device.TempSensor.Health" SubElementID="TempGood">
+          <Name>TempSensor is Good</Name>
+          <Description>Healthy TempSensor Condition</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.Monitor.Device.TempSensor.Health" SubElementID="TempWarning">
+          <Name>TempSensor is over warning temperature Threshold</Name>
+          <Description>TempSensor over warning threshold Condition</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.Monitor.Device.TempSensor.Health" SubElementID="TempCritical">
+          <Name>TempSensor is over critical temperature Threshold</Name>
+          <Description>TempSensor over critical threshold Condition</Description>
+        </DisplayString>
+
+        <!-- AP.F5.Monitor.Device.TempSensor.RollUp -->
+        <DisplayString ElementID="AP.F5.Monitor.Device.TempSensor.RollUp">
+          <Name>TempSensor RollUp</Name>
+          <Description>Rolls up TempSensor status to device</Description>
+        </DisplayString>
+
+      </DisplayStrings>
+
+    </LanguagePack>
+  </LanguagePacks>
+</ManagementPackFragment>

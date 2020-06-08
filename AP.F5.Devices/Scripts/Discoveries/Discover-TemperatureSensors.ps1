@@ -197,8 +197,7 @@ Try {
 		# Create a New F5 Device Temperature Sensor Instance
 		$instance = $DiscoveryData.CreateClassInstance("$MPElement[Name='AP.F5.Device.TempSensor']$")
 		$instance.AddProperty("$MPElement[Name='AP.F5.Device']/SerialNumber$", $DeviceKey)
-		$index = $i - 1
-		$instance.AddProperty("$MPElement[Name='AP.F5.Device.TempSensor']/Index$", $index)
+		$instance.AddProperty("$MPElement[Name='AP.F5.Device.TempSensor']/Index$", $i)
 		$instance.AddProperty("$MPElement[Name='System!System.Entity']/DisplayName$", "Temp-" + $i)	
 
 		# Add to Discovery Data
