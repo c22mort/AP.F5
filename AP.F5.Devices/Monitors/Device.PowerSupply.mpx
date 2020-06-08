@@ -1,0 +1,137 @@
+﻿<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Monitoring>
+    <Monitors>
+
+      <!-- AP.F5.Monitor.Device.PowerSupply.Health -->
+      <UnitMonitor ID="AP.F5.Monitor.Device.PowerSupply.Health" Accessibility="Public" Enabled="true" Target="AP.F5.Device.PowerSupply" ParentMonitorID="Health!System.Health.PerformanceState" Remotable="true" Priority="Normal" TypeID="AP.F5.UnitMonitor.Device.PowerSupplyHealth" ConfirmDelivery="false">
+        <Category>AvailabilityHealth</Category>
+        <AlertSettings AlertMessage="AP.F5.Monitor.Device.PowerSupply.Health.AlertMessage">
+          <AlertOnState>Error</AlertOnState>
+          <AutoResolve>true</AutoResolve>
+          <AlertPriority>Normal</AlertPriority>
+          <AlertSeverity>MatchMonitorHealth</AlertSeverity>
+          <AlertParameters>
+            <AlertParameter1>$Target/Host/Property[Type="AP.F5.Device"]/DeviceName$</AlertParameter1>
+            <AlertParameter2>$Data/Context/Property[@Name='Index']$</AlertParameter2>
+            <AlertParameter3>$Data/Context/Property[@Name='Status']$</AlertParameter3>
+          </AlertParameters>
+        </AlertSettings>
+        <OperationalStates>
+          <OperationalState ID="PowerSupplyGood" MonitorTypeStateID="PowerSupplyGood" HealthState="Success" />
+          <OperationalState ID="PowerSupplyNotPresent" MonitorTypeStateID="PowerSupplyNotPresent" HealthState="Warning" />
+          <OperationalState ID="PowerSupplyBad" MonitorTypeStateID="PowerSupplyBad" HealthState="Error" />
+        </OperationalStates>
+        <Configuration>
+          <IntervalSeconds>300</IntervalSeconds>
+          <SyncTime />
+          <Debug>false</Debug>
+          <SNMPAddress>$Target/Host/Property[Type="AP.F5.Device"]/SNMPAddress$</SNMPAddress>
+          <SNMPPort>$Target/Host/Property[Type="AP.F5.Device"]/SNMPPort$</SNMPPort>
+          <SNMPVersion>$Target/Host/Property[Type="AP.F5.Device"]/SNMPVersion$</SNMPVersion>
+          <SNMPCommunity>$RunAs[Name="AP.F5.Login.SNMPv2"]/CommunityString$</SNMPCommunity>
+          <SNMPv3UserName>$RunAs[Name="AP.F5.Login.SNMPv3"]/UserName$</SNMPv3UserName>
+          <SNMPv3AuthProtocol>$RunAs[Name="AP.F5.Login.SNMPv3"]/AuthenticationProtocol$</SNMPv3AuthProtocol>
+          <SNMPv3AuthPassword>$RunAs[Name="AP.F5.Login.SNMPv3"]/AuthenticationKey$</SNMPv3AuthPassword>
+          <SNMPv3PrivProtocol>$RunAs[Name="AP.F5.Login.SNMPv3"]/PrivacyProtocol$</SNMPv3PrivProtocol>
+          <SNMPv3PrivPassword>$RunAs[Name="AP.F5.Login.SNMPv3"]/PrivacyKey$</SNMPv3PrivPassword>
+          <SNMPv3ContextName>$RunAs[Name="AP.F5.Login.SNMPv3"]/ContextName$</SNMPv3ContextName>
+          <TimeoutSeconds>60</TimeoutSeconds>
+          <PowerSupplyIndex>$Target/Property[Type="AP.F5.Device.PowerSupply"]/Index$</PowerSupplyIndex>
+        </Configuration>
+      </UnitMonitor>
+
+      <!-- AP.F5.Monitor.Device.PowerSupply.RollUp -->
+      <DependencyMonitor ID="AP.F5.Monitor.Device.PowerSupply.RollUp" Accessibility="Public" Enabled="true" Target="AP.F5.Device" ParentMonitorID="Health!System.Health.PerformanceState" Remotable="true" Priority="Normal" RelationshipType="AP.F5.Device.Hosts.PowerSupplies" MemberMonitor="AP.F5.Monitor.Device.PowerSupply.Health">
+        <Category>AvailabilityHealth</Category>
+        <Algorithm>WorstOf</Algorithm>
+      </DependencyMonitor>
+
+    </Monitors>
+
+  </Monitoring>
+
+  <Presentation>
+    <StringResources>
+      <StringResource ID="AP.F5.Monitor.Device.PowerSupply.Health.AlertMessage" />
+    </StringResources>
+  </Presentation>
+
+  <LanguagePacks>
+    <LanguagePack ID="ENU" IsDefault="true">
+      <DisplayStrings>
+
+        <!-- AP.F5.Monitor.Device.PowerSupply.Health -->
+        <DisplayString ElementID="AP.F5.Monitor.Device.PowerSupply.Health">
+          <Name>Monitor PowerSupply Health</Name>
+          <Description>Monitors PowerSupply Health using SNMP</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.Monitor.Device.PowerSupply.Health.AlertMessage">
+          <Name>F5 Power Supply has changed State</Name>
+          <Description>
+            F5 Device : {0}
+
+            PowerSupply {1} has changed to {2}
+          </Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.Monitor.Device.PowerSupply.Health" SubElementID="PowerSupplyGood">
+          <Name>Power Supply is Good</Name>
+          <Description>Healthy Power Supply Condition</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.Monitor.Device.PowerSupply.Health" SubElementID="PowerSupplyNotPresent">
+          <Name>Power Supply is Not Present</Name>
+          <Description>Power Supply not Present Condition</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.Monitor.Device.PowerSupply.Health" SubElementID="PowerSupplyBad">
+          <Name>Power Supply is Bad</Name>
+          <Description>Bad Power Supply Condition</Description>
+        </DisplayString>
+
+        <!-- AP.F5.Monitor.Device.PowerSupply.RollUp -->
+        <DisplayString ElementID="AP.F5.Monitor.Device.PowerSupply.RollUp">
+          <Name>PowerSupply RollUp</Name>
+          <Description>Rolls up PowerSupply status to device</Description>
+        </DisplayString>
+
+      </DisplayStrings>
+
+      <KnowledgeArticles>
+
+        <!-- AP.F5.Base.Monitor.PowerSupply.Health -->
+        <KnowledgeArticle ElementID="AP.F5.Monitor.Device.PowerSupply.Health" Visible="true">
+          <MamlContent>
+            <section xmlns="http://schemas.microsoft.com/maml/2004/10">
+              <title>Summary</title>
+              <para>
+                Uses SNMP to get Device Power Supply Status for the F5 Device.
+              </para>
+            </section>
+            <section xmlns="http://schemas.microsoft.com/maml/2004/10">
+              <title>Thresholds</title>
+              <list>
+                <listItem>
+                  <para>Power Supply Good  - Healthy Condition</para>
+                </listItem>
+                <listItem>
+                  <para>Power Supply Not Present  - Warning Condition</para>
+                </listItem>
+                <listItem>
+                  <para>Power Supply Bad - Alert Condition</para>
+                </listItem>
+              </list>
+            </section>
+            <section xmlns="http://schemas.microsoft.com/maml/2004/10">
+              <title>SNMP Information</title>
+              <para>SNMP OIDs Used;</para>
+              <list>
+                <listItem>
+                  <para>.1.3.6.1.4.1.3375.2.1.3.2.2.2.1.2.PowerSupplyIndex - bigipTrafficMgmt.bigipSystem.sysPlatform.sysChassis.sysChassisPowerSupply.sysChassisPowerSupplyTable.sysChassisPowerSupplyEntry.sysChassisPowerSupplyStatus</para>
+                </listItem>
+              </list>
+            </section>
+          </MamlContent>
+        </KnowledgeArticle>
+      </KnowledgeArticles>
+
+    </LanguagePack>
+  </LanguagePacks>
+</ManagementPackFragment>

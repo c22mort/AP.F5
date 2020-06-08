@@ -1,0 +1,50 @@
+﻿<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Monitoring>
+    <Discoveries>
+
+      <!-- AP.F5.Discovery.Device.Fan -->
+      <Discovery ID="AP.F5.Discovery.Device.Fan" Target="AP.F5.Device" Enabled="true" ConfirmDelivery="false" Remotable="true" Priority="Normal">
+        <Category>Discovery</Category>
+        <DiscoveryTypes>
+          <DiscoveryClass TypeID="AP.F5.Device.Fan" />
+          <DiscoveryRelationship TypeID="AP.F5.Device.Hosts.Fans" />
+        </DiscoveryTypes>
+        <DataSource ID="DS" TypeID="AP.F5.DataSource.Discovery.Device.Fan">
+          <IntervalSeconds>300</IntervalSeconds>
+          <SyncTime>00:01</SyncTime>
+          <Debug>false</Debug>
+          <TimeoutSeconds>60</TimeoutSeconds>
+          <IPAddress>$Target/Property[Type="AP.F5.Device"]/SNMPAddress$</IPAddress>
+        </DataSource>
+      </Discovery>
+
+    </Discoveries>
+  </Monitoring>
+  <LanguagePacks>
+    <LanguagePack ID="ENU" IsDefault="true">
+      <DisplayStrings>
+
+        <!-- AP.F5.Discovery.Device.Fan -->
+        <DisplayString ElementID="AP.F5.Discovery.Device.Fan">
+          <Name>F5 Device Fan Discovery</Name>
+          <Description>Discovers F5 Device Fans</Description>
+        </DisplayString>
+
+      </DisplayStrings>
+      <KnowledgeArticles>
+
+        <!-- AP.F5.Discovery.Device.Fan -->
+        <KnowledgeArticle ElementID="AP.F5.Discovery.Device.Fan">
+          <MamlContent>
+            <section xmlns="http://schemas.microsoft.com/maml/2004/10">
+              <title>F5 Fan Discovery</title>
+              <para>Uses SNMP via a Powershell script to discover all Fans on a given F5 Device!</para>
+            </section>
+          </MamlContent>
+        </KnowledgeArticle>
+
+      </KnowledgeArticles>
+    
+    </LanguagePack>
+  </LanguagePacks>
+</ManagementPackFragment>

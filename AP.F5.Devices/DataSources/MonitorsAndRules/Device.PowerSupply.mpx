@@ -1,0 +1,435 @@
+﻿<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <TypeDefinitions>
+    <ModuleTypes>
+
+
+      <!-- FILTERED MONITOR DATASOURCES -->
+      <!-- AP.F5.DataSource.Monitor.Device.PowerSupplyInfo.Filtered -->
+      <!-- AP.F5.DataSource.Monitor.Device.PowerSupplyInfo, Filters results by PowerSupplyIndex -->
+      <DataSourceModuleType ID="AP.F5.DataSource.Monitor.Device.PowerSupplyInfo.Filtered" Accessibility="Public" Batching="false">
+        <Configuration>
+          <IncludeSchemaTypes>
+            <SchemaType>Windows!Microsoft.Windows.PowerShellSchema</SchemaType>
+          </IncludeSchemaTypes>
+          <xsd:element minOccurs="1" name="IntervalSeconds" type="xsd:integer"/>
+          <xsd:element minOccurs="1" name="SyncTime" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="Debug" type="xsd:boolean"/>
+          <xsd:element minOccurs="1" name="SNMPAddress" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPPort" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPVersion" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPCommunity" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3UserName" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3AuthProtocol" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3AuthPassword" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3PrivProtocol" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3PrivPassword" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3ContextName" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="TimeoutSeconds" type="xsd:integer"/>
+          <xsd:element minOccurs="1" name="PowerSupplyIndex" type="xsd:integer"/>
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="IntervalSeconds" Selector="$Config/IntervalSeconds$" ParameterType="int"/>
+          <OverrideableParameter ID="SyncTime" Selector="$Config/SyncTime$" ParameterType="string"/>
+          <OverrideableParameter ID="Debug" Selector="$Config/Debug$" ParameterType="bool"/>
+        </OverrideableParameters>
+        <ModuleImplementation>
+          <Composite>
+            <MemberModules>
+              <DataSource ID="Script" TypeID="AP.F5.DataSource.Monitor.Device.PowerSupplyInfo">
+                <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
+                <SyncTime>$Config/SyncTime$</SyncTime>
+                <Debug>$Config/Debug$</Debug>
+                <SNMPAddress>$Config/SNMPAddress$</SNMPAddress>
+                <SNMPPort>$Config/SNMPPort$</SNMPPort>
+                <SNMPVersion>$Config/SNMPVersion$</SNMPVersion>
+                <SNMPCommunity>$Config/SNMPCommunity$</SNMPCommunity>
+                <SNMPv3UserName>$Config/SNMPv3UserName$</SNMPv3UserName>
+                <SNMPv3AuthProtocol>$Config/SNMPv3AuthProtocol$</SNMPv3AuthProtocol>
+                <SNMPv3AuthPassword>$Config/SNMPv3AuthPassword$</SNMPv3AuthPassword>
+                <SNMPv3PrivProtocol>$config/SNMPv3PrivProtocol$</SNMPv3PrivProtocol>
+                <SNMPv3PrivPassword>$Config/SNMPv3PrivPassword$</SNMPv3PrivPassword>
+                <SNMPv3ContextName>$Config/SNMPv3ContextName$</SNMPv3ContextName>
+                <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+              </DataSource>
+              <ConditionDetection ID="FilterPowerSupplyIndex" TypeID="System!System.ExpressionFilter">
+                <Expression>
+                  <SimpleExpression>
+                    <ValueExpression>
+                      <XPathQuery Type="Integer">Property[@Name='Index']</XPathQuery>
+                    </ValueExpression>
+                    <Operator>Equal</Operator>
+                    <ValueExpression>
+                      <Value Type="Integer">$Config/PowerSupplyIndex$</Value>
+                    </ValueExpression>
+                  </SimpleExpression>
+                </Expression>
+              </ConditionDetection>
+            </MemberModules>
+            <Composition>
+              <Node ID="FilterPowerSupplyIndex">
+                <Node ID="Script" />
+              </Node>
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>System!System.PropertyBagData</OutputType>
+      </DataSourceModuleType>
+
+      <!-- MONITOR DATA SOURCES -->
+      <!-- AP.F5.DataSource.Monitor.Device.PowerSupplyInfo -->
+      <!-- Calls AP.F5.Probe.Device.PowerSupplyInfo wraps it with a scheduler -->
+      <DataSourceModuleType ID="AP.F5.DataSource.Monitor.Device.PowerSupplyInfo" Accessibility="Public" Batching="false">
+        <Configuration>
+          <IncludeSchemaTypes>
+            <SchemaType>Windows!Microsoft.Windows.PowerShellSchema</SchemaType>
+          </IncludeSchemaTypes>
+          <xsd:element minOccurs="1" name="IntervalSeconds" type="xsd:integer"/>
+          <xsd:element minOccurs="1" name="SyncTime" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="Debug" type="xsd:boolean"/>
+          <xsd:element minOccurs="1" name="SNMPAddress" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPPort" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPVersion" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPCommunity" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3UserName" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3AuthProtocol" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3AuthPassword" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3PrivProtocol" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3PrivPassword" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3ContextName" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="TimeoutSeconds" type="xsd:integer"/>
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="IntervalSeconds" Selector="$Config/IntervalSeconds$" ParameterType="int"/>
+          <OverrideableParameter ID="SyncTime" Selector="$Config/SyncTime$" ParameterType="string"/>
+          <OverrideableParameter ID="Debug" Selector="$Config/Debug$" ParameterType="bool"/>
+        </OverrideableParameters>
+        <ModuleImplementation Isolation="Any">
+          <Composite>
+            <MemberModules>
+              <DataSource ID="Scheduler" TypeID="System!System.SimpleScheduler">
+                <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
+                <SyncTime>$Config/SyncTime$</SyncTime>
+              </DataSource>
+              <ProbeAction ID="PSScript" TypeID="AP.F5.Probe.Device.PowerSupplyInfo">
+                <Debug>$Config/Debug$</Debug>
+                <SNMPAddress>$Config/SNMPAddress$</SNMPAddress>
+                <SNMPPort>$Config/SNMPPort$</SNMPPort>
+                <SNMPVersion>$Config/SNMPVersion$</SNMPVersion>
+                <SNMPCommunity>$Config/SNMPCommunity$</SNMPCommunity>
+                <SNMPv3UserName>$Config/SNMPv3UserName$</SNMPv3UserName>
+                <SNMPv3AuthProtocol>$Config/SNMPv3AuthProtocol$</SNMPv3AuthProtocol>
+                <SNMPv3AuthPassword>$Config/SNMPv3AuthPassword$</SNMPv3AuthPassword>
+                <SNMPv3PrivProtocol>$config/SNMPv3PrivProtocol$</SNMPv3PrivProtocol>
+                <SNMPv3PrivPassword>$Config/SNMPv3PrivPassword$</SNMPv3PrivPassword>
+                <SNMPv3ContextName>$Config/SNMPv3ContextName$</SNMPv3ContextName>
+                <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+              </ProbeAction>
+            </MemberModules>
+            <Composition>
+              <Node ID="PSScript">
+                <Node ID="Scheduler" />
+              </Node>
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>System!System.PropertyBagData</OutputType>
+      </DataSourceModuleType>
+
+      <!-- PROBES -->
+      <!-- AP.F5.Probe.Device.PowerSupplyInfo -->
+      <!-- Runs script to Return Device PowerSupply Info in a property bag-->
+      <ProbeActionModuleType ID="AP.F5.Probe.Device.PowerSupplyInfo" Accessibility="Public" Batching="false">
+        <Configuration>
+          <IncludeSchemaTypes>
+            <SchemaType>Windows!Microsoft.Windows.PowerShellSchema</SchemaType>
+          </IncludeSchemaTypes>
+          <xsd:element minOccurs="1" name="Debug" type="xsd:boolean"/>
+          <xsd:element minOccurs="1" name="SNMPAddress" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPPort" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPVersion" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPCommunity" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3UserName" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3AuthProtocol" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3AuthPassword" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3PrivProtocol" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3PrivPassword" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3ContextName" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="TimeoutSeconds" type="xsd:integer"/>
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="Debug" Selector="$Config/Debug$" ParameterType="bool"/>
+        </OverrideableParameters>
+        <ModuleImplementation Isolation="Any">
+          <Composite>
+            <MemberModules>
+              <ProbeAction ID="PSScript" TypeID="Windows!Microsoft.Windows.PowerShellPropertyBagTriggerOnlyProbe">
+                <ScriptName>Get-PowerSupplyInfo.ps1</ScriptName>
+                <ScriptBody>$IncludeFileContent/Scripts/MonitorsAndRules/Get-PowerSupplyInfo.ps1$</ScriptBody>
+                <SnapIns />
+                <Parameters>
+                  <Parameter>
+                    <Name>Debug</Name>
+                    <Value>$Config/Debug$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>SharpSnmpLocation</Name>
+                    <Value>$FileResource[Name="AP.F5.SharpSnmpLib"]/Path$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>SNMPAddress</Name>
+                    <Value>$Config/SNMPAddress$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>PortNumber</Name>
+                    <Value>$Config/SNMPPort$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>SNMPVersion</Name>
+                    <Value>$Config/SNMPVersion$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>SNMPv3UserName</Name>
+                    <Value>$Config/SNMPv3UserName$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>SNMPv3AuthProtocol</Name>
+                    <Value>$Config/SNMPv3AuthProtocol$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>SNMPv3AuthPassword</Name>
+                    <Value>$Config/SNMPv3AuthPassword$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>SNMPv3PrivProtocol</Name>
+                    <Value>$Config/SNMPv3PrivProtocol$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>SNMPv3PrivPassword</Name>
+                    <Value>$Config/SNMPv3PrivPassword$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>SNMPv3ContextName</Name>
+                    <Value>$Config/SNMPv3ContextName$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>CommunityString</Name>
+                    <Value>$Config/SNMPCommunity$</Value>
+                  </Parameter>
+                </Parameters>
+                <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+                <StrictErrorHandling>false</StrictErrorHandling>
+              </ProbeAction>
+            </MemberModules>
+            <Composition>
+              <Node ID="PSScript" />
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>System!System.PropertyBagData</OutputType>
+        <TriggerOnly>true</TriggerOnly>
+      </ProbeActionModuleType>
+
+    </ModuleTypes>
+
+    <MonitorTypes>
+
+      <!-- AP.F5.UnitMonitor.Device.PowerSupplyHealth -->
+      <!-- Uses SNMP via Powershell to Get Health of Device PowerSupply -->
+      <UnitMonitorType ID="AP.F5.UnitMonitor.Device.PowerSupplyHealth" Accessibility="Public">
+        <MonitorTypeStates>
+          <MonitorTypeState ID="PowerSupplyGood" NoDetection="false"/>
+          <MonitorTypeState ID="PowerSupplyBad" NoDetection="false"/>
+          <MonitorTypeState ID="PowerSupplyNotPresent" NoDetection="false"/>
+        </MonitorTypeStates>
+        <Configuration>
+          <xsd:element minOccurs="1" name="IntervalSeconds" type="xsd:integer"/>
+          <xsd:element minOccurs="1" name="SyncTime" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="Debug" type="xsd:boolean"/>
+          <xsd:element minOccurs="1" name="SNMPAddress" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPPort" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPVersion" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPCommunity" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3UserName" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3AuthProtocol" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3AuthPassword" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3PrivProtocol" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3PrivPassword" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3ContextName" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="TimeoutSeconds" type="xsd:integer"/>
+          <xsd:element minOccurs="1" name="PowerSupplyIndex" type="xsd:integer"/>
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="IntervalSeconds" Selector="$Config/IntervalSeconds$" ParameterType="int"/>
+          <OverrideableParameter ID="SyncTime" Selector="$Config/SyncTime$" ParameterType="string"/>
+          <OverrideableParameter ID="Debug" Selector="$Config/Debug$" ParameterType="bool"/>
+        </OverrideableParameters>
+        <MonitorImplementation>
+          <MemberModules>
+            <DataSource ID="DS" TypeID="AP.F5.DataSource.Monitor.Device.PowerSupplyInfo.Filtered">
+              <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
+              <SyncTime>$Config/SyncTime$</SyncTime>
+              <Debug>$Config/Debug$</Debug>
+              <SNMPAddress>$Config/SNMPAddress$</SNMPAddress>
+              <SNMPPort>$Config/SNMPPort$</SNMPPort>
+              <SNMPVersion>$Config/SNMPVersion$</SNMPVersion>
+              <SNMPCommunity>$Config/SNMPCommunity$</SNMPCommunity>
+              <SNMPv3UserName>$Config/SNMPv3UserName$</SNMPv3UserName>
+              <SNMPv3AuthProtocol>$Config/SNMPv3AuthProtocol$</SNMPv3AuthProtocol>
+              <SNMPv3AuthPassword>$Config/SNMPv3AuthPassword$</SNMPv3AuthPassword>
+              <SNMPv3PrivProtocol>$config/SNMPv3PrivProtocol$</SNMPv3PrivProtocol>
+              <SNMPv3PrivPassword>$Config/SNMPv3PrivPassword$</SNMPv3PrivPassword>
+              <SNMPv3ContextName>$Config/SNMPv3ContextName$</SNMPv3ContextName>
+              <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+              <PowerSupplyIndex>$Config/PowerSupplyIndex$</PowerSupplyIndex>
+            </DataSource>
+            <ProbeAction ID="Probe" TypeID="AP.F5.Probe.Device.PowerSupplyInfo">
+              <Debug>$Config/Debug$</Debug>
+              <SNMPAddress>$Config/SNMPAddress$</SNMPAddress>
+              <SNMPPort>$Config/SNMPPort$</SNMPPort>
+              <SNMPVersion>$Config/SNMPVersion$</SNMPVersion>
+              <SNMPCommunity>$Config/SNMPCommunity$</SNMPCommunity>
+              <SNMPv3UserName>$Config/SNMPv3UserName$</SNMPv3UserName>
+              <SNMPv3AuthProtocol>$Config/SNMPv3AuthProtocol$</SNMPv3AuthProtocol>
+              <SNMPv3AuthPassword>$Config/SNMPv3AuthPassword$</SNMPv3AuthPassword>
+              <SNMPv3PrivProtocol>$config/SNMPv3PrivProtocol$</SNMPv3PrivProtocol>
+              <SNMPv3PrivPassword>$Config/SNMPv3PrivPassword$</SNMPv3PrivPassword>
+              <SNMPv3ContextName>$Config/SNMPv3ContextName$</SNMPv3ContextName>
+              <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+            </ProbeAction>
+            <ConditionDetection ID="PowerSupplyGoodFilter" TypeID="System!System.ExpressionFilter">
+              <Expression>
+                <SimpleExpression>
+                  <ValueExpression>
+                    <XPathQuery Type="Integer">Property[@Name='Status']</XPathQuery>
+                  </ValueExpression>
+                  <Operator>Equal</Operator>
+                  <ValueExpression>
+                    <Value Type="Integer">1</Value>
+                  </ValueExpression>
+                </SimpleExpression>
+              </Expression>
+            </ConditionDetection>
+            <ConditionDetection ID="PowerSupplyBadFilter" TypeID="System!System.ExpressionFilter">
+              <Expression>
+                <SimpleExpression>
+                  <ValueExpression>
+                    <XPathQuery Type="Integer">Property[@Name='Status']</XPathQuery>
+                  </ValueExpression>
+                  <Operator>Equal</Operator>
+                  <ValueExpression>
+                    <Value Type="Integer">0</Value>
+                  </ValueExpression>
+                </SimpleExpression>
+              </Expression>
+            </ConditionDetection>
+            <ConditionDetection ID="PowerSupplyNotPresentFilter" TypeID="System!System.ExpressionFilter">
+              <Expression>
+                <SimpleExpression>
+                  <ValueExpression>
+                    <XPathQuery Type="Integer">Property[@Name='Status']</XPathQuery>
+                  </ValueExpression>
+                  <Operator>Equal</Operator>
+                  <ValueExpression>
+                    <Value Type="Integer">2</Value>
+                  </ValueExpression>
+                </SimpleExpression>
+              </Expression>
+            </ConditionDetection>          
+          </MemberModules>
+          <RegularDetections>
+            <RegularDetection MonitorTypeStateID="PowerSupplyGood">
+              <Node ID="PowerSupplyGoodFilter">
+                <Node ID="DS" />
+              </Node>
+            </RegularDetection>
+            <RegularDetection MonitorTypeStateID="PowerSupplyNotPresent">
+              <Node ID="PowerSupplyNotPresentFilter">
+                <Node ID="DS" />
+              </Node>
+            </RegularDetection>
+            <RegularDetection MonitorTypeStateID="PowerSupplyBad">
+              <Node ID="PowerSupplyBadFilter">
+                <Node ID="DS" />
+              </Node>
+            </RegularDetection>
+          </RegularDetections>
+        </MonitorImplementation>
+      </UnitMonitorType>
+
+    </MonitorTypes>
+  </TypeDefinitions>
+
+  <LanguagePacks>
+    <LanguagePack ID="ENU" IsDefault="true">
+
+      <DisplayStrings>
+
+        <!-- AP.F5.DataSource.Monitor.Device.PowerSupplyInfo.Filtered -->
+        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.PowerSupplyInfo.Filtered">
+          <Name>Filtered Power Supply Info Monitor DataSource</Name>
+          <Description>Runs AP.F5.DataSource.Monitor.Device.PowerSupplyInfo, filters out the Power Supply needed</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.PowerSupplyInfo.Filtered" SubElementID="IntervalSeconds">
+          <Name>Interval Seconds</Name>
+          <Description>Frequency in seconds that module is run.</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.PowerSupplyInfo.Filtered" SubElementID="SyncTime">
+          <Name>Synchronisation Time</Name>
+          <Description>Offset that this module is started from.</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.PowerSupplyInfo.Filtered" SubElementID="Debug">
+          <Name>Debug</Name>
+          <Description>Debug Flag, if true then additional info is posted to event log.</Description>
+        </DisplayString>
+
+        <!-- AP.F5.DataSource.Monitor.Device.PowerSupplyInfo -->
+        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.PowerSupplyInfo">
+          <Name>Power Supply Info Monitor DataSource</Name>
+          <Description>Wraps Power Supply Info Probe in scheduler and returns as PropertyBag for Monitors</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.PowerSupplyInfo" SubElementID="IntervalSeconds">
+          <Name>Interval Seconds</Name>
+          <Description>Frequency in seconds that module is run.</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.PowerSupplyInfo" SubElementID="SyncTime">
+          <Name>Synchronisation Time</Name>
+          <Description>Offset that this module is started from.</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.PowerSupplyInfo" SubElementID="Debug">
+          <Name>Debug</Name>
+          <Description>Debug Flag, if true then additional info is posted to event log.</Description>
+        </DisplayString>
+
+        <!-- AP.F5.Probe.Device.PowerSupplyInfo -->
+        <DisplayString ElementID="AP.F5.Probe.Device.PowerSupplyInfo">
+          <Name>Powershell Power Supply Probe</Name>
+          <Description>Runs Powershell SNMP Script to collect Power Supply Info</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.Probe.Device.PowerSupplyInfo" SubElementID="Debug">
+          <Name>Debug</Name>
+          <Description>Debug Flag, if true then additional info is posted to event log.</Description>
+        </DisplayString>
+
+        <!-- AP.F5.UnitMonitor.Device.PowerSupplyHealth -->
+        <DisplayString ElementID="AP.F5.UnitMonitor.Device.PowerSupplyHealth">
+          <Name>Device Power Supply Health Monitor</Name>
+          <Description>Compares used Power Supply Percentage against given thresholds</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.UnitMonitor.Device.PowerSupplyHealth" SubElementID="IntervalSeconds">
+          <Name>Interval Seconds</Name>
+          <Description>Frequency in seconds that module is run.</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.UnitMonitor.Device.PowerSupplyHealth" SubElementID="SyncTime">
+          <Name>Synchronisation Time</Name>
+          <Description>Offset that this module is started from.</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.UnitMonitor.Device.PowerSupplyHealth" SubElementID="Debug">
+          <Name>Debug</Name>
+          <Description>Debug Flag, if true then additional info is posted to event log.</Description>
+        </DisplayString>
+
+      </DisplayStrings>
+
+    </LanguagePack>
+  </LanguagePacks>
+</ManagementPackFragment>

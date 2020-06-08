@@ -1,0 +1,203 @@
+﻿<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Monitoring>
+    <Monitors>
+
+      <!-- AP.F5.Monitor.Device.Processor.Health -->
+      <UnitMonitor ID="AP.F5.Monitor.Device.Processor.Health" Accessibility="Public" Enabled="true" Target="AP.F5.Device.Processor" ParentMonitorID="Health!System.Health.PerformanceState" Remotable="true" Priority="Normal" TypeID="AP.F5.UnitMonitor.Device.ProcessorHealth" ConfirmDelivery="false">
+        <Category>AvailabilityHealth</Category>
+        <AlertSettings AlertMessage="AP.F5.Monitor.Device.Processor.Health.AlertMessage">
+          <AlertOnState>Warning</AlertOnState>
+          <AutoResolve>true</AutoResolve>
+          <AlertPriority>Normal</AlertPriority>
+          <AlertSeverity>MatchMonitorHealth</AlertSeverity>
+          <AlertParameters>
+            <AlertParameter1>$Target/Host/Property[Type="AP.F5.Device"]/DeviceName$</AlertParameter1>
+            <AlertParameter2>$Data/Context/Property[@Name='UsedPercentage']$</AlertParameter2>
+          </AlertParameters>
+        </AlertSettings>
+        <OperationalStates>
+          <OperationalState ID="ProcessorHealthy" MonitorTypeStateID="ProcessorHealthy" HealthState="Success" />
+          <OperationalState ID="ProcessorWarning" MonitorTypeStateID="ProcessorWarning" HealthState="Warning" />
+          <OperationalState ID="ProcessorCritical" MonitorTypeStateID="ProcessorCritical" HealthState="Error" />
+        </OperationalStates>
+        <Configuration>
+          <IntervalSeconds>300</IntervalSeconds>
+          <SyncTime />
+          <Debug>false</Debug>
+          <SNMPAddress>$Target/Host/Property[Type="AP.F5.Device"]/SNMPAddress$</SNMPAddress>
+          <SNMPPort>$Target/Host/Property[Type="AP.F5.Device"]/SNMPPort$</SNMPPort>
+          <SNMPVersion>$Target/Host/Property[Type="AP.F5.Device"]/SNMPVersion$</SNMPVersion>
+          <SNMPCommunity>$RunAs[Name="AP.F5.Login.SNMPv2"]/CommunityString$</SNMPCommunity>
+          <SNMPv3UserName>$RunAs[Name="AP.F5.Login.SNMPv3"]/UserName$</SNMPv3UserName>
+          <SNMPv3AuthProtocol>$RunAs[Name="AP.F5.Login.SNMPv3"]/AuthenticationProtocol$</SNMPv3AuthProtocol>
+          <SNMPv3AuthPassword>$RunAs[Name="AP.F5.Login.SNMPv3"]/AuthenticationKey$</SNMPv3AuthPassword>
+          <SNMPv3PrivProtocol>$RunAs[Name="AP.F5.Login.SNMPv3"]/PrivacyProtocol$</SNMPv3PrivProtocol>
+          <SNMPv3PrivPassword>$RunAs[Name="AP.F5.Login.SNMPv3"]/PrivacyKey$</SNMPv3PrivPassword>
+          <SNMPv3ContextName>$RunAs[Name="AP.F5.Login.SNMPv3"]/ContextName$</SNMPv3ContextName>
+          <TimeoutSeconds>60</TimeoutSeconds>
+          <CriticalUsage>90</CriticalUsage>
+          <WarningUsage>80</WarningUsage>
+          <ProcessorIndex>$Target/Property[Type="AP.F5.Device.Processor"]/Index$</ProcessorIndex>
+        </Configuration>
+      </UnitMonitor>
+
+      <!-- AP.F5.Monitor.Device.Processor.RollUp -->
+      <DependencyMonitor ID="AP.F5.Monitor.Device.Processor.RollUp" Accessibility="Public" Enabled="true" Target="AP.F5.Device" ParentMonitorID="Health!System.Health.PerformanceState" Remotable="true" Priority="Normal" RelationshipType="AP.F5.Device.Hosts.Processors" MemberMonitor="AP.F5.Monitor.Device.Processor.Health">
+        <Category>AvailabilityHealth</Category>
+        <Algorithm>WorstOf</Algorithm>
+      </DependencyMonitor>
+    
+    </Monitors>
+    
+  </Monitoring>
+
+  <Presentation>
+    <StringResources>
+      <StringResource ID="AP.F5.Monitor.Device.Processor.Health.AlertMessage" />
+    </StringResources> 
+  </Presentation>
+
+  <LanguagePacks>
+    <LanguagePack ID="ENU" IsDefault="true">
+      <DisplayStrings>
+
+        <!-- AP.F5.Monitor.Device.Processor.Health -->
+        <DisplayString ElementID="AP.F5.Monitor.Device.Processor.Health">
+          <Name>Monitor Processor Health</Name>
+          <Description>Monitors Processor Health using SNMP</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.Monitor.Device.Processor.Health.AlertMessage">
+          <Name>F5 Device Low on Available Processor</Name>
+          <Description>
+            F5 Device : {0}
+
+            Processor Usage has changed to {1}%
+          </Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.Monitor.Device.Processor.Health" SubElementID="ProcessorHealthy">
+          <Name>Processor Healthy</Name>
+          <Description>Healthy Processor Condition</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.Monitor.Device.Processor.Health" SubElementID="ProcessorWarning">
+          <Name>Processor Warning</Name>
+          <Description>Warning Processor Condition</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.Monitor.Device.Processor.Health" SubElementID="ProcessorCritical">
+          <Name>Processor Critical</Name>
+          <Description>Critical Processor Condition</Description>
+        </DisplayString>
+
+        <!-- AP.F5.Monitor.Device.Processor.RollUp -->
+        <DisplayString ElementID="AP.F5.Monitor.Device.Processor.RollUp">
+          <Name>Processor RollUp</Name>
+          <Description>Rolls up Processor status to device</Description>
+        </DisplayString>
+      
+      </DisplayStrings>
+
+      <KnowledgeArticles>
+        
+        <!-- AP.F5.Monitor.Device.Processor.Health -->
+        <KnowledgeArticle ElementID="AP.F5.Monitor.Device.Processor.Health" Visible="true">
+          <MamlContent>
+            <section xmlns="http://schemas.microsoft.com/maml/2004/10">
+              <title>Summary</title>
+              <para>
+                Uses SNMP to get Processor usage, average over last 5 minutes, for all F5 Device processors.
+              </para>
+              <table>
+                <title>Threshlolds</title>
+                <tableHeader>
+                  <row>
+                    <entry>
+                      <para>Name</para>
+                    </entry>
+                    <entry>
+                      <para>Default Value</para>
+                    </entry>
+                    <entry>
+                      <para>Overridable</para>
+                    </entry>
+                  </row>
+                </tableHeader>
+                <row>
+                  <entry>
+                    <para>WarningUsage</para>
+                  </entry>
+                  <entry>
+                    <para>80</para>
+                  </entry>
+                  <entry>
+                    <para>YES</para>
+                  </entry>
+                </row>
+                <row>
+                  <entry>
+                    <para>CriticalUsage</para>
+                  </entry>
+                  <entry>
+                    <para>90</para>
+                  </entry>
+                  <entry>
+                    <para>YES</para>
+                  </entry>
+                </row>
+              </table>
+              <table>
+                <title>Monitored Conditions</title>
+                <tableHeader>
+                  <row>
+                    <entry>
+                      <para>Condition</para>
+                    </entry>
+                    <entry>
+                      <para>Comparison</para>
+                    </entry>
+                  </row>
+                </tableHeader>
+                <row>
+                  <entry>
+                    <para>Healthy Condition</para>
+                  </entry>
+                  <entry>
+                    <para>&lt; WarningUsage</para>
+                  </entry>
+                </row>
+                <row>
+                  <entry>
+                    <para>Warning Condition</para>
+                  </entry>
+                  <entry>
+                    <para>&gt;=WarningUsage and &lt;=CriticalUsage</para>
+                  </entry>
+                </row>
+                <row>
+                  <entry>
+                    <para>Critical Condition</para>
+                  </entry>
+                  <entry>
+                    <para>&gt;CriticalUsage</para>
+                  </entry>
+                </row>
+              </table>
+            </section>
+            <section xmlns="http://schemas.microsoft.com/maml/2004/10">
+              <title>SNMP Information</title>
+              <para>SNMP OIDs Used;</para>
+              <list>
+                <listItem>
+                  <para>.1.3.6.1.4.1.3375.2.1.7.5.1.0 - bigipTrafficMgmt.bigipSystem.sysHostInfoStat.sysMultiHostCpu.sysMultiHostCpuNumber</para>
+                </listItem>
+                <listItem>
+                  <para>.1.3.6.1.4.1.3375.2.1.7.5.2.1.35 - bigipTrafficMgmt.bigipSystem.sysHostInfoStat.sysMultiHostCpu.sysMultiHostCpuTable.sysMultiHostCpuEntry.sysMultiHostCpuUsageRatio5m</para>
+                </listItem>
+              </list>
+            </section>
+          </MamlContent>
+        </KnowledgeArticle>
+
+      </KnowledgeArticles>
+      
+    </LanguagePack>
+  </LanguagePacks>
+</ManagementPackFragment>

@@ -1,0 +1,26 @@
+﻿<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<TypeDefinitions>
+		<EntityTypes>
+			<ClassTypes>
+		
+				<!-- AP.F5.Base.Root -->       
+				<ClassType ID="AP.F5.Root" Base="System!System.LogicalEntity" Accessibility="Public" Abstract="false" Hosted="false" Singleton="true" />			  
+		
+			</ClassTypes>	
+        
+		</EntityTypes>
+	</TypeDefinitions>
+	<LanguagePacks>
+	<LanguagePack ID="ENU" IsDefault="true">
+		<DisplayStrings>
+
+			<!-- AP.F5.Base.Root -->
+			<DisplayString ElementID="AP.F5.Root">
+				<Name>F5</Name>
+				<Description>Root Object of all AP.F5 Management Packs</Description>
+			</DisplayString>
+
+		</DisplayStrings>
+	</LanguagePack>
+	</LanguagePacks>
+</ManagementPackFragment>

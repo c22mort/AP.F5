@@ -1,0 +1,140 @@
+﻿<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Monitoring>
+    <Monitors>
+
+      <!-- AP.F5.Monitor.Device.Fan.Health -->
+      <UnitMonitor ID="AP.F5.Monitor.Device.Fan.Health" Accessibility="Public" Enabled="true" Target="AP.F5.Device.Fan" ParentMonitorID="Health!System.Health.PerformanceState" Remotable="true" Priority="Normal" TypeID="AP.F5.UnitMonitor.Device.FanHealth" ConfirmDelivery="false">
+        <Category>AvailabilityHealth</Category>
+        <AlertSettings AlertMessage="AP.F5.Monitor.Device.Fan.Health.AlertMessage">
+          <AlertOnState>Error</AlertOnState>
+          <AutoResolve>true</AutoResolve>
+          <AlertPriority>Normal</AlertPriority>
+          <AlertSeverity>MatchMonitorHealth</AlertSeverity>
+          <AlertParameters>
+            <AlertParameter1>$Target/Host/Property[Type="AP.F5.Device"]/DeviceName$</AlertParameter1>
+            <AlertParameter2>$Data/Context/Property[@Name='Index']$</AlertParameter2>
+            <AlertParameter3>$Data/Context/Property[@Name='Status']$</AlertParameter3>
+          </AlertParameters>
+        </AlertSettings>
+        <OperationalStates>
+          <OperationalState ID="FanGood" MonitorTypeStateID="FanGood" HealthState="Success" />
+          <OperationalState ID="FanNotPresent" MonitorTypeStateID="FanNotPresent" HealthState="Warning" />
+          <OperationalState ID="FanBad" MonitorTypeStateID="FanBad" HealthState="Error" />
+        </OperationalStates>
+        <Configuration>
+          <IntervalSeconds>300</IntervalSeconds>
+          <SyncTime />
+          <Debug>false</Debug>
+          <SNMPAddress>$Target/Host/Property[Type="AP.F5.Device"]/SNMPAddress$</SNMPAddress>
+          <SNMPPort>$Target/Host/Property[Type="AP.F5.Device"]/SNMPPort$</SNMPPort>
+          <SNMPVersion>$Target/Host/Property[Type="AP.F5.Device"]/SNMPVersion$</SNMPVersion>
+          <SNMPCommunity>$RunAs[Name="AP.F5.Login.SNMPv2"]/CommunityString$</SNMPCommunity>
+          <SNMPv3UserName>$RunAs[Name="AP.F5.Login.SNMPv3"]/UserName$</SNMPv3UserName>
+          <SNMPv3AuthProtocol>$RunAs[Name="AP.F5.Login.SNMPv3"]/AuthenticationProtocol$</SNMPv3AuthProtocol>
+          <SNMPv3AuthPassword>$RunAs[Name="AP.F5.Login.SNMPv3"]/AuthenticationKey$</SNMPv3AuthPassword>
+          <SNMPv3PrivProtocol>$RunAs[Name="AP.F5.Login.SNMPv3"]/PrivacyProtocol$</SNMPv3PrivProtocol>
+          <SNMPv3PrivPassword>$RunAs[Name="AP.F5.Login.SNMPv3"]/PrivacyKey$</SNMPv3PrivPassword>
+          <SNMPv3ContextName>$RunAs[Name="AP.F5.Login.SNMPv3"]/ContextName$</SNMPv3ContextName>
+          <TimeoutSeconds>60</TimeoutSeconds>
+          <FanIndex>$Target/Property[Type="AP.F5.Device.Fan"]/Index$</FanIndex>
+        </Configuration>
+      </UnitMonitor>
+
+      <!-- AP.F5.Monitor.Device.Fan.RollUp -->
+      <DependencyMonitor ID="AP.F5.Monitor.Device.Fan.RollUp" Accessibility="Public" Enabled="true" Target="AP.F5.Device" ParentMonitorID="Health!System.Health.PerformanceState" Remotable="true" Priority="Normal" RelationshipType="AP.F5.Device.Hosts.Fans" MemberMonitor="AP.F5.Monitor.Device.Fan.Health">
+        <Category>AvailabilityHealth</Category>
+        <Algorithm>WorstOf</Algorithm>
+      </DependencyMonitor>
+
+    </Monitors>
+
+  </Monitoring>
+
+  <Presentation>
+    <StringResources>
+      <StringResource ID="AP.F5.Monitor.Device.Fan.Health.AlertMessage" />
+    </StringResources>
+  </Presentation>
+
+  <LanguagePacks>
+    <LanguagePack ID="ENU" IsDefault="true">
+      <DisplayStrings>
+
+        <!-- AP.F5.Monitor.Device.Fan.Health -->
+        <DisplayString ElementID="AP.F5.Monitor.Device.Fan.Health">
+          <Name>Monitor Fan Health</Name>
+          <Description>Monitors Fan Health using SNMP</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.Monitor.Device.Fan.Health.AlertMessage">
+          <Name>F5 Fan has changed State</Name>
+          <Description>
+            F5 Device : {0}
+
+            Fan {1} has changed to {2}
+          </Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.Monitor.Device.Fan.Health" SubElementID="FanGood">
+          <Name>Fan is Good</Name>
+          <Description>Healthy Fan Condition</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.Monitor.Device.Fan.Health" SubElementID="FanNotPresent">
+          <Name>Fan is Not Present</Name>
+          <Description>Fan not Present Condition</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.Monitor.Device.Fan.Health" SubElementID="FanBad">
+          <Name>Fan is Bad</Name>
+          <Description>Fan Condition</Description>
+        </DisplayString>
+
+        <!-- AP.F5.Monitor.Device.Fan.RollUp -->
+        <DisplayString ElementID="AP.F5.Monitor.Device.Fan.RollUp">
+          <Name>Fan RollUp</Name>
+          <Description>Rolls up Fan status to device</Description>
+        </DisplayString>
+
+      </DisplayStrings>
+
+      <KnowledgeArticles>
+
+        <!-- AP.F5.Base.Monitor.Fan.Health -->
+        <KnowledgeArticle ElementID="AP.F5.Monitor.Device.Fan.Health" Visible="true">
+          <MamlContent>
+            <section xmlns="http://schemas.microsoft.com/maml/2004/10">
+              <title>Summary</title>
+              <para>
+                Uses SNMP to get Device Fan Status for the F5 Device.
+              </para>
+            </section>
+            <section xmlns="http://schemas.microsoft.com/maml/2004/10">
+              <title>Thresholds</title>
+              <list>
+                <listItem>
+                  <para>Fan Good  - Healthy Condition</para>
+                </listItem>
+                <listItem>
+                  <para>Fan Not Present  - Warning Condition</para>
+                </listItem>
+                <listItem>
+                  <para>Fan Bad - Alert Condition</para>
+                </listItem>
+              </list>
+            </section>
+            <section xmlns="http://schemas.microsoft.com/maml/2004/10">
+              <title>SNMP Information</title>
+              <para>SNMP OIDs Used;</para>
+              <list>
+                <listItem>
+                  <para>.1.3.6.1.4.1.3375.2.1.3.2.1.1.0 - bigipTrafficMgmt.bigipSystem.sysPlatform.sysChassis.sysChassisFan.sysChassisFanNumber</para>
+                </listItem>
+                <listItem>
+                  <para>.1.3.6.1.4.1.3375.2.1.3.2.1.2.1.2 - bigipTrafficMgmt.bigipSystem.sysPlatform.sysChassis.sysChassisFan.sysChassisFanTable.sysChassisFanEntry.sysChassisFanStatus</para>
+                </listItem>
+              </list>
+            </section>
+          </MamlContent>
+        </KnowledgeArticle>
+      </KnowledgeArticles>
+
+    </LanguagePack>
+  </LanguagePacks>
+</ManagementPackFragment>

@@ -1,0 +1,132 @@
+﻿<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <TypeDefinitions>
+    <ModuleTypes>
+
+      <!-- AP.F5.Discovery.DataSource.Device.Processor -->
+      <DataSourceModuleType ID="AP.F5.DataSource.Discovery.Device.Processor" Accessibility="Public" Batching="false">
+        <Configuration>
+          <xsd:element minOccurs="1" name="IntervalSeconds" type="xsd:integer"/>
+          <xsd:element minOccurs="1" name="SyncTime" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="Debug" type="xsd:boolean"/>
+          <xsd:element minOccurs="1" name="TimeoutSeconds" type="xsd:integer"/>
+          <xsd:element minOccurs="1" name="IPAddress" type="xsd:string"/>
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="IntervalSeconds" Selector="$Config/IntervalSeconds$" ParameterType="int"/>
+          <OverrideableParameter ID="SyncTime" Selector="$Config/SyncTime$" ParameterType="string"/>
+          <OverrideableParameter ID="Debug" Selector="$Config/Debug$" ParameterType="bool"/>
+        </OverrideableParameters>
+        <ModuleImplementation Isolation="Any">
+          <Composite>
+            <MemberModules>
+              <DataSource ID="DiscoveryProvider" TypeID="Windows!Microsoft.Windows.TimedPowerShell.DiscoveryProvider">
+                <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
+                <SyncTime>$Config/SyncTime$</SyncTime>
+                <ScriptName>Discover-Processors.ps1</ScriptName>
+                <ScriptBody>$IncludeFileContent/Scripts/Discoveries/Discover-Processors.ps1$</ScriptBody>
+                <Parameters>
+                  <Parameter>
+                    <Name>Debug</Name>
+                    <Value>$Config/Debug$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>SharpSnmpLocation</Name>
+                    <Value>$FileResource[Name="AP.F5.SharpSnmpLib"]/Path$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>sourceId</Name>
+                    <Value>$MPElement$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>managedEntityId</Name>
+                    <Value>$Target/Id$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>deviceKey</Name>
+                    <Value>$Target/Property[Type="AP.F5.Device"]/SerialNumber$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>SNMPAddress</Name>
+                    <Value>$Target/Property[Type="AP.F5.Device"]/SNMPAddress$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>PortNumber</Name>
+                    <Value>$Target/Property[Type="AP.F5.Device"]/SNMPPort$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>SNMPVersion</Name>
+                    <Value>$Target/Property[Type="AP.F5.Device"]/SNMPVersion$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>SNMPv3UserName</Name>
+                    <Value>$RunAs[Name="AP.F5.Login.SNMPv3"]/UserName$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>SNMPv3AuthProtocol</Name>
+                    <Value>$RunAs[Name="AP.F5.Login.SNMPv3"]/AuthenticationProtocol$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>SNMPv3AuthPassword</Name>
+                    <Value>$RunAs[Name="AP.F5.Login.SNMPv3"]/AuthenticationKey$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>SNMPv3PrivProtocol</Name>
+                    <Value>$RunAs[Name="AP.F5.Login.SNMPv3"]/PrivacyProtocol$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>SNMPv3PrivPassword</Name>
+                    <Value>$RunAs[Name="AP.F5.Login.SNMPv3"]/PrivacyKey$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>SNMPv3ContextName</Name>
+                    <Value>$RunAs[Name="AP.F5.Login.SNMPv3"]/ContextName$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>CommunityString</Name>
+                    <Value>$RunAs[Name="AP.F5.Login.SNMPv2"]/CommunityString$</Value>
+                  </Parameter>
+                </Parameters>
+                <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+                <StrictErrorHandling>false</StrictErrorHandling>
+              </DataSource>
+            </MemberModules>
+            <Composition>
+              <Node ID="DiscoveryProvider" />
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>System!System.Discovery.Data</OutputType>
+      </DataSourceModuleType>
+
+    </ModuleTypes>
+  </TypeDefinitions>
+
+  <LanguagePacks>
+    <LanguagePack ID="ENU" IsDefault="true">
+
+      <DisplayStrings>
+
+        <!-- AP.F5.Discovery.DataSource.Device.Processor -->
+        <DisplayString ElementID="AP.F5.DataSource.Discovery.Device.Processor">
+          <Name>F5 Device Processor Discovery DataSource</Name>
+          <Description>Discover AP.F5 Device CPUs from AP.F5.Device</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.DataSource.Discovery.Device.Processor" SubElementID="IntervalSeconds">
+          <Name>Interval Seconds</Name>
+          <Description>Frequency in seconds that module is run.</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.DataSource.Discovery.Device.Processor" SubElementID="SyncTime">
+          <Name>Synchronisation Time</Name>
+          <Description>Offset that this module is started from.</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.DataSource.Discovery.Device.Processor" SubElementID="Debug">
+          <Name>Debug</Name>
+          <Description>Debug Flag, if true then additional info is posted to event log.</Description>
+        </DisplayString>
+
+      </DisplayStrings>
+
+    </LanguagePack>
+  </LanguagePacks>
+
+</ManagementPackFragment>
