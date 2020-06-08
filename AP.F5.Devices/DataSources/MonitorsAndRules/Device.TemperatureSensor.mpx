@@ -321,7 +321,7 @@
                       <ValueExpression>
                         <XPathQuery Type="Integer">Property[@Name='Temperature']</XPathQuery>
                       </ValueExpression>
-                      <Operator>Greater</Operator>
+                      <Operator>GreaterEqual</Operator>
                       <ValueExpression>
                         <Value Type="Integer">$Config/WarningTemp$</Value>
                       </ValueExpression>
