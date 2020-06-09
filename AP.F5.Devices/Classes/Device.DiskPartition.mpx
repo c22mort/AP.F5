@@ -6,7 +6,6 @@
         <!-- AP.F5.Device.DiskPartition -->
         <ClassType ID="AP.F5.Device.DiskPartition" Base="System!System.LogicalEntity" Accessibility="Public" Abstract="false" Hosted="true" Singleton="false">
           <Property ID="Path" Key="true" Type="string" />
-          <Property ID="OIDSuffix" Key="false" Type="string" />
           <Property ID="Size" Key="false" Type="double" />
         </ClassType>
 
@@ -35,10 +34,6 @@
         <DisplayString ElementID="AP.F5.Device.DiskPartition" SubElementID="Path">
           <Name>Path</Name>
           <Description>Path of Disk Partition</Description>
-        </DisplayString>
-        <DisplayString ElementID="AP.F5.Device.DiskPartition" SubElementID="OIDSuffix">
-          <Name>OID Suffix</Name>
-          <Description>OID Suffix of Disk Partition</Description>
         </DisplayString>
         <DisplayString ElementID="AP.F5.Device.DiskPartition" SubElementID="Size">
           <Name>Size(Gb)</Name>

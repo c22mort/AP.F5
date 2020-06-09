@@ -75,6 +75,86 @@
         <OutputType>System!System.PropertyBagData</OutputType>
       </DataSourceModuleType>
 
+      <!-- PERFORMANCE DATA SOURCES -->
+      <!-- AP.F5.DataSource.Perf.Device.TempSensorTemp.Filtered -->
+      <!-- Calls AP.F5.Probe.Device.TempSensorInfo, Filters By Index and returns as Performance Data -->
+      <DataSourceModuleType ID="AP.F5.DataSource.Perf.Device.TempSensorTemp.Filtered" Accessibility="Public" Batching="false">
+        <Configuration>
+          <IncludeSchemaTypes>
+            <SchemaType>Windows!Microsoft.Windows.PowerShellSchema</SchemaType>
+          </IncludeSchemaTypes>
+          <xsd:element minOccurs="1" name="IntervalSeconds" type="xsd:integer"/>
+          <xsd:element minOccurs="1" name="SyncTime" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="Debug" type="xsd:boolean"/>
+          <xsd:element minOccurs="1" name="SNMPAddress" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPPort" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPVersion" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPCommunity" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3UserName" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3AuthProtocol" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3AuthPassword" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3PrivProtocol" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3PrivPassword" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3ContextName" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="TimeoutSeconds" type="xsd:integer"/>
+          <xsd:element minOccurs="1" name="TempSensorIndex" type="xsd:string"/>
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="IntervalSeconds" Selector="$Config/IntervalSeconds$" ParameterType="int"/>
+          <OverrideableParameter ID="SyncTime" Selector="$Config/SyncTime$" ParameterType="string"/>
+          <OverrideableParameter ID="Debug" Selector="$Config/Debug$" ParameterType="bool"/>
+        </OverrideableParameters>
+        <ModuleImplementation Isolation="Any">
+          <Composite>
+            <MemberModules>
+              <DataSource ID="Script" TypeID="AP.F5.DataSource.Monitor.Device.TempSensorInfo">
+                <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
+                <SyncTime>$Config/SyncTime$</SyncTime>
+                <Debug>$Config/Debug$</Debug>
+                <SNMPAddress>$Config/SNMPAddress$</SNMPAddress>
+                <SNMPPort>$Config/SNMPPort$</SNMPPort>
+                <SNMPVersion>$Config/SNMPVersion$</SNMPVersion>
+                <SNMPCommunity>$Config/SNMPCommunity$</SNMPCommunity>
+                <SNMPv3UserName>$Config/SNMPv3UserName$</SNMPv3UserName>
+                <SNMPv3AuthProtocol>$Config/SNMPv3AuthProtocol$</SNMPv3AuthProtocol>
+                <SNMPv3AuthPassword>$Config/SNMPv3AuthPassword$</SNMPv3AuthPassword>
+                <SNMPv3PrivProtocol>$config/SNMPv3PrivProtocol$</SNMPv3PrivProtocol>
+                <SNMPv3PrivPassword>$Config/SNMPv3PrivPassword$</SNMPv3PrivPassword>
+                <SNMPv3ContextName>$Config/SNMPv3ContextName$</SNMPv3ContextName>
+                <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+              </DataSource>
+              <ConditionDetection ID="FilterByIndex" TypeID="System!System.ExpressionFilter">
+                <Expression>
+                  <SimpleExpression>
+                    <ValueExpression>
+                      <XPathQuery Type="Integer">Property[@Name='Index']</XPathQuery>
+                    </ValueExpression>
+                    <Operator>Equal</Operator>
+                    <ValueExpression>
+                      <Value Type="Integer">$Config/TempSensorIndex$</Value>
+                    </ValueExpression>
+                  </SimpleExpression>
+                </Expression>
+              </ConditionDetection>
+              <ConditionDetection ID="PerfMapper" TypeID="Perf!System.Performance.DataGenericMapper">
+                <ObjectName>TempSensor</ObjectName>
+                <CounterName>Temperature</CounterName>
+                <InstanceName>$Target/Property[Type="System!System.Entity"]/DisplayName$</InstanceName>
+                <Value>$Data/Property[@Name="Temperature"]$</Value>
+              </ConditionDetection>
+            </MemberModules>
+            <Composition>
+              <Node ID="PerfMapper">
+                <Node ID="FilterByIndex">
+                  <Node ID="Script" />
+                </Node>
+              </Node>
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>Perf!System.Performance.Data</OutputType>
+      </DataSourceModuleType>
+
       <!-- MONITOR DATA SOURCES -->
       <!-- AP.F5.DataSource.Monitor.Device.TempSensorInfo -->
       <!-- Calls AP.F5.Probe.Device.TempSensorInfo wraps it with a scheduler -->
@@ -135,6 +215,7 @@
         <OutputType>System!System.PropertyBagData</OutputType>
       </DataSourceModuleType>
 
+      
       <!-- PROBES -->
       <!-- AP.F5.Probe.Device.TempSensorInfo -->
       <!-- Runs script to Return Device TempSensor Info in a property bag-->
@@ -387,7 +468,7 @@
         <!-- AP.F5.DataSource.Monitor.Device.TempSensorInfo.Filtered -->
         <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.TempSensorInfo.Filtered">
           <Name>Filtered Temperature Sensor Info Monitor DataSource</Name>
-          <Description>Runs AP.F5.DataSource.Monitor.Device.TempSensorInfo, filters out the Power Supply needed</Description>
+          <Description>Runs AP.F5.DataSource.Monitor.Device.TempSensorInfo, filters out the Temperature Sensor needed</Description>
         </DisplayString>
         <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.TempSensorInfo.Filtered" SubElementID="IntervalSeconds">
           <Name>Interval Seconds</Name>
@@ -402,10 +483,28 @@
           <Description>Debug Flag, if true then additional info is posted to event log.</Description>
         </DisplayString>
 
+        <!-- AP.F5.DataSource.Perf.Device.TempSensorTemp.Filtered -->
+        <DisplayString ElementID="AP.F5.DataSource.Perf.Device.TempSensorTemp.Filtered">
+          <Name>Filtered Temperature Sensor Info Performance DataSource</Name>
+          <Description>Calls AP.F5.Probe.Device.TempSensorInfo, Filters By Index and returns as Performance Data</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.DataSource.Perf.Device.TempSensorTemp.Filtered" SubElementID="IntervalSeconds">
+          <Name>Interval Seconds</Name>
+          <Description>Frequency in seconds that module is run.</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.DataSource.Perf.Device.TempSensorTemp.Filtered" SubElementID="SyncTime">
+          <Name>Synchronisation Time</Name>
+          <Description>Offset that this module is started from.</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.DataSource.Perf.Device.TempSensorTemp.Filtered" SubElementID="Debug">
+          <Name>Debug</Name>
+          <Description>Debug Flag, if true then additional info is posted to event log.</Description>
+        </DisplayString>
+        
         <!-- AP.F5.DataSource.Monitor.Device.TempSensorInfo -->
         <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.TempSensorInfo">
           <Name>Temperature Sensor Info Monitor DataSource</Name>
-          <Description>Wraps Power Supply Info Probe in scheduler and returns as PropertyBag for Monitors</Description>
+          <Description>Wraps Temp Sensor Info Probe in scheduler and returns as PropertyBag for Monitors</Description>
         </DisplayString>
         <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.TempSensorInfo" SubElementID="IntervalSeconds">
           <Name>Interval Seconds</Name>
@@ -423,7 +522,7 @@
         <!-- AP.F5.Probe.Device.TempSensorInfo -->
         <DisplayString ElementID="AP.F5.Probe.Device.TempSensorInfo">
           <Name>Powershell Temperature Sensor Probe</Name>
-          <Description>Runs Powershell SNMP Script to collect Power Supply Info</Description>
+          <Description>Runs Powershell SNMP Script to collect Temp Sensor Info</Description>
         </DisplayString>
         <DisplayString ElementID="AP.F5.Probe.Device.TempSensorInfo" SubElementID="Debug">
           <Name>Debug</Name>
@@ -433,7 +532,7 @@
         <!-- AP.F5.UnitMonitor.Device.TempSensorHealth -->
         <DisplayString ElementID="AP.F5.UnitMonitor.Device.TempSensorHealth">
           <Name>Device Temperature Sensor Health Monitor</Name>
-          <Description>Compares used Power Supply Percentage against given thresholds</Description>
+          <Description>Compares Temperature against given thresholds</Description>
         </DisplayString>
         <DisplayString ElementID="AP.F5.UnitMonitor.Device.TempSensorHealth" SubElementID="IntervalSeconds">
           <Name>Interval Seconds</Name>

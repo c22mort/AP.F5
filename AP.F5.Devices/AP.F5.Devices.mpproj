@@ -202,6 +202,9 @@
     <Compile Include="Rules\Device.Processor.mpx">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Rules\Device.TempSensor.mpx">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="SecureReference\SecureReference.mpx">
       <SubType>Code</SubType>
     </Compile>
@@ -217,6 +220,7 @@
     <EmbeddedResource Include="Scripts\Discoveries\Discover-PowerSupplies.ps1" />
     <EmbeddedResource Include="Scripts\Discoveries\Discover-Processors.ps1" />
     <EmbeddedResource Include="Scripts\Discoveries\Discover-TemperatureSensors.ps1" />
+    <EmbeddedResource Include="Scripts\MonitorsAndRules\Get-DiskPartitionInfo.ps1" />
     <EmbeddedResource Include="Scripts\MonitorsAndRules\Get-FanInfo.ps1" />
     <EmbeddedResource Include="Scripts\MonitorsAndRules\Get-MemoryInfo.ps1" />
     <EmbeddedResource Include="Scripts\MonitorsAndRules\Get-PowerSupplyInfo.ps1" />

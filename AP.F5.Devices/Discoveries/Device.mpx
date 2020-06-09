@@ -10,7 +10,7 @@
           <DiscoveryRelationship TypeID="AP.F5.Root.Hosts.Devices" />
         </DiscoveryTypes>
         <DataSource ID="DS" TypeID="AP.F5.DataSource.Discovery.Device.Filtered">
-          <IntervalSeconds>14400</IntervalSeconds>
+          <IntervalSeconds>1800</IntervalSeconds>
           <SyncTime>00:00</SyncTime>
           <Debug>false</Debug>
           <TimeoutSeconds>60</TimeoutSeconds>

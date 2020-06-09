@@ -282,14 +282,18 @@ If ($SNMPVersion -eq "3") {
 		For($i=0; $i -lt $DiskCount; $i++){
 			$Path = $DiskPaths[$i].Data.ToString()
 			$Suffix = $DiskPaths[$i].Id.ToString().Replace($sysHostDiskPartition.ToString(),"")
-			$Size = $DiskBlockSize[$i].Data.ToUint32() * $DiskTotalBlocks[$i].Data.ToUInt32()
-			$Size = [Math]::Round((($Size / 1024) / 1024) / 1024, 1)
-			# Create a New F5 Device Fan Instance
+			If ($DiskBlockSize[$i].Data.TypeCode -eq "Gauge32") {
+				$Size = $DiskBlockSize[$i].Data.ToUInt32() * $DiskTotalBlocks[$i].Data.ToUInt32()
+				$Size = [Math]::Round((($Size / 1024) / 1024) / 1024, 1)
+			} else {
+				$Size = $DiskBlockSize[$i].Data.ToInt32() * $DiskTotalBlocks[$i].Data.ToInt32()
+				$Size = [Math]::Round((($Size / 1024) / 1024) / 1024, 1)			
+			}
+			# Create a New F5 Device Disk Partition Instance
 			$instance = $DiscoveryData.CreateClassInstance("$MPElement[Name='AP.F5.Device.DiskPartition']$")
 			$instance.AddProperty("$MPElement[Name='AP.F5.Device']/SerialNumber$", $DeviceKey)
 			$instance.AddProperty("$MPElement[Name='AP.F5.Device.DiskPartition']/Path$", $Path)
 			$instance.AddProperty("$MPElement[Name='AP.F5.Device.DiskPartition']/Size$", $Size)
-			$instance.AddProperty("$MPElement[Name='AP.F5.Device.DiskPartition']/OIDSuffix$", $Suffix)
 			$instance.AddProperty("$MPElement[Name='System!System.Entity']/DisplayName$", $Path)	
 
 			# Add to Discovery Data
@@ -313,14 +317,18 @@ If ($SNMPVersion -eq "3") {
 		For($i=1; $i -le $DiskCount; $i++){		
 			$Path = $DiskPaths[$i].Data.ToString()
 			$Suffix = $DiskPaths[$i].Id.ToString().Replace($sysHostDiskPartition.ToString(),"")
-			$Size = $DiskBlockSize[$i].Data.ToUint32() * $DiskTotalBlocks[$i].Data.ToUInt32()
-			$Size = [Math]::Round((($Size / 1024) / 1024) / 1024, 1)
-			# Create a New F5 Device Fan Instance
+			If ($DiskBlockSize[$i].Data.TypeCode -eq "Gauge32") {
+				$Size = $DiskBlockSize[$i].Data.ToUInt32() * $DiskTotalBlocks[$i].Data.ToUInt32()
+				$Size = [Math]::Round((($Size / 1024) / 1024) / 1024, 1)
+			} else {
+				$Size = $DiskBlockSize[$i].Data.ToInt32() * $DiskTotalBlocks[$i].Data.ToInt32()
+				$Size = [Math]::Round((($Size / 1024) / 1024) / 1024, 1)			
+			}
+			# Create a New F5 Device Disk Partition Instance
 			$instance = $DiscoveryData.CreateClassInstance("$MPElement[Name='AP.F5.Device.DiskPartition']$")
 			$instance.AddProperty("$MPElement[Name='AP.F5.Device']/SerialNumber$", $DeviceKey)
 			$instance.AddProperty("$MPElement[Name='AP.F5.Device.DiskPartition']/Path$", $Path)
 			$instance.AddProperty("$MPElement[Name='AP.F5.Device.DiskPartition']/Size$", $Size)
-			$instance.AddProperty("$MPElement[Name='AP.F5.Device.DiskPartition']/OIDSuffix$", $Suffix)
 			$instance.AddProperty("$MPElement[Name='System!System.Entity']/DisplayName$", $Path)	
 
 			# Add to Discovery Data
