@@ -5,8 +5,8 @@
       <!-- AP.F5.Monitor.Device.TempSensor.Health -->
       <UnitMonitor ID="AP.F5.Monitor.Device.TempSensor.Health" Accessibility="Public" Enabled="true" Target="AP.F5.Device.TempSensor" ParentMonitorID="Health!System.Health.ConfigurationState" Remotable="true" Priority="Normal" TypeID="AP.F5.UnitMonitor.Device.TempSensorHealth" ConfirmDelivery="false">
         <Category>AvailabilityHealth</Category>
-        <AlertSettings AlertMessage="AP.F5.Monitor.Device.Fan.Health.AlertMessage">
-          <AlertOnState>Error</AlertOnState>
+        <AlertSettings AlertMessage="AP.F5.Monitor.Device.TempSensor.Health.AlertMessage">
+          <AlertOnState>Warning</AlertOnState>
           <AutoResolve>true</AutoResolve>
           <AlertPriority>Normal</AlertPriority>
           <AlertSeverity>MatchMonitorHealth</AlertSeverity>
@@ -37,8 +37,8 @@
           <SNMPv3ContextName>$RunAs[Name="AP.F5.Login.SNMPv3"]/ContextName$</SNMPv3ContextName>
           <TimeoutSeconds>60</TimeoutSeconds>
           <TempSensorIndex>$Target/Property[Type="AP.F5.Device.TempSensor"]/Index$</TempSensorIndex>
-          <WarningTemp>27</WarningTemp>
-          <CriticalTemp>32</CriticalTemp>
+          <WarningTemp>29</WarningTemp>
+          <CriticalTemp>35</CriticalTemp>
         </Configuration>
       </UnitMonitor>
 

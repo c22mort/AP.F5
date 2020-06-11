@@ -29,15 +29,15 @@ $Timeout = 10000
 
 #Constants used for event logging
 $SCRIPT_NAME			= 'Get-PowerSupplyInfo.ps1'
-$EVENT_LEVEL_ERROR 		= 1
-$EVENT_LEVEL_WARNING 	= 2
-$EVENT_LEVEL_INFO 		= 4
+$EVENT_LEVEL_ERROR      = 1
+$EVENT_LEVEL_WARNING    = 2
+$EVENT_LEVEL_INFO       = 4
 
-$SCRIPT_STARTED				= 14646
-$SCRIPT_PROPERTYBAG_CREATED	= 14647
-$SCRIPT_EVENT				= 14648
-$SCRIPT_ENDED				= 14649
-$SCRIPT_ERROR				= 14650
+$SCRIPT_STARTED             = 14611
+$SCRIPT_PROPERTYBAG_CREATED	= 14612
+$SCRIPT_EVENT               = 14613
+$SCRIPT_ERROR               = 14614
+$SCRIPT_ENDED               = 14615
 
 #==================================================================================
 # Function:	Get-SnmpV2
@@ -66,7 +66,7 @@ function Get-SnmpV2
     } Catch {
 		# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_INFO,$message)
+   		Log-Event $SCRIPT_ERROR $EVENT_LEVEL_INFO $message $true
 	}
 }
 #==================================================================================
@@ -142,7 +142,7 @@ function Get-SnmpV3
     } Catch {
 		# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_INFO,$message)
+   		Log-Event $SCRIPT_ERROR $EVENT_LEVEL_INFO $message $true
     }
 }
 #==================================================================================
@@ -172,7 +172,7 @@ function Walk-SnmpV2
     } Catch {
 		# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_INFO,$message)
+   		Log-Event $SCRIPT_ERROR $EVENT_LEVEL_INFO $message $true
     }
 }
 #==================================================================================
@@ -243,23 +243,28 @@ function BulkGet-SnmpV3
     } Catch {
 		# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_INFO,$message)
+   		Log-Event $SCRIPT_ERROR $EVENT_LEVEL_INFO $message $true
     }                   
 }
 
 #==================================================================================
-# Sub:		LogDebugEvent
+# Sub:      LogEvent
 # Purpose:	Logs an informational event to the Operations Manager event log
-#			only if Debug argument is true
+#           $writeevent by default is debug value
 #==================================================================================
-function Log-DebugEvent
+function Log-Event
 {
-	param($eventNo,$message, $option)
+	param(
+    $eventNo,
+    $eventLevel,
+    $message,
+    $writeEvent = $Debug
+    )
 
 	$message = $SNMPAddress + "`r`n" + $message + $option
-	if ($Debug -eq $true)
+	if ($writeEvent -eq $true)
 	{
-		$api.LogScriptEvent($SCRIPT_NAME,$eventNo,$EVENT_LEVEL_INFO,$message)
+		$api.LogScriptEvent($SCRIPT_NAME,$eventNo,$eventLevel,$message)
 	}
 }
 
@@ -267,7 +272,7 @@ function Log-DebugEvent
 $api = New-Object -comObject 'MOM.ScriptAPI'
 
 # Log Startup Message
-Log-DebugEvent $SCRIPT_STARTED "Collecting Power Supply Info from F5 Device"
+Log-Event $SCRIPT_STARTED $EVENT_LEVEL_INFO "Collecting Power Supply Info from F5 Device"
 
 # Load SharpSNMPLib
 [void][reflection.assembly]::LoadFrom( (Resolve-Path $SharpSnmpLocation) )
@@ -286,44 +291,63 @@ $PsuCount = 0
 If ($SNMPVersion -eq "3") {
 	Try {
 
-		# Get Count of Power Supplies
-		[int]$PsuCount = (Get-SnmpV3 $connection $sysChassisPowerSupplyNumber).Data.ToInt32()
-		# Get Status of Power Supplies (SNMP3 0 based array)
-		$PsuStatus = BulkGet-SnmpV3 $connection $PsuCount $sysChassisPowerSupplyStatus
-		For ($i=0; $i -lt $psuCount;$i++){
-			[int]$index = $i + 1
-			$message = "Created Power Supply Info Property Bag for PSU-"+ $index + "`r`n"
-			$message = $message + "Power Supply Status : " + $PsuStatus[$i].Data.ToInt32()
-			Log-DebugEvent $SCRIPT_PROPERTYBAG_CREATED $message
-			$bag = $api.CreatePropertyBag()
-			$bag.AddValue("Index", [int]$index)
-			$bag.AddValue("Status", $PsuStatus[$i].Data.ToInt32())
-			$bag
+	    # Try To get Number of PSUs
+		$PsuCount = (Get-SnmpV3 $connection $sysChassisPowerSupplyNumber).Data
+        # Did we Get a Reply
+        If ($PsuCount -eq $null) {
+		    # Write Warning to Event Log
+            Log-Event $SCRIPT_ERROR $EVENT_LEVEL_WARNING "No SNMP Response" $true
+		}
+		else
+		{
+			[int]$PsuCount = $PsuCount.ToInt32()
+			# Get Status of Power Supplies (SNMP3 0 based array)
+			$PsuStatus = BulkGet-SnmpV3 $connection $PsuCount $sysChassisPowerSupplyStatus
+			For ($i=0; $i -lt $psuCount;$i++){
+				[int]$index = $i + 1
+				$message = "Created Power Supply Info Property Bag for PSU-"+ $index + "`r`n"
+				$message = $message + "Power Supply Status : " + $PsuStatus[$i].Data.ToInt32()
+				Log-Event $SCRIPT_PROPERTYBAG_CREATED $EVENT_LEVEL_INFO $message
+				$bag = $api.CreatePropertyBag()
+				$bag.AddValue("Index", [int]$index)
+				$bag.AddValue("Status", $PsuStatus[$i].Data.ToInt32())
+				$bag
+			}
+		
 		}
 	} Catch {
 		# Log Finished Message
 		$message = "SNMPv3 Error : " + $_
-		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_ERROR,$message)
+   		Log-Event $SCRIPT_ERROR $EVENT_LEVEL_INFO $message $true
 	}
 } else {
 	Try {
 
-
-		[int]$PsuCount = (Get-SnmpV2 $connection $sysChassisPowerSupplyNumber).Data.ToInt32()
-		$PsuStatus = Walk-SnmpV2 $connection $sysChassisPowerSupplyStatus
-		For ($i=1; $i -le $psuCount;$i++){
-			$message = "Created Power Supply Info Property Bag for PSU-"+ $i + "`r`n"
-			$message = $message + "Power Supply Status : " + $PsuStatus[$i].Data.ToInt32()
-			Log-DebugEvent $SCRIPT_PROPERTYBAG_CREATED $message
-			$bag = $api.CreatePropertyBag()
-			$bag.AddValue("Index", [int]$i)
-			$bag.AddValue("Status", $PsuStatus[$i].Data.ToInt32())
-			$bag
+	    # Try To get Number of PSUs
+		$PsuCount = (Get-SnmpV2 $connection $sysChassisPowerSupplyNumber).Data
+        # Did we Get a Reply
+        If ($PsuCount -eq $null) {
+		    # Write Warning to Event Log
+            Log-Event $SCRIPT_ERROR $EVENT_LEVEL_WARNING "No SNMP Response" $true
+		}
+		else
+		{
+			[int]$PsuCount = $PsuCount.ToInt32()
+			$PsuStatus = Walk-SnmpV2 $connection $sysChassisPowerSupplyStatus
+			For ($i=1; $i -le $psuCount;$i++){
+				$message = "Created Power Supply Info Property Bag for PSU-"+ $i + "`r`n"
+				$message = $message + "Power Supply Status : " + $PsuStatus[$i].Data.ToInt32()
+				Log-Event $SCRIPT_PROPERTYBAG_CREATED $EVENT_LEVEL_INFO $message
+				$bag = $api.CreatePropertyBag()
+				$bag.AddValue("Index", [int]$i)
+				$bag.AddValue("Status", $PsuStatus[$i].Data.ToInt32())
+				$bag
+			}
 		}
 	} Catch {
 		# Log error Message
 		$message = "SNMPv2 Error : " + $Error + " : " + $_
-		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_ERROR,$message)	
+   		Log-Event $SCRIPT_ERROR $EVENT_LEVEL_INFO $message $true
 	}
 }
 
@@ -335,4 +359,4 @@ $TimeTaken = NEW-TIMESPAN -Start $StartTime -End $EndTime
 $Seconds = [math]::Round($TimeTaken.TotalSeconds, 2)
 
 # Log Finished Message
-Log-DebugEvent $SCRIPT_ENDED "Script Finished. Took $Seconds Seconds to Complete!"
+Log-Event $SCRIPT_ENDED $EVENT_LEVEL_INFO "Script Finished. Took $Seconds Seconds to Complete!"

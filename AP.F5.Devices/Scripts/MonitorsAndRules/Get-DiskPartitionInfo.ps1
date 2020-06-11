@@ -29,15 +29,15 @@ $Timeout = 10000
 
 #Constants used for event logging
 $SCRIPT_NAME			= 'Get-DiskPartitionInfo.ps1'
-$EVENT_LEVEL_ERROR 		= 1
-$EVENT_LEVEL_WARNING 	= 2
-$EVENT_LEVEL_INFO 		= 4
+$EVENT_LEVEL_ERROR      = 1
+$EVENT_LEVEL_WARNING    = 2
+$EVENT_LEVEL_INFO       = 4
 
-$SCRIPT_STARTED				= 14661
-$SCRIPT_PROPERTYBAG_CREATED	= 14662
-$SCRIPT_EVENT				= 14663
-$SCRIPT_ENDED				= 14664
-$SCRIPT_ERROR				= 14665
+$SCRIPT_STARTED             = 14611
+$SCRIPT_PROPERTYBAG_CREATED	= 14612
+$SCRIPT_EVENT               = 14613
+$SCRIPT_ERROR               = 14614
+$SCRIPT_ENDED               = 14615
 
 #==================================================================================
 # Function:	Get-SnmpV2
@@ -66,7 +66,7 @@ function Get-SnmpV2
     } Catch {
 		# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_INFO,$message)
+   		Log-Event $SCRIPT_ERROR $EVENT_LEVEL_ERROR $message $true
 	}
 }
 #==================================================================================
@@ -142,7 +142,7 @@ function Get-SnmpV3
     } Catch {
 		# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_INFO,$message)
+   		Log-Event $SCRIPT_ERROR $EVENT_LEVEL_ERROR $message $true
     }
 }
 #==================================================================================
@@ -172,7 +172,7 @@ function Walk-SnmpV2
     } Catch {
 		# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_INFO,$message)
+   		Log-Event $SCRIPT_ERROR $EVENT_LEVEL_ERROR $message $true
     }
 }
 #==================================================================================
@@ -243,23 +243,28 @@ function BulkGet-SnmpV3
     } Catch {
 		# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_INFO,$message)
+   		Log-Event $SCRIPT_ERROR $EVENT_LEVEL_ERROR $message $true
     }                   
 }
 
 #==================================================================================
-# Sub:		LogDebugEvent
+# Sub:		LogEvent
 # Purpose:	Logs an informational event to the Operations Manager event log
-#			only if Debug argument is true
+#			$writeevent by default is debug value
 #==================================================================================
-function Log-DebugEvent
+function Log-Event
 {
-	param($eventNo,$message, $option)
+	param(
+    $eventNo,
+    $eventLevel,
+    $message,
+    $writeEvent = $Debug
+    )
 
 	$message = $SNMPAddress + "`r`n" + $message + $option
-	if ($Debug -eq $true)
+	if ($writeEvent -eq $true)
 	{
-		$api.LogScriptEvent($SCRIPT_NAME,$eventNo,$EVENT_LEVEL_INFO,$message)
+		$api.LogScriptEvent($SCRIPT_NAME,$eventNo,$eventLevel,$message)
 	}
 }
 
@@ -267,7 +272,7 @@ function Log-DebugEvent
 $api = New-Object -comObject 'MOM.ScriptAPI'
 
 # Log Startup Message
-Log-DebugEvent $SCRIPT_STARTED "Collecting Disk Partition Info from F5 Device"
+Log-Event $SCRIPT_STARTED $EVENT_LEVEL_INFO "Collecting Disk Partition Info from F5 Device"
 
 # Load SharpSNMPLib
 [void][reflection.assembly]::LoadFrom( (Resolve-Path $SharpSnmpLocation) )
@@ -276,6 +281,8 @@ $walkMode = [Lextm.SharpSnmpLib.Messaging.WalkMode]::WithinSubtree
 # Create endpoint for SNMP server
 $connection = New-Object System.Net.IpEndPoint ([System.Net.IPAddress]::Parse($SNMPAddress), $PortNumber)
 
+# bigipTrafficMgmt.bigipSystem.sysSystem.sysSystemName
+$sysSystemName =  New-Object Lextm.SharpSnmpLib.ObjectIdentifier(".1.3.6.1.4.1.3375.2.1.6.1.0")
 # bigipTrafficMgmt.bigipSystem.sysHostInfoStat.sysHostDisk.sysHostDiskNumber
 $sysHostDiskNumber = New-Object Lextm.SharpSnmpLib.ObjectIdentifier(".1.3.6.1.4.1.3375.2.1.7.3.1.0")
 # bigipTrafficMgmt.bigipSystem.sysHostInfoStat.sysHostDisk.sysHostDiskTable.sysHostDiskEntry.sysHostDiskPartition
@@ -289,82 +296,102 @@ $sysHostDiskFreeBlocks = New-Object Lextm.SharpSnmpLib.ObjectIdentifier(".1.3.6.
 $DiskPartitionCount = 0
 If ($SNMPVersion -eq "3") {
 	Try {
-
-		# Get Count of Disk Partitions
-		[int]$DiskPartitionCount = (Get-SnmpV3 $connection $sysHostDiskNumber).Data.ToInt32()
-		# Get Disk Partition Paths (SNMPv3 0 Based Array)
-		$DiskPartitionPaths = BulkGet-SnmpV3 $connection $DiskPartitionCount $sysHostDiskPartition
-		# Get Disk Partition TotalBlocks (SNMPv3 0 Based Array)
-		$DiskPartitionTotalBlocks = BulkGet-SnmpV3 $connection $DiskPartitionCount $sysHostDiskTotalBlocks
-		# Get Disk Partition TotalBlocks (SNMPv3 0 Based Array)
-		$DiskPartitionFreeBlocks = BulkGet-SnmpV3 $connection $DiskPartitionCount $sysHostDiskFreeBlocks
-		For ($i=0; $i -lt $DiskPartitionCount;$i++){
-			If ($DiskPartitionFreeBlocks[$i].Data.TypeCode -eq "Gauge32") {
-				# Calculate Disk Free space and used space
-				[Double]$DiskFreePercentage = [Math]::Round(($DiskPartitionFreeBlocks[$i].Data.ToUInt32() / $DiskPartitionTotalBlocks[$i].Data.ToUInt32()) * 100, 1)
-				[Double]$DiskUsedPercentage = 100 - $DiskFreePercentage
-			} else {			
-				# Calculate Disk Free space and used space
-				[Double]$DiskFreePercentage = [Math]::Round(($DiskPartitionFreeBlocks[$i].Data.ToInt32() / $DiskPartitionTotalBlocks[$i].Data.ToInt32()) * 100, 1)
-				[Double]$DiskUsedPercentage = 100 - $DiskFreePercentage
+	    # Try To get System Name
+        $sysName = (Get-SnmpV3 $connection $sysSystemName).Data
+        # Did we Get a Reply
+        If ($sysName -eq $null) 
+		{
+            # Write Warning to Event Log
+            Log-Event $SCRIPT_ERROR $EVENT_LEVEL_WARNING "No SNMP Response" $true
+		}
+		else
+		{		
+			# Get Count of Disk Partitions
+			[int]$DiskPartitionCount = (Get-SnmpV3 $connection $sysHostDiskNumber).Data.ToInt32()
+			# Get Disk Partition Paths (SNMPv3 0 Based Array)
+			$DiskPartitionPaths = BulkGet-SnmpV3 $connection $DiskPartitionCount $sysHostDiskPartition
+			# Get Disk Partition TotalBlocks (SNMPv3 0 Based Array)
+			$DiskPartitionTotalBlocks = BulkGet-SnmpV3 $connection $DiskPartitionCount $sysHostDiskTotalBlocks
+			# Get Disk Partition TotalBlocks (SNMPv3 0 Based Array)
+			$DiskPartitionFreeBlocks = BulkGet-SnmpV3 $connection $DiskPartitionCount $sysHostDiskFreeBlocks
+			For ($i=0; $i -lt $DiskPartitionCount;$i++){
+				If ($DiskPartitionFreeBlocks[$i].Data.TypeCode -eq "Gauge32") {
+					# Calculate Disk Free space and used space
+					[Double]$DiskFreePercentage = [Math]::Round(($DiskPartitionFreeBlocks[$i].Data.ToUInt32() / $DiskPartitionTotalBlocks[$i].Data.ToUInt32()) * 100, 1)
+					[Double]$DiskUsedPercentage = 100 - $DiskFreePercentage
+				} else {			
+					# Calculate Disk Free space and used space
+					[Double]$DiskFreePercentage = [Math]::Round(($DiskPartitionFreeBlocks[$i].Data.ToInt32() / $DiskPartitionTotalBlocks[$i].Data.ToInt32()) * 100, 1)
+					[Double]$DiskUsedPercentage = [Math]::Round((100 - $DiskFreePercentage), 1)
+				}
+				# Write Debug message
+				$message = "Created Disk Partition Info Property Bag for "+ $DiskPartitionPaths[$i].Data.ToString() + "`r`n"
+				$message = $message + "Free Disk Space % : " + $DiskFreePercentage + "`r`n"
+				$message = $message + "Used Disk Space % : " + $DiskUsedPercentage + "`r`n"
+				Log-Event $SCRIPT_PROPERTYBAG_CREATED $EVENT_LEVEL_INFO $message
+				# Create Property bag
+				$bag = $api.CreatePropertyBag()
+				$bag.AddValue("Path", $DiskPartitionPaths[$i].Data.ToString())
+				$bag.AddValue("UsedSpacePercentage", $DiskUsedPercentage)
+				$bag.AddValue("FreeSpacePercentage", $DiskFreePercentage)
+				$bag
 			}
-			# Write Debug message
-			$message = "Created Disk Partition Info Property Bag for "+ $DiskPartitionPaths[$i].Data.ToString() + "`r`n"
-			$message = $message + "Free Disk Space % : " + $DiskFreePercentage + "`r`n"
-			$message = $message + "Used Disk Space % : " + $DiskUsedPercentage + "`r`n"
-			Log-DebugEvent $SCRIPT_PROPERTYBAG_CREATED $message
-			# Create Property bag
-			$bag = $api.CreatePropertyBag()
-			$bag.AddValue("Path", $DiskPartitionPaths[$i].Data.ToString())
-			$bag.AddValue("UsedSpacePercentage", $DiskUsedPercentage)
-			$bag.AddValue("FreeSpacePercentage", $DiskFreePercentage)
-			#$api.Return($bag)
-			$bag
 		}
 	} Catch {
 		# Log Finished Message
 		$message = "SNMPv3 Error : " + $_
-		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_ERROR,$message)
+		Log-Event $SCRIPT_ERROR $EVENT_LEVEL_ERROR $message
 	}
 } else {
 	Try {
+	    # Try To get System Name
+        $sysName = (Get-SnmpV2 $connection $sysSystemName).Data
+        # Did we Get a Reply
+        If ($sysName -eq $null) 
+		{
+            # Write Warning to Event Log
+            Log-Event $SCRIPT_ERROR $EVENT_LEVEL_WARNING "No SNMP Response" $true
+		}
+		else
+		{		
 
-		# Get Count of Disk Partitions
-		[int]$DiskPartitionCount = (Get-SnmpV2 $connection $sysHostDiskNumber).Data.ToInt32()
-		# Get Disk Partition Paths (SNMPv2 1 Based Array)
-		$DiskPartitionPaths = Walk-SnmpV2 $connection $sysHostDiskPartition
-		# Get Disk Partition TotalBlocks (SNMPv2 1 Based Array)
-		$DiskPartitionTotalBlocks = Walk-SnmpV2 $connection $sysHostDiskTotalBlocks
-		# Get Disk Partition TotalBlocks (SNMPv2 1 Based Array)
-		$DiskPartitionFreeBlocks = Walk-SnmpV2 $connection $sysHostDiskFreeBlocks
+			# Get Count of Disk Partitions
+			[int]$DiskPartitionCount = (Get-SnmpV2 $connection $sysHostDiskNumber).Data.ToInt32()
+			# Get Disk Partition Paths (SNMPv2 1 Based Array)
+			$DiskPartitionPaths = Walk-SnmpV2 $connection $sysHostDiskPartition
+			# Get Disk Partition TotalBlocks (SNMPv2 1 Based Array)
+			$DiskPartitionTotalBlocks = Walk-SnmpV2 $connection $sysHostDiskTotalBlocks
+			# Get Disk Partition TotalBlocks (SNMPv2 1 Based Array)
+			$DiskPartitionFreeBlocks = Walk-SnmpV2 $connection $sysHostDiskFreeBlocks
 		
-		For ($i=1; $i -le $DiskPartitionCount;$i++){
-			If ($DiskPartitionFreeBlocks[$i].Data.TypeCode -eq "Gauge32") {
-				# Calculate Disk Free space and used space
-				[Double]$DiskFreePercentage = [Math]::Round(($DiskPartitionFreeBlocks[$i].Data.ToUInt32() / $DiskPartitionTotalBlocks[$i].Data.ToUInt32()) * 100, 1)
-				[Double]$DiskUsedPercentage = 100 - $DiskFreePercentage
-			} else {			
-				# Calculate Disk Free space and used space
-				[Double]$DiskFreePercentage = [Math]::Round(($DiskPartitionFreeBlocks[$i].Data.ToInt32() / $DiskPartitionTotalBlocks[$i].Data.ToInt32()) * 100, 1)
-				[Double]$DiskUsedPercentage = 100 - $DiskFreePercentage
+			For ($i=1; $i -le $DiskPartitionCount;$i++){
+				If ($DiskPartitionFreeBlocks[$i].Data.TypeCode -eq "Gauge32") {
+					# Calculate Disk Free space and used space
+					[Double]$DiskFreePercentage = [Math]::Round(($DiskPartitionFreeBlocks[$i].Data.ToUInt32() / $DiskPartitionTotalBlocks[$i].Data.ToUInt32()) * 100, 1)
+					[Double]$DiskUsedPercentage = 100 - $DiskFreePercentage
+				} else {			
+					# Calculate Disk Free space and used space
+					[Double]$DiskFreePercentage = [Math]::Round(($DiskPartitionFreeBlocks[$i].Data.ToInt32() / $DiskPartitionTotalBlocks[$i].Data.ToInt32()) * 100, 1)
+					[Double]$DiskUsedPercentage = [Math]::Round((100 - $DiskFreePercentage), 1)
+				}
+				# Write Debug message
+				$message = "Created Disk Partition Info Property Bag for "+ $DiskPartitionPaths[$i].Data.ToString() + "`r`n"
+				$message = $message + "Free Disk Space % : " + $DiskFreePercentage + "`r`n"
+				$message = $message + "Used Disk Space % : " + $DiskUsedPercentage + "`r`n"
+				Log-Event $SCRIPT_PROPERTYBAG_CREATED $EVENT_LEVEL_INFO $message
+				# Create Property bag
+				$bag = $api.CreatePropertyBag()
+				$bag.AddValue("Path", $DiskPartitionPaths[$i].Data.ToString())
+				$bag.AddValue("UsedSpacePercentage", $DiskUsedPercentage)
+				$bag.AddValue("FreeSpacePercentage", $DiskFreePercentage)
+				$bag
 			}
-			# Write Debug message
-			$message = "Created Disk Partition Info Property Bag for "+ $DiskPartitionPaths[$i].Data.ToString() + "`r`n"
-			$message = $message + "Free Disk Space % : " + $DiskFreePercentage + "`r`n"
-			$message = $message + "Used Disk Space % : " + $DiskUsedPercentage + "`r`n"
-			Log-DebugEvent $SCRIPT_PROPERTYBAG_CREATED $message
-			# Create Property bag
-			$bag = $api.CreatePropertyBag()
-			$bag.AddValue("Path", $DiskPartitionPaths[$i].Data.ToString())
-			$bag.AddValue("UsedSpacePercentage", $DiskUsedPercentage)
-			$bag.AddValue("FreeSpacePercentage", $DiskFreePercentage)
-			$bag
 		}
 
 	} Catch {
 		# Log error Message
 		$message = "SNMPv2 Error : " + $Error + " : " + $_
-		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_ERROR,$message)	
+		Log-Event $SCRIPT_ERROR $EVENT_LEVEL_ERROR $message
 	}
 }
 
@@ -375,4 +402,4 @@ $TimeTaken = NEW-TIMESPAN -Start $StartTime -End $EndTime
 $Seconds = [math]::Round($TimeTaken.TotalSeconds, 2)
 
 # Log Finished Message
-Log-DebugEvent $SCRIPT_ENDED "Script Finished. Took $Seconds Seconds to Complete!"
+Log-Event $SCRIPT_ENDED $EVENT_LEVEL_INFO "Script Finished. Took $Seconds Seconds to Complete!"

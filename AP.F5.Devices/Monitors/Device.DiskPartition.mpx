@@ -1,0 +1,90 @@
+﻿<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Monitoring>
+    <Monitors>
+
+      <!-- AP.F5.Monitor.Device.DiskPartition.FreeSpace -->
+      <UnitMonitor ID="AP.F5.Monitor.Device.DiskPartition.FreeSpace" Accessibility="Public" Enabled="true" Target="AP.F5.Device.DiskPartition" ParentMonitorID="Health!System.Health.PerformanceState" Remotable="true" Priority="Normal" TypeID="AP.F5.UnitMonitor.Device.DiskPartitionFreeSpace" ConfirmDelivery="false">
+        <Category>AvailabilityHealth</Category>
+        <AlertSettings AlertMessage="AP.F5.Monitor.Device.DiskPartition.FreeSpace.AlertMessage">
+          <AlertOnState>Warning</AlertOnState>
+          <AutoResolve>true</AutoResolve>
+          <AlertPriority>Normal</AlertPriority>
+          <AlertSeverity>MatchMonitorHealth</AlertSeverity>
+          <AlertParameters>
+            <AlertParameter1>$Target/Host/Property[Type="AP.F5.Device"]/DeviceName$</AlertParameter1>
+            <AlertParameter2>$Data/Context/Property[@Name='Path']$</AlertParameter2>
+            <AlertParameter3>$Data/Context/Property[@Name='FreeSpacePercentage']$</AlertParameter3>
+          </AlertParameters>
+        </AlertSettings>
+        <OperationalStates>
+          <OperationalState ID="DiskPartitionFreeSpaceHealthy" MonitorTypeStateID="DiskPartitionFreeSpaceHealthy" HealthState="Success" />
+          <OperationalState ID="DiskPartitionFreeSpaceWarning" MonitorTypeStateID="DiskPartitionFreeSpaceWarning" HealthState="Warning" />
+          <OperationalState ID="DiskPartitionFreeSpaceCritical" MonitorTypeStateID="DiskPartitionFreeSpaceCritical" HealthState="Error" />
+        </OperationalStates>
+        <Configuration>
+          <IntervalSeconds>300</IntervalSeconds>
+          <SyncTime />
+          <Debug>true</Debug>
+          <SNMPAddress>$Target/Host/Property[Type="AP.F5.Device"]/SNMPAddress$</SNMPAddress>
+          <SNMPPort>$Target/Host/Property[Type="AP.F5.Device"]/SNMPPort$</SNMPPort>
+          <SNMPVersion>$Target/Host/Property[Type="AP.F5.Device"]/SNMPVersion$</SNMPVersion>
+          <SNMPCommunity>$RunAs[Name="AP.F5.Login.SNMPv2"]/CommunityString$</SNMPCommunity>
+          <SNMPv3UserName>$RunAs[Name="AP.F5.Login.SNMPv3"]/UserName$</SNMPv3UserName>
+          <SNMPv3AuthProtocol>$RunAs[Name="AP.F5.Login.SNMPv3"]/AuthenticationProtocol$</SNMPv3AuthProtocol>
+          <SNMPv3AuthPassword>$RunAs[Name="AP.F5.Login.SNMPv3"]/AuthenticationKey$</SNMPv3AuthPassword>
+          <SNMPv3PrivProtocol>$RunAs[Name="AP.F5.Login.SNMPv3"]/PrivacyProtocol$</SNMPv3PrivProtocol>
+          <SNMPv3PrivPassword>$RunAs[Name="AP.F5.Login.SNMPv3"]/PrivacyKey$</SNMPv3PrivPassword>
+          <SNMPv3ContextName>$RunAs[Name="AP.F5.Login.SNMPv3"]/ContextName$</SNMPv3ContextName>
+          <TimeoutSeconds>60</TimeoutSeconds>
+          <DiskPartitionPath>$Target/Property[Type="AP.F5.Device.DiskPartition"]/Path$</DiskPartitionPath>
+          <WarningLimit>20</WarningLimit>
+          <CriticalLimit>10</CriticalLimit>
+        </Configuration>
+      </UnitMonitor>
+
+    </Monitors>
+
+  </Monitoring>
+
+  <Presentation>
+    <StringResources>
+      <StringResource ID="AP.F5.Monitor.Device.DiskPartition.FreeSpace.AlertMessage" />
+    </StringResources>
+  </Presentation>
+
+  <LanguagePacks>
+    <LanguagePack ID="ENU" IsDefault="true">
+      <DisplayStrings>
+
+        <!-- AP.F5.Monitor.Device.DiskPartition.FreeSpace -->
+        <DisplayString ElementID="AP.F5.Monitor.Device.DiskPartition.FreeSpace">
+          <Name>Monitor DiskPartition Free Space</Name>
+          <Description>Monitors DiskPartition Free Space using SNMP</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.Monitor.Device.DiskPartition.FreeSpace.AlertMessage">
+          <Name>F5 Device Disk Partition Low on Free Space</Name>
+          <Description>
+            F5 Device : {0}
+
+            Free Space on Partition {1} has changed to {2}%
+          </Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.Monitor.Device.DiskPartition.FreeSpace" SubElementID="DiskPartitionFreeSpaceHealthy">
+          <Name>DiskPartition Healthy</Name>
+          <Description>Healthy DiskPartition Condition</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.Monitor.Device.DiskPartition.FreeSpace" SubElementID="DiskPartitionFreeSpaceWarning">
+          <Name>DiskPartition Warning</Name>
+          <Description>Warning DiskPartition Condition</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.Monitor.Device.DiskPartition.FreeSpace" SubElementID="DiskPartitionFreeSpaceCritical">
+          <Name>DiskPartition Critical</Name>
+          <Description>Critical DiskPartition Condition</Description>
+        </DisplayString>
+
+      </DisplayStrings>
+
+
+    </LanguagePack>
+  </LanguagePacks>
+</ManagementPackFragment>

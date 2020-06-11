@@ -130,10 +130,16 @@
     <Compile Include="DataSources\Discovery\Device.TemperatureSensore.mpx">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DataSources\MonitorsAndRules\Device.DiskPartition.mpx">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="DataSources\MonitorsAndRules\Device.Fan.mpx">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="DataSources\MonitorsAndRules\Device.Memory.mpx">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DataSources\MonitorsAndRules\Device.mpx">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="DataSources\MonitorsAndRules\Device.PowerSupply.mpx">
@@ -172,10 +178,16 @@
     <Compile Include="LanguagePack.mpx">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Monitors\Device.DiskPartition.mpx">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Monitors\Device.Fan.mpx">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Monitors\Device.Memory.mpx">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Monitors\Device.mpx">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Monitors\Device.PowerSupply.mpx">
@@ -199,6 +211,9 @@
     <Compile Include="Rules\Device.Memory.mpx">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Rules\Device.mpx">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Rules\Device.Processor.mpx">
       <SubType>Code</SubType>
     </Compile>
@@ -220,6 +235,7 @@
     <EmbeddedResource Include="Scripts\Discoveries\Discover-PowerSupplies.ps1" />
     <EmbeddedResource Include="Scripts\Discoveries\Discover-Processors.ps1" />
     <EmbeddedResource Include="Scripts\Discoveries\Discover-TemperatureSensors.ps1" />
+    <EmbeddedResource Include="Scripts\MonitorsAndRules\Get-DeviceInfo.ps1" />
     <EmbeddedResource Include="Scripts\MonitorsAndRules\Get-DiskPartitionInfo.ps1" />
     <EmbeddedResource Include="Scripts\MonitorsAndRules\Get-FanInfo.ps1" />
     <EmbeddedResource Include="Scripts\MonitorsAndRules\Get-MemoryInfo.ps1" />

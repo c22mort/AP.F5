@@ -29,15 +29,15 @@ $Timeout = 10000
 
 #Constants used for event logging
 $SCRIPT_NAME			= 'Get-FanInfo.ps1'
-$EVENT_LEVEL_ERROR 		= 1
-$EVENT_LEVEL_WARNING 	= 2
-$EVENT_LEVEL_INFO 		= 4
+$EVENT_LEVEL_ERROR      = 1
+$EVENT_LEVEL_WARNING    = 2
+$EVENT_LEVEL_INFO       = 4
 
-$SCRIPT_STARTED				= 14651
-$SCRIPT_PROPERTYBAG_CREATED	= 14652
-$SCRIPT_EVENT				= 14653
-$SCRIPT_ENDED				= 14654
-$SCRIPT_ERROR				= 14655
+$SCRIPT_STARTED             = 14611
+$SCRIPT_PROPERTYBAG_CREATED	= 14612
+$SCRIPT_EVENT               = 14613
+$SCRIPT_ERROR               = 14614
+$SCRIPT_ENDED               = 14615
 
 #==================================================================================
 # Function:	Get-SnmpV2
@@ -66,7 +66,7 @@ function Get-SnmpV2
     } Catch {
 		# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_INFO,$message)
+   		Log-Event $SCRIPT_ERROR $EVENT_LEVEL_ERROR $message $true
 	}
 }
 #==================================================================================
@@ -142,7 +142,7 @@ function Get-SnmpV3
     } Catch {
 		# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_INFO,$message)
+   		Log-Event $SCRIPT_ERROR $EVENT_LEVEL_ERROR $message $true
     }
 }
 #==================================================================================
@@ -172,7 +172,7 @@ function Walk-SnmpV2
     } Catch {
 		# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_INFO,$message)
+   		Log-Event $SCRIPT_ERROR $EVENT_LEVEL_ERROR $message $true
     }
 }
 #==================================================================================
@@ -243,23 +243,28 @@ function BulkGet-SnmpV3
     } Catch {
 		# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   			$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_INFO,$message)
+   		Log-Event $SCRIPT_ERROR $EVENT_LEVEL_ERROR $message $true
     }                   
 }
 
 #==================================================================================
-# Sub:		LogDebugEvent
+# Sub:		LogEvent
 # Purpose:	Logs an informational event to the Operations Manager event log
-#			only if Debug argument is true
+#			$writeevent by default is debug value
 #==================================================================================
-function Log-DebugEvent
+function Log-Event
 {
-	param($eventNo,$message, $option)
+	param(
+    $eventNo,
+    $eventLevel,
+    $message,
+    $writeEvent = $Debug
+    )
 
 	$message = $SNMPAddress + "`r`n" + $message + $option
-	if ($Debug -eq $true)
+	if ($writeEvent -eq $true)
 	{
-		$api.LogScriptEvent($SCRIPT_NAME,$eventNo,$EVENT_LEVEL_INFO,$message)
+		$api.LogScriptEvent($SCRIPT_NAME,$eventNo,$eventLevel,$message)
 	}
 }
 
@@ -267,7 +272,7 @@ function Log-DebugEvent
 $api = New-Object -comObject 'MOM.ScriptAPI'
 
 # Log Startup Message
-Log-DebugEvent $SCRIPT_STARTED "Collecting Fan Info from F5 Device"
+Log-Event $SCRIPT_STARTED $EVENT_LEVEL_INFO "Collecting Fan Info from F5 Device"
 
 # Load SharpSNMPLib
 [void][reflection.assembly]::LoadFrom( (Resolve-Path $SharpSnmpLocation) )
@@ -276,6 +281,8 @@ $walkMode = [Lextm.SharpSnmpLib.Messaging.WalkMode]::WithinSubtree
 # Create endpoint for SNMP server
 $connection = New-Object System.Net.IpEndPoint ([System.Net.IPAddress]::Parse($SNMPAddress), $PortNumber)
 
+# bigipTrafficMgmt.bigipSystem.sysSystem.sysSystemName
+$sysSystemName =  New-Object Lextm.SharpSnmpLib.ObjectIdentifier(".1.3.6.1.4.1.3375.2.1.6.1.0")
 # bigipTrafficMgmt.bigipSystem.sysPlatform.sysChassis.sysChassisFan.sysChassisFanNumber
 $sysChassisFanNumber = New-Object Lextm.SharpSnmpLib.ObjectIdentifier(".1.3.6.1.4.1.3375.2.1.3.2.1.1.0")
 # bigipTrafficMgmt.bigipSystem.sysPlatform.sysChassis.sysChassisFan.sysChassisFanTable.sysChassisFanEntry.sysChassisFanStatus
@@ -286,46 +293,69 @@ $FanCount = 0
 If ($SNMPVersion -eq "3") {
 	Try {
 
-		# Get Count of Fans
-		[int]$FanCount = (Get-SnmpV3 $connection $sysChassisFanNumber).Data.ToInt32()
-		# Get Status of Fans (SNMP3 0 based array)
-		$FanStatus = BulkGet-SnmpV3 $connection $FanCount $sysChassisFanStatus
-		For ($i=0; $i -lt $FanCount;$i++){
-			[int]$index = $i + 1
-			$message = "Created Fan Info Property Bag for Fan-"+ $index + "`r`n"
-			$message = $message + "Fan Status : " + $FanStatus[$i].Data.ToInt32()
-			Log-DebugEvent $SCRIPT_PROPERTYBAG_CREATED $message
-			$bag = $api.CreatePropertyBag()
-			$bag.AddValue("Index", [int]$index)
-			$bag.AddValue("Status", $FanStatus[$i].Data.ToInt32())
-			$bag
+        # Try To get System Name
+        $sysName = (Get-SnmpV3 $connection $sysSystemName).Data
+        # Did we Get a Reply
+        If ($sysName -eq $null) {
+
+            # Write Warning to Event Log
+            Log-Event $SCRIPT_ERROR $EVENT_LEVEL_WARNING "No SNMP Response" $true
+		}
+		else
+		{
+			# Get Count of Fans
+			[int]$FanCount = (Get-SnmpV3 $connection $sysChassisFanNumber).Data.ToInt32()
+			# Get Status of Fans (SNMP3 0 based array)
+			$FanStatus = BulkGet-SnmpV3 $connection $FanCount $sysChassisFanStatus
+			For ($i=0; $i -lt $FanCount;$i++){
+				[int]$index = $i + 1
+				$message = "Created Fan Info Property Bag for Fan-"+ $index + "`r`n"
+				$message = $message + "Fan Status : " + $FanStatus[$i].Data.ToInt32()
+				Log-Event $SCRIPT_PROPERTYBAG_CREATED $EVENT_LEVEL_INFO $message
+				$bag = $api.CreatePropertyBag()
+				$bag.AddValue("Index", [int]$index)
+				$bag.AddValue("Status", $FanStatus[$i].Data.ToInt32())
+				$bag
+			}
+		
 		}
 
 	} Catch {
 		# Log Finished Message
 		$message = "SNMPv3 Error : " + $_
-		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_ERROR,$message)
+		Log-Event $SCRIPT_ERROR $EVENT_LEVEL_ERROR $message $true
 	}
 } else {
 	Try {
+        # Try To get System Name
+        $sysName = (Get-SnmpV2 $connection $sysSystemName).Data
+        # Did we Get a Reply
+        If ($sysName -eq $null) {
 
-		# Get Count of Fans
-		[int]$FanCount = (Get-SnmpV2 $connection $sysChassisFanNumber).Data.ToInt32()
-		# Get Status of Fans (SNMP2 1 based array)
-		$FanStatus = Walk-SnmpV2 $connection $sysChassisFanStatus
-		For ($i=1; $i -le $FanCount;$i++){
-			$message = "Created Fan Info Property Bag for Fan-"+ $i + "`r`n"
-			$message = $message + "Fan Status : " + $FanStatus[$i].Data.ToInt32()
-			Log-DebugEvent $SCRIPT_PROPERTYBAG_CREATED $message
-			$bag = $api.CreatePropertyBag()
-			$bag.AddValue("Index", [int]$i)
-			$bag.AddValue("Status", $FanStatus[$i].Data.ToInt32())
-			$bag
+            # Write Warning to Event Log
+            Log-Event $SCRIPT_ERROR $EVENT_LEVEL_WARNING "No SNMP Response" $true
+		}
+		else
+		{
+
+			# Get Count of Fans
+			[int]$FanCount = (Get-SnmpV2 $connection $sysChassisFanNumber).Data.ToInt32()
+			# Get Status of Fans (SNMP2 1 based array)
+			$FanStatus = Walk-SnmpV2 $connection $sysChassisFanStatus
+			For ($i=1; $i -le $FanCount;$i++){
+				$message = "Created Fan Info Property Bag for Fan-"+ $i + "`r`n"
+				$message = $message + "Fan Status : " + $FanStatus[$i].Data.ToInt32()
+				Log-Event $SCRIPT_PROPERTYBAG_CREATED $EVENT_LEVEL_INFO $message
+				$bag = $api.CreatePropertyBag()
+				$bag.AddValue("Index", [int]$i)
+				$bag.AddValue("Status", $FanStatus[$i].Data.ToInt32())
+				$bag
+			}
 		}
 	} Catch {
 		# Log error Message
 		$message = "SNMPv2 Error : " + $Error + " : " + $_
-		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_ERROR,$message)	
+		Log-Event $SCRIPT_ERROR $EVENT_LEVEL_ERROR $message $true	
 	}
 }
 
@@ -335,4 +365,4 @@ $TimeTaken = NEW-TIMESPAN -Start $StartTime -End $EndTime
 $Seconds = [math]::Round($TimeTaken.TotalSeconds, 2)
 
 # Log Finished Message
-Log-DebugEvent $SCRIPT_ENDED "Script Finished. Took $Seconds Seconds to Complete!"
+Log-Event $SCRIPT_ENDED $EVENT_LEVEL_INFO "Script Finished. Took $Seconds Seconds to Complete!"

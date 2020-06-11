@@ -1,0 +1,145 @@
+﻿<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Monitoring>
+    <Monitors>
+
+      <!-- AP.F5.Monitor.Device.SnmpState -->
+      <UnitMonitor ID="AP.F5.Monitor.Device.SnmpState" Accessibility="Public" Enabled="true" Target="AP.F5.Device" ParentMonitorID="Health!System.Health.AvailabilityState" Remotable="true" Priority="Normal" TypeID="AP.F5.UnitMonitor.Device.SnmpState" ConfirmDelivery="false">
+        <Category>AvailabilityHealth</Category>
+        <AlertSettings AlertMessage="AP.F5.Monitor.Device.SnmpState.AlertMessage">
+          <AlertOnState>Error</AlertOnState>
+          <AutoResolve>true</AutoResolve>
+          <AlertPriority>Normal</AlertPriority>
+          <AlertSeverity>MatchMonitorHealth</AlertSeverity>
+          <AlertParameters>
+            <AlertParameter1>$Target/Property[Type="AP.F5.Device"]/DeviceName$</AlertParameter1>
+            <AlertParameter2>$Data/Context/Property[@Name='SnmpState']$</AlertParameter2>
+          </AlertParameters>
+        </AlertSettings>
+        <OperationalStates>
+          <OperationalState ID="SnmpGood" MonitorTypeStateID="SnmpGood" HealthState="Success" />
+          <OperationalState ID="SnmpBad" MonitorTypeStateID="SnmpBad" HealthState="Error" />
+        </OperationalStates>
+        <Configuration>
+          <IntervalSeconds>300</IntervalSeconds>
+          <SyncTime />
+          <Debug>true</Debug>
+          <SNMPAddress>$Target/Property[Type="AP.F5.Device"]/SNMPAddress$</SNMPAddress>
+          <SNMPPort>$Target/Property[Type="AP.F5.Device"]/SNMPPort$</SNMPPort>
+          <SNMPVersion>$Target/Property[Type="AP.F5.Device"]/SNMPVersion$</SNMPVersion>
+          <SNMPCommunity>$RunAs[Name="AP.F5.Login.SNMPv2"]/CommunityString$</SNMPCommunity>
+          <SNMPv3UserName>$RunAs[Name="AP.F5.Login.SNMPv3"]/UserName$</SNMPv3UserName>
+          <SNMPv3AuthProtocol>$RunAs[Name="AP.F5.Login.SNMPv3"]/AuthenticationProtocol$</SNMPv3AuthProtocol>
+          <SNMPv3AuthPassword>$RunAs[Name="AP.F5.Login.SNMPv3"]/AuthenticationKey$</SNMPv3AuthPassword>
+          <SNMPv3PrivProtocol>$RunAs[Name="AP.F5.Login.SNMPv3"]/PrivacyProtocol$</SNMPv3PrivProtocol>
+          <SNMPv3PrivPassword>$RunAs[Name="AP.F5.Login.SNMPv3"]/PrivacyKey$</SNMPv3PrivPassword>
+          <SNMPv3ContextName>$RunAs[Name="AP.F5.Login.SNMPv3"]/ContextName$</SNMPv3ContextName>
+          <TimeoutSeconds>60</TimeoutSeconds>
+        </Configuration>
+      </UnitMonitor>
+      
+      <!-- AP.F5.Monitor.Device.FailoverState -->
+      <UnitMonitor ID="AP.F5.Monitor.Device.FailoverState" Accessibility="Public" Enabled="true" Target="AP.F5.Device" ParentMonitorID="Health!System.Health.AvailabilityState" Remotable="true" Priority="Normal" TypeID="AP.F5.UnitMonitor.Device.FailoverState" ConfirmDelivery="false">
+        <Category>AvailabilityHealth</Category>
+        <AlertSettings AlertMessage="AP.F5.Monitor.Device.FailoverState.AlertMessage">
+          <AlertOnState>Error</AlertOnState>
+          <AutoResolve>true</AutoResolve>
+          <AlertPriority>Normal</AlertPriority>
+          <AlertSeverity>MatchMonitorHealth</AlertSeverity>
+          <AlertParameters>
+            <AlertParameter1>$Target/Property[Type="AP.F5.Device"]/DeviceName$</AlertParameter1>
+            <AlertParameter2>$Data/Context/Property[@Name='FailoverStateId']$</AlertParameter2>
+            <AlertParameter3>$Data/Context/Property[@Name='FailoverStateText']$</AlertParameter3>
+          </AlertParameters>
+        </AlertSettings>
+        <OperationalStates>
+          <OperationalState ID="DeviceActive" MonitorTypeStateID="DeviceActive" HealthState="Success" />
+          <OperationalState ID="DeviceStandby" MonitorTypeStateID="DeviceStandby" HealthState="Warning" />
+          <OperationalState ID="DeviceOffline" MonitorTypeStateID="DeviceOffline" HealthState="Error" />
+        </OperationalStates>
+        <Configuration>
+          <IntervalSeconds>300</IntervalSeconds>
+          <SyncTime />
+          <Debug>true</Debug>
+          <SNMPAddress>$Target/Property[Type="AP.F5.Device"]/SNMPAddress$</SNMPAddress>
+          <SNMPPort>$Target/Property[Type="AP.F5.Device"]/SNMPPort$</SNMPPort>
+          <SNMPVersion>$Target/Property[Type="AP.F5.Device"]/SNMPVersion$</SNMPVersion>
+          <SNMPCommunity>$RunAs[Name="AP.F5.Login.SNMPv2"]/CommunityString$</SNMPCommunity>
+          <SNMPv3UserName>$RunAs[Name="AP.F5.Login.SNMPv3"]/UserName$</SNMPv3UserName>
+          <SNMPv3AuthProtocol>$RunAs[Name="AP.F5.Login.SNMPv3"]/AuthenticationProtocol$</SNMPv3AuthProtocol>
+          <SNMPv3AuthPassword>$RunAs[Name="AP.F5.Login.SNMPv3"]/AuthenticationKey$</SNMPv3AuthPassword>
+          <SNMPv3PrivProtocol>$RunAs[Name="AP.F5.Login.SNMPv3"]/PrivacyProtocol$</SNMPv3PrivProtocol>
+          <SNMPv3PrivPassword>$RunAs[Name="AP.F5.Login.SNMPv3"]/PrivacyKey$</SNMPv3PrivPassword>
+          <SNMPv3ContextName>$RunAs[Name="AP.F5.Login.SNMPv3"]/ContextName$</SNMPv3ContextName>
+          <TimeoutSeconds>60</TimeoutSeconds>
+        </Configuration>
+      </UnitMonitor>
+
+    </Monitors>
+
+  </Monitoring>
+
+  <Presentation>
+    <StringResources>
+      <StringResource ID="AP.F5.Monitor.Device.SnmpState.AlertMessage" />
+      <StringResource ID="AP.F5.Monitor.Device.FailoverState.AlertMessage" />
+    </StringResources>
+  </Presentation>
+
+  <LanguagePacks>
+    <LanguagePack ID="ENU" IsDefault="true">
+      <DisplayStrings>
+
+        <!-- AP.F5.Monitor.Device.SnmpState -->
+        <DisplayString ElementID="AP.F5.Monitor.Device.SnmpState">
+          <Name>Monitor SNMP State</Name>
+          <Description>Monitors SNMP State using SNMP</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.Monitor.Device.SnmpState.AlertMessage">
+          <Name>F5 Device has changed SnmpState</Name>
+          <Description>
+            F5 Device : {0}
+
+            SnmpState has changed to {1}
+          </Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.Monitor.Device.SnmpState" SubElementID="SnmpGood">
+          <Name>Device SNMP State is Good</Name>
+          <Description>Device SNMP State is Good</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.Monitor.Device.SnmpState" SubElementID="SnmpBad">
+          <Name>Device SNMP State is Bad</Name>
+          <Description>Device SNMP State is Bad</Description>
+        </DisplayString>
+
+        <!-- AP.F5.Monitor.Device.FailoverState -->
+        <DisplayString ElementID="AP.F5.Monitor.Device.FailoverState">
+          <Name>Monitor Device Failover State</Name>
+          <Description>Monitors Device Failover State using SNMP</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.Monitor.Device.FailoverState.AlertMessage">
+          <Name>F5 Device has changed FailoverState</Name>
+          <Description>
+            F5 Device : {0}
+
+            FailoverState has changed to {1}({2})
+          </Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.Monitor.Device.FailoverState" SubElementID="DeviceActive">
+          <Name>Device is Active</Name>
+          <Description>Failover State is Active</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.Monitor.Device.FailoverState" SubElementID="DeviceStandby">
+          <Name>FailoverState is Standby</Name>
+          <Description>FailoverState is Standby</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.Monitor.Device.FailoverState" SubElementID="DeviceOffline">
+          <Name>FailoverState is Offline</Name>
+          <Description>FailoverState is Offline</Description>
+        </DisplayString>
+
+      </DisplayStrings>
+
+
+    </LanguagePack>
+  </LanguagePacks>
+</ManagementPackFragment>

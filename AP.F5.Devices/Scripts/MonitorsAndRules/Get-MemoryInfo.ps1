@@ -29,15 +29,15 @@ $Timeout = 10000
 
 #Constants used for event logging
 $SCRIPT_NAME			= 'Get-MemoryInfo.ps1'
-$EVENT_LEVEL_ERROR 		= 1
-$EVENT_LEVEL_WARNING 	= 2
-$EVENT_LEVEL_INFO 		= 4
+$EVENT_LEVEL_ERROR      = 1
+$EVENT_LEVEL_WARNING    = 2
+$EVENT_LEVEL_INFO       = 4
 
-$SCRIPT_STARTED				= 14631
-$SCRIPT_PROPERTYBAG_CREATED	= 14632
-$SCRIPT_EVENT				= 14633
-$SCRIPT_ENDED				= 14634
-$SCRIPT_ERROR				= 14635
+$SCRIPT_STARTED             = 14611
+$SCRIPT_PROPERTYBAG_CREATED	= 14612
+$SCRIPT_EVENT               = 14613
+$SCRIPT_ERROR               = 14614
+$SCRIPT_ENDED               = 14615
 
 #==================================================================================
 # Function:	Get-SnmpV2
@@ -66,7 +66,7 @@ function Get-SnmpV2
     } Catch {
 		# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_INFO,$message)
+   		Log-Event $SCRIPT_ERROR $EVENT_LEVEL_ERROR $message $true
 	}
 }
 
@@ -141,25 +141,30 @@ function Get-SnmpV3
         # Get Results
         $reply = [Lextm.SharpSnmpLib.Messaging.SnmpMessageExtension]::GetResponse($request, 3500, $reciever)
     } Catch {
-		# Write Error to Event Log
+    	# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_INFO,$message)
+   		Log-Event $SCRIPT_ERROR $EVENT_LEVEL_ERROR $message $true
     }
 }
 
 #==================================================================================
-# Sub:		LogDebugEvent
+# Sub:		LogEvent
 # Purpose:	Logs an informational event to the Operations Manager event log
-#			only if Debug argument is true
+#			$writeevent by default is debug value
 #==================================================================================
-function Log-DebugEvent
+function Log-Event
 {
-	param($eventNo,$message, $option)
+	param(
+    $eventNo,
+    $eventLevel,
+    $message,
+    $writeEvent = $Debug
+    )
 
 	$message = $SNMPAddress + "`r`n" + $message + $option
-	if ($Debug -eq $true)
+	if ($writeEvent -eq $true)
 	{
-		$api.LogScriptEvent($SCRIPT_NAME,$eventNo,$EVENT_LEVEL_INFO,$message)
+		$api.LogScriptEvent($SCRIPT_NAME,$eventNo,$eventLevel,$message)
 	}
 }
 
@@ -167,7 +172,7 @@ function Log-DebugEvent
 $api = New-Object -comObject 'MOM.ScriptAPI'
 
 # Log Startup Message
-Log-DebugEvent $SCRIPT_STARTED "Collecting Memory Info from F5 Device"
+Log-Event $SCRIPT_STARTED $EVENT_LEVEL_INFO "Collecting Memory Info from F5 Device"
 
 # Load SharpSNMPLib
 [void][reflection.assembly]::LoadFrom( (Resolve-Path $SharpSnmpLocation) )
@@ -176,6 +181,8 @@ $walkMode = [Lextm.SharpSnmpLib.Messaging.WalkMode]::WithinSubtree
 # Create endpoint for SNMP server
 $connection = New-Object System.Net.IpEndPoint ([System.Net.IPAddress]::Parse($SNMPAddress), $PortNumber)
 
+# bigipTrafficMgmt.bigipSystem.sysSystem.sysSystemName
+$sysSystemName =  New-Object Lextm.SharpSnmpLib.ObjectIdentifier(".1.3.6.1.4.1.3375.2.1.6.1.0")
 # bigipTrafficMgmt.bigipSystem.sysHostInfoStat.sysHostMemory.sysHostMemoryTotal
 $sysHostMemoryTotal = New-Object Lextm.SharpSnmpLib.ObjectIdentifier(".1.3.6.1.4.1.3375.2.1.7.1.1.0")
 # bigipTrafficMgmt.bigipSystem.sysHostInfoStat.sysHostMemory.sysHostMemoryUsed
@@ -184,35 +191,95 @@ $sysHostMemoryUsed = New-Object Lextm.SharpSnmpLib.ObjectIdentifier(".1.3.6.1.4.
 # Get SNMP Data (Version Dependant)
 If ($SNMPVersion -eq "3") {
 	Try {
-		$TotalMemory = (Get-SnmpV3 $connection $sysHostMemoryTotal).Data.ToUInt64()
-		$UsedMemory = (Get-SnmpV3 $connection $sysHostMemoryUsed).Data.ToUInt64()
+		
+        # Try To get System Name
+        $sysName = (Get-SnmpV3 $connection $sysSystemName).Data
+        # Did we Get a Reply
+        If ($sysName -eq $null) {
+
+            # Write Warning to Event Log
+            Log-Event $SCRIPT_ERROR $EVENT_LEVEL_WARNING "No SNMP Response" $true
+		}
+		else{
+			# Get memory Counters
+			$UsedMemorySNMP = Get-SnmpV3 $connection $sysHostMemoryUsed
+			$TotalMemorySNMP = Get-SnmpV3 $connection $sysHostMemoryTotal
+			# Work If Counter64 or 32
+			If ($TotalMemorySNMP.Data.TypeCode -eq "Counter64") {
+				$UsedMemory = $UsedMemorySNMP.Data.ToUInt64()
+				$TotalMemory = $TotalMemorySNMP.Data.ToUInt64()
+			} 
+			else 
+			{
+				$UsedMemory = $UsedMemorySNMP.Data.ToUInt32()
+				$TotalMemory = $TotalMemorySNMP.Data.ToUInt32()		
+			}
+			# Calculate Used Memory Percentage
+			[Double]$UsedPercentage = [Math]::Round(($UsedMemory / $TotalMemory) * 100, 1)
+			# Write Log message
+			$message = "Created Memory Info Property Bag;`r`n"
+			$message = $message + "Memory Percentage : " + $UsedPercentage.ToString() + "`r`n"
+			Log-Event $SCRIPT_PROPERTYBAG_CREATED $EVENT_LEVEL_INFO $message
+			# Create Property Bag
+			$bag = $api.CreatePropertyBag()
+			$bag.AddValue("TotalMemory", $TotalMemory)
+			$bag.AddValue("UsedMemory", $UsedMemory)
+			$bag.AddValue("UsedPercentage", $UsedPercentage)
+			$bag
+		
+		}
+
 	} Catch {
 		# Log Finished Message
 		$message = "SNMPv3 Error : " + $_
-		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_ERROR,$message)
+		Log-Event $SCRIPT_ERROR $EVENT_LEVEL_ERROR $message $true
 	}
 } else {
-	Try {
-		$TotalMemory = (Get-SnmpV2 $connection $sysHostMemoryTotal).Data.ToUInt64()	
-		$UsedMemory = (Get-SnmpV2 $connection $sysHostMemoryUsed).Data.ToUInt64()
+	Try
+	{
+        # Try To get System Name
+        $sysName = (Get-SnmpV2 $connection $sysSystemName).Data
+        # Did we Get a Reply
+        If ($sysName -eq $null) {
+
+            # Write Warning to Event Log
+            Log-Event $SCRIPT_ERROR $EVENT_LEVEL_WARNING "No SNMP Response" $true
+		}
+		else{
+			# Get memory Counters
+			$UsedMemorySNMP = Get-SnmpV2 $connection $sysHostMemoryUsed
+			$TotalMemorySNMP = Get-SnmpV2 $connection $sysHostMemoryTotal
+			# Work If Counter64 or 32
+			If ($TotalMemorySNMP.Data.TypeCode -eq "Counter64") {
+				$UsedMemory = $UsedMemorySNMP.Data.ToUInt64()
+				$TotalMemory = $TotalMemorySNMP.Data.ToUInt64()
+			} 
+			else 
+			{
+				$UsedMemory = $UsedMemorySNMP.Data.ToUInt32()
+				$TotalMemory = $TotalMemorySNMP.Data.ToUInt32()		
+			}
+			# Calculate Used Memory Percentage
+			[Double]$UsedPercentage = [Math]::Round(($UsedMemory / $TotalMemory) * 100, 1)
+			# Write Log message
+			$message = "Created Memory Info Property Bag;`r`n"
+			$message = $message + "Memory Percentage : " + $UsedPercentage.ToString() + "`r`n"
+			Log-Event $SCRIPT_PROPERTYBAG_CREATED $EVENT_LEVEL_INFO $message
+			# Create Property Bag
+			$bag = $api.CreatePropertyBag()
+			$bag.AddValue("TotalMemory", $TotalMemory)
+			$bag.AddValue("UsedMemory", $UsedMemory)
+			$bag.AddValue("UsedPercentage", $UsedPercentage)
+			$bag
+		
+		}
 	} Catch {
 		# Log error Message
 		$message = "SNMPv2 Error : " + $Error + " : " + $_
-		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_ERROR,$message)	
+		Log-Event $SCRIPT_ERROR $EVENT_LEVEL_ERROR $message $true
 	}
 }
 
-If ($TotalMemory -ne 0 -And $UsedMemory -ne 0) {
-	# Calculate Used Memory Percentage
-	[Double]$UsedPercentage = [Math]::Round(($UsedMemory / $TotalMemory) * 100, 1)
-	Log-DebugEvent $SCRIPT_EVENT "Memory Percentage : " $UsedPercentage.ToString()
-	Log-DebugEvent $SCRIPT_PROPERTYBAG_CREATED "Created Memory Info Property Bag"
-	$bag = $api.CreatePropertyBag()
-	$bag.AddValue("TotalMemory", $TotalMemory)
-	$bag.AddValue("UsedMemory", $UsedMemory)
-	$bag.AddValue("UsedPercentage", $UsedPercentage)
-	$bag
-}
 
 # Get End Time For Script
 $EndTime = (GET-DATE)
@@ -220,4 +287,4 @@ $TimeTaken = NEW-TIMESPAN -Start $StartTime -End $EndTime
 $Seconds = [math]::Round($TimeTaken.TotalSeconds, 2)
 
 # Log Finished Message
-Log-DebugEvent $SCRIPT_ENDED "Script Finished. Took $Seconds Seconds to Complete!"
+Log-Event $SCRIPT_ENDED $EVENT_LEVEL_INFO "Script Finished. Took $Seconds Seconds to Complete!"

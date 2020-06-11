@@ -29,15 +29,15 @@ $Timeout = 10000
 
 #Constants used for event logging
 $SCRIPT_NAME			= 'Get-ProcessorInfo.ps1'
-$EVENT_LEVEL_ERROR 		= 1
-$EVENT_LEVEL_WARNING 	= 2
-$EVENT_LEVEL_INFO 		= 4
+$EVENT_LEVEL_ERROR      = 1
+$EVENT_LEVEL_WARNING    = 2
+$EVENT_LEVEL_INFO       = 4
 
-$SCRIPT_STARTED				= 14641
-$SCRIPT_PROPERTYBAG_CREATED	= 14642
-$SCRIPT_EVENT				= 14643
-$SCRIPT_ENDED				= 14644
-$SCRIPT_ERROR				= 14645
+$SCRIPT_STARTED             = 14611
+$SCRIPT_PROPERTYBAG_CREATED	= 14612
+$SCRIPT_EVENT               = 14613
+$SCRIPT_ERROR               = 14614
+$SCRIPT_ENDED               = 14615
 
 #==================================================================================
 # Function:	Get-SnmpV2
@@ -66,7 +66,7 @@ function Get-SnmpV2
     } Catch {
 		# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_INFO,$message)
+   		Log-Event $SCRIPT_ERROR $EVENT_LEVEL_INFO $message $true
 	}
 }
 #==================================================================================
@@ -142,7 +142,7 @@ function Get-SnmpV3
     } Catch {
 		# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_INFO,$message)
+   		Log-Event $SCRIPT_ERROR $EVENT_LEVEL_INFO $message $true
     }
 }
 #==================================================================================
@@ -172,7 +172,7 @@ function Walk-SnmpV2
     } Catch {
 		# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_INFO,$message)
+   		Log-Event $SCRIPT_ERROR $EVENT_LEVEL_INFO $message $true
     }
 }
 #==================================================================================
@@ -243,23 +243,28 @@ function BulkGet-SnmpV3
     } Catch {
 		# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_INFO,$message)
+   		Log-Event $SCRIPT_ERROR $EVENT_LEVEL_INFO $message $true
     }                   
 }
 
 #==================================================================================
-# Sub:		LogDebugEvent
+# Sub:      LogEvent
 # Purpose:	Logs an informational event to the Operations Manager event log
-#			only if Debug argument is true
+#           $writeevent by default is debug value
 #==================================================================================
-function Log-DebugEvent
+function Log-Event
 {
-	param($eventNo,$message, $option)
+	param(
+    $eventNo,
+    $eventLevel,
+    $message,
+    $writeEvent = $Debug
+    )
 
 	$message = $SNMPAddress + "`r`n" + $message + $option
-	if ($Debug -eq $true)
+	if ($writeEvent -eq $true)
 	{
-		$api.LogScriptEvent($SCRIPT_NAME,$eventNo,$EVENT_LEVEL_INFO,$message)
+		$api.LogScriptEvent($SCRIPT_NAME,$eventNo,$eventLevel,$message)
 	}
 }
 
@@ -267,7 +272,7 @@ function Log-DebugEvent
 $api = New-Object -comObject 'MOM.ScriptAPI'
 
 # Log Startup Message
-Log-DebugEvent $SCRIPT_STARTED "Collecting Processor Info from F5 Device"
+Log-Event $SCRIPT_STARTED $EVENT_LEVEL_INFO "Collecting Processor Info from F5 Device"
 
 # Load SharpSNMPLib
 [void][reflection.assembly]::LoadFrom( (Resolve-Path $SharpSnmpLocation) )
@@ -287,19 +292,31 @@ If ($SNMPVersion -eq "3") {
 	Try {
 
 		# Get Count of Processors
-		[int]$CpuCount = (Get-SnmpV3 $connection $sysMultiHostCpuNumber).Data.ToInt32()
-		# Get Processor Usage (SNMPv3 0 Based Array)
-		$CpuUsage = BulkGet-SnmpV3 $connection $CpuCount $sysMultiHostCpuUsageRatio5m
-		For ($i=0; $i -lt $CpuCount;$i++){
-			[int]$index = $i + 1
-			$message = "Created Processor Info Property Bag for CPU-"+ $index + "`r`n"
-			$message = $message + "CPU Usage : " + $CpuUsage[$i].Data.ToUInt32()
-			Log-DebugEvent $SCRIPT_PROPERTYBAG_CREATED $message
-			$bag = $api.CreatePropertyBag()
-			$bag.AddValue("Index", [int]$index)
-			$bag.AddValue("UsedPercentage", $CpuUsage[$i].Data.ToUInt32())
-			$bag
+		$CpuCount = (Get-SnmpV3 $connection $sysMultiHostCpuNumber).Data
+		
+		# Did we Get a Reply
+        If ($CpuCount -eq $null) 
+		{
+		    # Write Warning to Event Log
+            Log-Event $SCRIPT_ERROR $EVENT_LEVEL_WARNING "No SNMP Response" $true
 		}
+		else
+		{
+			[int]$CpuCount = $CpuCount.ToInt32()
+			# Get Processor Usage (SNMPv3 0 Based Array)
+			$CpuUsage = BulkGet-SnmpV3 $connection $CpuCount $sysMultiHostCpuUsageRatio5m
+			For ($i=0; $i -lt $CpuCount;$i++){
+				[int]$index = $i + 1
+				$message = "Created Processor Info Property Bag for CPU-"+ $index + "`r`n"
+				$message = $message + "CPU Usage : " + $CpuUsage[$i].Data.ToUInt32()
+				Log-Event $SCRIPT_PROPERTYBAG_CREATED $EVENT_LEVEL_INFO $message
+				$bag = $api.CreatePropertyBag()
+				$bag.AddValue("Index", [int]$index)
+				$bag.AddValue("UsedPercentage", $CpuUsage[$i].Data.ToUInt32())
+				$bag
+			}
+		}
+
 	} Catch {
 		# Log Finished Message
 		$message = "SNMPv3 Error : " + $_
@@ -309,17 +326,28 @@ If ($SNMPVersion -eq "3") {
 	Try {
 
 		# Get Count of Processors
-		[int]$CpuCount = (Get-SnmpV2 $connection $sysMultiHostCpuNumber).Data.ToInt32()
-		# Get Processor Usage (SNMPv2 1 Based Array)
-		$CpuUsage = Walk-SnmpV2 $connection $sysMultiHostCpuUsageRatio5m
-		For ($i=1; $i -le $CpuCount;$i++){
-			$message = "Created Processor Info Property Bag for CPU-"+ $i + "`r`n"
-			$message = $message + "CPU Usage : " + $CpuUsage[$i].Data.ToUInt32()
-			Log-DebugEvent $SCRIPT_PROPERTYBAG_CREATED $message
-			$bag = $api.CreatePropertyBag()
-			$bag.AddValue("Index", [int]$i)
-			$bag.AddValue("UsedPercentage", $CpuUsage[$i].Data.ToUInt32())
-			$bag
+		$CpuCount = (Get-SnmpV3 $connection $sysMultiHostCpuNumber).Data
+		
+		# Did we Get a Reply
+        If ($CpuCount -eq $null) 
+		{
+		    # Write Warning to Event Log
+            Log-Event $SCRIPT_ERROR $EVENT_LEVEL_WARNING "No SNMP Response" $true
+		}
+		else
+		{
+			[int]$CpuCount = $CpuCount.ToInt32()
+			# Get Processor Usage (SNMPv2 1 Based Array)
+			$CpuUsage = Walk-SnmpV2 $connection $sysMultiHostCpuUsageRatio5m
+			For ($i=1; $i -le $CpuCount;$i++){
+				$message = "Created Processor Info Property Bag for CPU-"+ $i + "`r`n"
+				$message = $message + "CPU Usage : " + $CpuUsage[$i].Data.ToUInt32()
+				Log-Event $SCRIPT_PROPERTYBAG_CREATED $EVENT_LEVEL_INFO $message
+				$bag = $api.CreatePropertyBag()
+				$bag.AddValue("Index", [int]$i)
+				$bag.AddValue("UsedPercentage", $CpuUsage[$i].Data.ToUInt32())
+				$bag
+			}
 		}
 
 	} Catch {
@@ -336,4 +364,4 @@ $TimeTaken = NEW-TIMESPAN -Start $StartTime -End $EndTime
 $Seconds = [math]::Round($TimeTaken.TotalSeconds, 2)
 
 # Log Finished Message
-Log-DebugEvent $SCRIPT_ENDED "Script Finished. Took $Seconds Seconds to Complete!"
+Log-Event $SCRIPT_ENDED $EVENT_LEVEL_INFO "Script Finished. Took $Seconds Seconds to Complete!"

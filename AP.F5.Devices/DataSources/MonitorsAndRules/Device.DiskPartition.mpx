@@ -1,0 +1,452 @@
+﻿<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <TypeDefinitions>
+    <ModuleTypes>
+
+
+      <!-- FILTERED MONITOR DATASOURCES -->
+      <!-- AP.F5.DataSource.Monitor.Device.DiskPartitionInfo.Filtered -->
+      <!-- AP.F5.DataSource.Monitor.Device.FanInfo, Filters results by Fan Index -->
+      <DataSourceModuleType ID="AP.F5.DataSource.Monitor.Device.DiskPartitionInfo.Filtered" Accessibility="Public" Batching="false">
+        <Configuration>
+          <IncludeSchemaTypes>
+            <SchemaType>Windows!Microsoft.Windows.PowerShellSchema</SchemaType>
+          </IncludeSchemaTypes>
+          <xsd:element minOccurs="1" name="IntervalSeconds" type="xsd:integer"/>
+          <xsd:element minOccurs="1" name="SyncTime" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="Debug" type="xsd:boolean"/>
+          <xsd:element minOccurs="1" name="SNMPAddress" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPPort" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPVersion" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPCommunity" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3UserName" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3AuthProtocol" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3AuthPassword" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3PrivProtocol" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3PrivPassword" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3ContextName" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="TimeoutSeconds" type="xsd:integer"/>
+          <xsd:element minOccurs="1" name="DiskPartitionPath" type="xsd:string"/>
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="IntervalSeconds" Selector="$Config/IntervalSeconds$" ParameterType="int"/>
+          <OverrideableParameter ID="SyncTime" Selector="$Config/SyncTime$" ParameterType="string"/>
+          <OverrideableParameter ID="Debug" Selector="$Config/Debug$" ParameterType="bool"/>
+        </OverrideableParameters>
+        <ModuleImplementation>
+          <Composite>
+            <MemberModules>
+              <DataSource ID="Script" TypeID="AP.F5.DataSource.Monitor.Device.DiskPartitionInfo">
+                <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
+                <SyncTime>$Config/SyncTime$</SyncTime>
+                <Debug>$Config/Debug$</Debug>
+                <SNMPAddress>$Config/SNMPAddress$</SNMPAddress>
+                <SNMPPort>$Config/SNMPPort$</SNMPPort>
+                <SNMPVersion>$Config/SNMPVersion$</SNMPVersion>
+                <SNMPCommunity>$Config/SNMPCommunity$</SNMPCommunity>
+                <SNMPv3UserName>$Config/SNMPv3UserName$</SNMPv3UserName>
+                <SNMPv3AuthProtocol>$Config/SNMPv3AuthProtocol$</SNMPv3AuthProtocol>
+                <SNMPv3AuthPassword>$Config/SNMPv3AuthPassword$</SNMPv3AuthPassword>
+                <SNMPv3PrivProtocol>$config/SNMPv3PrivProtocol$</SNMPv3PrivProtocol>
+                <SNMPv3PrivPassword>$Config/SNMPv3PrivPassword$</SNMPv3PrivPassword>
+                <SNMPv3ContextName>$Config/SNMPv3ContextName$</SNMPv3ContextName>
+                <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+              </DataSource>
+              <ConditionDetection ID="FilterFanIndex" TypeID="System!System.ExpressionFilter">
+                <Expression>
+                  <SimpleExpression>
+                    <ValueExpression>
+                      <XPathQuery Type="String">Property[@Name='Path']</XPathQuery>
+                    </ValueExpression>
+                    <Operator>Equal</Operator>
+                    <ValueExpression>
+                      <Value Type="Integer">$Config/DiskPartitionPath$</Value>
+                    </ValueExpression>
+                  </SimpleExpression>
+                </Expression>
+              </ConditionDetection>
+            </MemberModules>
+            <Composition>
+              <Node ID="FilterFanIndex">
+                <Node ID="Script" />
+              </Node>
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>System!System.PropertyBagData</OutputType>
+      </DataSourceModuleType>
+
+      <!-- MONITOR DATA SOURCES -->
+      <!-- AP.F5.DataSource.Monitor.Device.DiskPartitionInfo -->
+      <!-- Calls AP.F5.Probe.Device.DiskPartitionInfo wraps it with a scheduler -->
+      <DataSourceModuleType ID="AP.F5.DataSource.Monitor.Device.DiskPartitionInfo" Accessibility="Public" Batching="false">
+        <Configuration>
+          <IncludeSchemaTypes>
+            <SchemaType>Windows!Microsoft.Windows.PowerShellSchema</SchemaType>
+          </IncludeSchemaTypes>
+          <xsd:element minOccurs="1" name="IntervalSeconds" type="xsd:integer"/>
+          <xsd:element minOccurs="1" name="SyncTime" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="Debug" type="xsd:boolean"/>
+          <xsd:element minOccurs="1" name="SNMPAddress" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPPort" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPVersion" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPCommunity" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3UserName" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3AuthProtocol" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3AuthPassword" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3PrivProtocol" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3PrivPassword" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3ContextName" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="TimeoutSeconds" type="xsd:integer"/>
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="IntervalSeconds" Selector="$Config/IntervalSeconds$" ParameterType="int"/>
+          <OverrideableParameter ID="SyncTime" Selector="$Config/SyncTime$" ParameterType="string"/>
+          <OverrideableParameter ID="Debug" Selector="$Config/Debug$" ParameterType="bool"/>
+        </OverrideableParameters>
+        <ModuleImplementation Isolation="Any">
+          <Composite>
+            <MemberModules>
+              <DataSource ID="Scheduler" TypeID="System!System.SimpleScheduler">
+                <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
+                <SyncTime>$Config/SyncTime$</SyncTime>
+              </DataSource>
+              <ProbeAction ID="PSScript" TypeID="AP.F5.Probe.Device.DiskPartitionInfo">
+                <Debug>$Config/Debug$</Debug>
+                <SNMPAddress>$Config/SNMPAddress$</SNMPAddress>
+                <SNMPPort>$Config/SNMPPort$</SNMPPort>
+                <SNMPVersion>$Config/SNMPVersion$</SNMPVersion>
+                <SNMPCommunity>$Config/SNMPCommunity$</SNMPCommunity>
+                <SNMPv3UserName>$Config/SNMPv3UserName$</SNMPv3UserName>
+                <SNMPv3AuthProtocol>$Config/SNMPv3AuthProtocol$</SNMPv3AuthProtocol>
+                <SNMPv3AuthPassword>$Config/SNMPv3AuthPassword$</SNMPv3AuthPassword>
+                <SNMPv3PrivProtocol>$config/SNMPv3PrivProtocol$</SNMPv3PrivProtocol>
+                <SNMPv3PrivPassword>$Config/SNMPv3PrivPassword$</SNMPv3PrivPassword>
+                <SNMPv3ContextName>$Config/SNMPv3ContextName$</SNMPv3ContextName>
+                <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+              </ProbeAction>
+            </MemberModules>
+            <Composition>
+              <Node ID="PSScript">
+                <Node ID="Scheduler" />
+              </Node>
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>System!System.PropertyBagData</OutputType>
+      </DataSourceModuleType>
+
+      <!-- PROBES -->
+      <!-- AP.F5.Probe.Device.DiskPartitionInfo -->
+      <!-- Runs script to Return Device Fan Info in a property bag-->
+      <ProbeActionModuleType ID="AP.F5.Probe.Device.DiskPartitionInfo" Accessibility="Public" Batching="false">
+        <Configuration>
+          <IncludeSchemaTypes>
+            <SchemaType>Windows!Microsoft.Windows.PowerShellSchema</SchemaType>
+          </IncludeSchemaTypes>
+          <xsd:element minOccurs="1" name="Debug" type="xsd:boolean"/>
+          <xsd:element minOccurs="1" name="SNMPAddress" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPPort" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPVersion" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPCommunity" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3UserName" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3AuthProtocol" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3AuthPassword" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3PrivProtocol" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3PrivPassword" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3ContextName" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="TimeoutSeconds" type="xsd:integer"/>
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="Debug" Selector="$Config/Debug$" ParameterType="bool"/>
+        </OverrideableParameters>
+        <ModuleImplementation Isolation="Any">
+          <Composite>
+            <MemberModules>
+              <ProbeAction ID="PSScript" TypeID="Windows!Microsoft.Windows.PowerShellPropertyBagTriggerOnlyProbe">
+                <ScriptName>Get-DiskPartitionInfo.ps1</ScriptName>
+                <ScriptBody>$IncludeFileContent/Scripts/MonitorsAndRules/Get-DiskPartitionInfo.ps1$</ScriptBody>
+                <SnapIns />
+                <Parameters>
+                  <Parameter>
+                    <Name>Debug</Name>
+                    <Value>$Config/Debug$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>SharpSnmpLocation</Name>
+                    <Value>$FileResource[Name="AP.F5.SharpSnmpLib"]/Path$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>SNMPAddress</Name>
+                    <Value>$Config/SNMPAddress$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>PortNumber</Name>
+                    <Value>$Config/SNMPPort$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>SNMPVersion</Name>
+                    <Value>$Config/SNMPVersion$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>SNMPv3UserName</Name>
+                    <Value>$Config/SNMPv3UserName$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>SNMPv3AuthProtocol</Name>
+                    <Value>$Config/SNMPv3AuthProtocol$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>SNMPv3AuthPassword</Name>
+                    <Value>$Config/SNMPv3AuthPassword$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>SNMPv3PrivProtocol</Name>
+                    <Value>$Config/SNMPv3PrivProtocol$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>SNMPv3PrivPassword</Name>
+                    <Value>$Config/SNMPv3PrivPassword$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>SNMPv3ContextName</Name>
+                    <Value>$Config/SNMPv3ContextName$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>CommunityString</Name>
+                    <Value>$Config/SNMPCommunity$</Value>
+                  </Parameter>
+                </Parameters>
+                <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+                <StrictErrorHandling>false</StrictErrorHandling>
+              </ProbeAction>
+            </MemberModules>
+            <Composition>
+              <Node ID="PSScript" />
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>System!System.PropertyBagData</OutputType>
+        <TriggerOnly>true</TriggerOnly>
+      </ProbeActionModuleType>
+
+    </ModuleTypes>
+
+    <MonitorTypes>
+
+      <!-- AP.F5.UnitMonitor.Device.DiskPartitionFreeSpace -->
+      <!-- Uses SNMP via Powershell to Check Free Space of Device Disk Partition -->
+      <UnitMonitorType ID="AP.F5.UnitMonitor.Device.DiskPartitionFreeSpace" Accessibility="Public">
+        <MonitorTypeStates>
+          <MonitorTypeState ID="DiskPartitionFreeSpaceHealthy" NoDetection="false"/>
+          <MonitorTypeState ID="DiskPartitionFreeSpaceWarning" NoDetection="false"/>
+          <MonitorTypeState ID="DiskPartitionFreeSpaceCritical" NoDetection="false"/>
+        </MonitorTypeStates>
+        <Configuration>
+          <xsd:element minOccurs="1" name="IntervalSeconds" type="xsd:integer"/>
+          <xsd:element minOccurs="1" name="SyncTime" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="Debug" type="xsd:boolean"/>
+          <xsd:element minOccurs="1" name="SNMPAddress" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPPort" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPVersion" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPCommunity" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3UserName" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3AuthProtocol" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3AuthPassword" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3PrivProtocol" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3PrivPassword" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="SNMPv3ContextName" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="TimeoutSeconds" type="xsd:integer"/>
+          <xsd:element minOccurs="1" name="DiskPartitionPath" type="xsd:string"/>
+          <xsd:element minOccurs="1" name="WarningLimit" type="xsd:integer"/>
+          <xsd:element minOccurs="1" name="CriticalLimit" type="xsd:integer"/>
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="IntervalSeconds" Selector="$Config/IntervalSeconds$" ParameterType="int"/>
+          <OverrideableParameter ID="SyncTime" Selector="$Config/SyncTime$" ParameterType="string"/>
+          <OverrideableParameter ID="Debug" Selector="$Config/Debug$" ParameterType="bool"/>
+        </OverrideableParameters>
+        <MonitorImplementation>
+          <MemberModules>
+            <DataSource ID="DS" TypeID="AP.F5.DataSource.Monitor.Device.DiskPartitionInfo.Filtered">
+              <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
+              <SyncTime>$Config/SyncTime$</SyncTime>
+              <Debug>$Config/Debug$</Debug>
+              <SNMPAddress>$Config/SNMPAddress$</SNMPAddress>
+              <SNMPPort>$Config/SNMPPort$</SNMPPort>
+              <SNMPVersion>$Config/SNMPVersion$</SNMPVersion>
+              <SNMPCommunity>$Config/SNMPCommunity$</SNMPCommunity>
+              <SNMPv3UserName>$Config/SNMPv3UserName$</SNMPv3UserName>
+              <SNMPv3AuthProtocol>$Config/SNMPv3AuthProtocol$</SNMPv3AuthProtocol>
+              <SNMPv3AuthPassword>$Config/SNMPv3AuthPassword$</SNMPv3AuthPassword>
+              <SNMPv3PrivProtocol>$config/SNMPv3PrivProtocol$</SNMPv3PrivProtocol>
+              <SNMPv3PrivPassword>$Config/SNMPv3PrivPassword$</SNMPv3PrivPassword>
+              <SNMPv3ContextName>$Config/SNMPv3ContextName$</SNMPv3ContextName>
+              <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+              <DiskPartitionPath>$Config/DiskPartitionPath$</DiskPartitionPath>
+            </DataSource>
+            <ProbeAction ID="Probe" TypeID="AP.F5.Probe.Device.DiskPartitionInfo">
+              <Debug>$Config/Debug$</Debug>
+              <SNMPAddress>$Config/SNMPAddress$</SNMPAddress>
+              <SNMPPort>$Config/SNMPPort$</SNMPPort>
+              <SNMPVersion>$Config/SNMPVersion$</SNMPVersion>
+              <SNMPCommunity>$Config/SNMPCommunity$</SNMPCommunity>
+              <SNMPv3UserName>$Config/SNMPv3UserName$</SNMPv3UserName>
+              <SNMPv3AuthProtocol>$Config/SNMPv3AuthProtocol$</SNMPv3AuthProtocol>
+              <SNMPv3AuthPassword>$Config/SNMPv3AuthPassword$</SNMPv3AuthPassword>
+              <SNMPv3PrivProtocol>$config/SNMPv3PrivProtocol$</SNMPv3PrivProtocol>
+              <SNMPv3PrivPassword>$Config/SNMPv3PrivPassword$</SNMPv3PrivPassword>
+              <SNMPv3ContextName>$Config/SNMPv3ContextName$</SNMPv3ContextName>
+              <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+            </ProbeAction>
+            <ConditionDetection ID="DiskPartitionGoodFilter" TypeID="System!System.ExpressionFilter">
+              <Expression>
+                <SimpleExpression>
+                  <ValueExpression>
+                    <XPathQuery Type="Double">Property[@Name='FreeSpacePercentage']</XPathQuery>
+                  </ValueExpression>
+                  <Operator>Greater</Operator>
+                  <ValueExpression>
+                    <Value Type="Double">$Config/WarningLimit$</Value>
+                  </ValueExpression>
+                </SimpleExpression>
+              </Expression>
+            </ConditionDetection>
+            <ConditionDetection ID="DiskPartitionWarningFilter" TypeID="System!System.ExpressionFilter">
+              <Expression>
+                <And>
+                  <Expression>
+                    <SimpleExpression>
+                      <ValueExpression>
+                        <XPathQuery Type="Double">Property[@Name='FreeSpacePercentage']</XPathQuery>
+                      </ValueExpression>
+                      <Operator>LessEqual</Operator>
+                      <ValueExpression>
+                        <Value Type="Double">$Config/WarningLimit$</Value>
+                      </ValueExpression>
+                    </SimpleExpression>
+                  </Expression>
+                  <Expression>
+                    <SimpleExpression>
+                      <ValueExpression>
+                        <XPathQuery Type="Double">Property[@Name='FreeSpacePercentage']</XPathQuery>
+                      </ValueExpression>
+                      <Operator>Greater</Operator>
+                      <ValueExpression>
+                        <Value Type="Double">$Config/CriticalLimit$</Value>
+                      </ValueExpression>
+                    </SimpleExpression>
+                  </Expression>
+                </And>
+              </Expression>
+            </ConditionDetection>
+            <ConditionDetection ID="DiskPartitionBadFilter" TypeID="System!System.ExpressionFilter">
+              <Expression>
+                <SimpleExpression>
+                  <ValueExpression>
+                    <XPathQuery Type="Double">Property[@Name='FreeSpacePercentage']</XPathQuery>
+                  </ValueExpression>
+                  <Operator>LessEqual</Operator>
+                  <ValueExpression>
+                    <Value Type="Double">$Config/CriticalLimit$</Value>
+                  </ValueExpression>
+                </SimpleExpression>
+              </Expression>
+            </ConditionDetection>
+          </MemberModules>
+          <RegularDetections>
+            <RegularDetection MonitorTypeStateID="DiskPartitionFreeSpaceHealthy">
+              <Node ID="DiskPartitionGoodFilter">
+                <Node ID="DS" />
+              </Node>
+            </RegularDetection>
+            <RegularDetection MonitorTypeStateID="DiskPartitionFreeSpaceWarning">
+              <Node ID="DiskPartitionWarningFilter">
+                <Node ID="DS" />
+              </Node>
+            </RegularDetection>
+            <RegularDetection MonitorTypeStateID="DiskPartitionFreeSpaceCritical">
+              <Node ID="DiskPartitionBadFilter">
+                <Node ID="DS" />
+              </Node>
+            </RegularDetection>
+          </RegularDetections>
+        </MonitorImplementation>
+      </UnitMonitorType>
+
+    </MonitorTypes>
+  </TypeDefinitions>
+
+  <LanguagePacks>
+    <LanguagePack ID="ENU" IsDefault="true">
+
+      <DisplayStrings>
+
+        <!-- AP.F5.DataSource.Monitor.Device.DiskPartitionInfo.Filtered -->
+        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.DiskPartitionInfo.Filtered">
+          <Name>Filtered Disk Partitioon Info Monitor DataSource</Name>
+          <Description>Runs AP.F5.DataSource.Monitor.Device.DiskPartitionInfo, filters out the Disk Partition needed</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.DiskPartitionInfo.Filtered" SubElementID="IntervalSeconds">
+          <Name>Interval Seconds</Name>
+          <Description>Frequency in seconds that module is run.</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.DiskPartitionInfo.Filtered" SubElementID="SyncTime">
+          <Name>Synchronisation Time</Name>
+          <Description>Offset that this module is started from.</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.DiskPartitionInfo.Filtered" SubElementID="Debug">
+          <Name>Debug</Name>
+          <Description>Debug Flag, if true then additional info is posted to event log.</Description>
+        </DisplayString>
+
+        <!-- AP.F5.DataSource.Monitor.Device.DiskPartitionInfo -->
+        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.DiskPartitionInfo">
+          <Name>DiskPartition Info Monitor DataSource</Name>
+          <Description>Wraps DiskPartition Info Probe in scheduler and returns as PropertyBag for Monitors</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.DiskPartitionInfo" SubElementID="IntervalSeconds">
+          <Name>Interval Seconds</Name>
+          <Description>Frequency in seconds that module is run.</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.DiskPartitionInfo" SubElementID="SyncTime">
+          <Name>Synchronisation Time</Name>
+          <Description>Offset that this module is started from.</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.DiskPartitionInfo" SubElementID="Debug">
+          <Name>Debug</Name>
+          <Description>Debug Flag, if true then additional info is posted to event log.</Description>
+        </DisplayString>
+
+        <!-- AP.F5.Probe.Device.DiskPartitionInfo -->
+        <DisplayString ElementID="AP.F5.Probe.Device.DiskPartitionInfo">
+          <Name>Powershell DiskPartition Probe</Name>
+          <Description>Runs Powershell SNMP Script to collect DiskPartition Info</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.Probe.Device.DiskPartitionInfo" SubElementID="Debug">
+          <Name>Debug</Name>
+          <Description>Debug Flag, if true then additional info is posted to event log.</Description>
+        </DisplayString>
+
+        <!-- AP.F5.UnitMonitor.Device.DiskPartitionFreeSpace -->
+        <DisplayString ElementID="AP.F5.UnitMonitor.Device.DiskPartitionFreeSpace">
+          <Name>Device DiskPartition Free Space Health Monitor</Name>
+          <Description>Compares Disk Partition Free Space Percentage against given thresholds</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.UnitMonitor.Device.DiskPartitionFreeSpace" SubElementID="IntervalSeconds">
+          <Name>Interval Seconds</Name>
+          <Description>Frequency in seconds that module is run.</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.UnitMonitor.Device.DiskPartitionFreeSpace" SubElementID="SyncTime">
+          <Name>Synchronisation Time</Name>
+          <Description>Offset that this module is started from.</Description>
+        </DisplayString>
+        <DisplayString ElementID="AP.F5.UnitMonitor.Device.DiskPartitionFreeSpace" SubElementID="Debug">
+          <Name>Debug</Name>
+          <Description>Debug Flag, if true then additional info is posted to event log.</Description>
+        </DisplayString>
+
+      </DisplayStrings>
+
+    </LanguagePack>
+  </LanguagePacks>
+</ManagementPackFragment>
