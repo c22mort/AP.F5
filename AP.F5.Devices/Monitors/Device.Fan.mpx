@@ -3,7 +3,7 @@
     <Monitors>
 
       <!-- AP.F5.Monitor.Device.Fan.Health -->
-      <UnitMonitor ID="AP.F5.Monitor.Device.Fan.Health" Accessibility="Public" Enabled="true" Target="AP.F5.Device.Fan" ParentMonitorID="Health!System.Health.ConfigurationState" Remotable="true" Priority="Normal" TypeID="AP.F5.UnitMonitor.Device.FanHealth" ConfirmDelivery="false">
+      <UnitMonitor ID="AP.F5.Monitor.Device.Fan.Health" Accessibility="Public" Enabled="true" Target="AP.F5.Device.Fan" ParentMonitorID="Health!System.Health.ConfigurationState" Remotable="true" Priority="Normal" TypeID="AP.F5.UnitMonitor.Device.Fan.Health" ConfirmDelivery="false">
         <Category>AvailabilityHealth</Category>
         <AlertSettings AlertMessage="AP.F5.Monitor.Device.Fan.Health.AlertMessage">
           <AlertOnState>Error</AlertOnState>

@@ -2,7 +2,7 @@
   <TypeDefinitions>
     <ModuleTypes>
 
-      <!-- AP.F5.Discovery.DataSource.Device.PowerSupply -->
+      <!-- AP.F5.DataSource.Discovery.Device.PowerSupply -->
       <DataSourceModuleType ID="AP.F5.DataSource.Discovery.Device.PowerSupply" Accessibility="Public" Batching="false">
         <Configuration>
           <xsd:element minOccurs="1" name="IntervalSeconds" type="xsd:integer"/>
@@ -106,7 +106,7 @@
 
       <DisplayStrings>
 
-        <!-- AP.F5.Discovery.DataSource.Device.PowerSupply -->
+        <!-- AP.F5.DataSource.Discovery.Device.PowerSupply -->
         <DisplayString ElementID="AP.F5.DataSource.Discovery.Device.PowerSupply">
           <Name>F5 Device Power Supply Discovery DataSource</Name>
           <Description>Discover AP.F5 Device Power Supplies from AP.F5.Device</Description>

@@ -3,9 +3,9 @@
     <ModuleTypes>
 
       <!-- MONITOR DATA SOURCES -->
-      <!-- AP.F5.DataSource.Monitor.Device.MemoryInfo -->
-      <!-- Calls AP.F5.Probe.MemoryHealth.Powershell wraps it with a scheduler -->
-      <DataSourceModuleType ID="AP.F5.DataSource.Monitor.Device.MemoryInfo" Accessibility="Public" Batching="false">
+      <!-- AP.F5.DataSource.Device.Memory.Info -->
+      <!-- Calls AP.F5.Probe.Device.Memory.Info wraps it with a scheduler -->
+      <DataSourceModuleType ID="AP.F5.DataSource.Device.Memory.Info" Accessibility="Public" Batching="false">
         <Configuration>
           <IncludeSchemaTypes>
             <SchemaType>Windows!Microsoft.Windows.PowerShellSchema</SchemaType>
@@ -37,7 +37,7 @@
                 <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
                 <SyncTime>$Config/SyncTime$</SyncTime>
               </DataSource>
-              <ProbeAction ID="PSScript" TypeID="AP.F5.Probe.Device.MemoryInfo">
+              <ProbeAction ID="PSScript" TypeID="AP.F5.Probe.Device.Memory.Info">
                 <Debug>$Config/Debug$</Debug>
                 <SNMPAddress>$Config/SNMPAddress$</SNMPAddress>
                 <SNMPPort>$Config/SNMPPort$</SNMPPort>
@@ -65,7 +65,7 @@
 
       <!-- PERFORMANCE DATA SOURCES -->
       <!-- AP.F5.DataSource.Perf.Device.MemoryUsage-->
-      <!-- Calls AP.F5.Probe.Powershell.Device.MemoryInfo wraps it with a scheduler. Returns as Performance Data -->
+      <!-- Calls AP.F5.Probe.Powershell.Device.Memory.Info wraps it with a scheduler. Returns as Performance Data -->
       <DataSourceModuleType ID="AP.F5.DataSource.Perf.Device.MemoryUsage" Accessibility="Public" Batching="false">
         <Configuration>
           <IncludeSchemaTypes>
@@ -98,7 +98,7 @@
                 <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
                 <SyncTime>$Config/SyncTime$</SyncTime>
               </DataSource>
-              <ProbeAction ID="PSScript" TypeID="AP.F5.Probe.Device.MemoryInfo">
+              <ProbeAction ID="PSScript" TypeID="AP.F5.Probe.Device.Memory.Info">
                 <Debug>$Config/Debug$</Debug>
                 <SNMPAddress>$Config/SNMPAddress$</SNMPAddress>
                 <SNMPPort>$Config/SNMPPort$</SNMPPort>
@@ -133,9 +133,9 @@
       
       
       <!-- PROBES -->
-      <!-- AP.F5.Probe.Device.MemoryInfo -->
+      <!-- AP.F5.Probe.Device.Memory.Info -->
       <!-- Runs script to Return Device Memory Info in a property bag-->
-      <ProbeActionModuleType ID="AP.F5.Probe.Device.MemoryInfo" Accessibility="Public" Batching="false">
+      <ProbeActionModuleType ID="AP.F5.Probe.Device.Memory.Info" Accessibility="Public" Batching="false">
         <Configuration>
           <IncludeSchemaTypes>
             <SchemaType>Windows!Microsoft.Windows.PowerShellSchema</SchemaType>
@@ -265,7 +265,7 @@
         </OverrideableParameters>
         <MonitorImplementation>
           <MemberModules>
-            <DataSource ID="DS" TypeID="AP.F5.DataSource.Monitor.Device.MemoryInfo">
+            <DataSource ID="DS" TypeID="AP.F5.DataSource.Device.Memory.Info">
               <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
               <SyncTime>$Config/SyncTime$</SyncTime>
               <Debug>$Config/Debug$</Debug>
@@ -281,7 +281,7 @@
               <SNMPv3ContextName>$Config/SNMPv3ContextName$</SNMPv3ContextName>
               <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
             </DataSource>
-            <ProbeAction ID="Probe" TypeID="AP.F5.Probe.Device.MemoryInfo">
+            <ProbeAction ID="Probe" TypeID="AP.F5.Probe.Device.Memory.Info">
               <Debug>$Config/Debug$</Debug>
               <SNMPAddress>$Config/SNMPAddress$</SNMPAddress>
               <SNMPPort>$Config/SNMPPort$</SNMPPort>
@@ -378,20 +378,20 @@
 
       <DisplayStrings>
 
-        <!-- AP.F5.DataSource.Monitor.Device.MemoryInfo -->
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.MemoryInfo">
-          <Name>Memory Info Monitor DataSource</Name>
-          <Description>Wraps Memory Info Probe in scheduler and returns as PropertyBag for Monitors</Description>
+        <!-- AP.F5.DataSource.Device.Memory.Info -->
+        <DisplayString ElementID="AP.F5.DataSource.Device.Memory.Info">
+          <Name>Memory Info DataSource</Name>
+          <Description>Wraps Memory Info Probe in scheduler and returns as PropertyBag</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.MemoryInfo" SubElementID="IntervalSeconds">
+        <DisplayString ElementID="AP.F5.DataSource.Device.Memory.Info" SubElementID="IntervalSeconds">
           <Name>Interval Seconds</Name>
           <Description>Frequency in seconds that module is run.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.MemoryInfo" SubElementID="SyncTime">
+        <DisplayString ElementID="AP.F5.DataSource.Device.Memory.Info" SubElementID="SyncTime">
           <Name>Synchronisation Time</Name>
           <Description>Offset that this module is started from.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.MemoryInfo" SubElementID="Debug">
+        <DisplayString ElementID="AP.F5.DataSource.Device.Memory.Info" SubElementID="Debug">
           <Name>Debug</Name>
           <Description>Debug Flag, if true then additional info is posted to event log.</Description>
         </DisplayString>
@@ -414,12 +414,12 @@
           <Description>Debug Flag, if true then additional info is posted to event log.</Description>
         </DisplayString>
 
-        <!-- AP.F5.Probe.Device.MemoryInfo -->
-        <DisplayString ElementID="AP.F5.Probe.Device.MemoryInfo">
+        <!-- AP.F5.Probe.Device.Memory.Info -->
+        <DisplayString ElementID="AP.F5.Probe.Device.Memory.Info">
           <Name>Powershell Memory Probe</Name>
           <Description>Runs Powershell SNMP Script to colelct Memory Info, Total, Used and Used Percentage</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.Probe.Device.MemoryInfo" SubElementID="Debug">
+        <DisplayString ElementID="AP.F5.Probe.Device.Memory.Info" SubElementID="Debug">
           <Name>Debug</Name>
           <Description>Debug Flag, if true then additional info is posted to event log.</Description>
         </DisplayString>

@@ -3,7 +3,7 @@
     <Monitors>
 
       <!-- AP.F5.Monitor.Device.DiskPartition.FreeSpace -->
-      <UnitMonitor ID="AP.F5.Monitor.Device.DiskPartition.FreeSpace" Accessibility="Public" Enabled="true" Target="AP.F5.Device.DiskPartition" ParentMonitorID="Health!System.Health.PerformanceState" Remotable="true" Priority="Normal" TypeID="AP.F5.UnitMonitor.Device.DiskPartitionFreeSpace" ConfirmDelivery="false">
+      <UnitMonitor ID="AP.F5.Monitor.Device.DiskPartition.FreeSpace" Accessibility="Public" Enabled="true" Target="AP.F5.Device.DiskPartition" ParentMonitorID="Health!System.Health.PerformanceState" Remotable="true" Priority="Normal" TypeID="AP.F5.UnitMonitor.Device.DiskPartition.FreeSpace" ConfirmDelivery="false">
         <Category>AvailabilityHealth</Category>
         <AlertSettings AlertMessage="AP.F5.Monitor.Device.DiskPartition.FreeSpace.AlertMessage">
           <AlertOnState>Warning</AlertOnState>

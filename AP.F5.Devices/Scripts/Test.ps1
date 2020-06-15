@@ -1,8 +1,8 @@
 ﻿#==================================================================================
-# Script: 	Get-TempSensorInfo.ps1
-# Date:			05/06/20
+# Script: 	Get-ProcessorInfo.ps1
+# Date:		05/06/20
 # Author: 	Andi Patrick
-# Purpose:	Gets F5 Device Temperature Sensor Info via SNMP returns all as Property Bag
+# Purpose:	Gets F5 Device Processor Info via SNMP returns all as Property Bag
 #==================================================================================
 
 # Get the named parameters
@@ -28,7 +28,7 @@ $StartTime = (GET-DATE)
 $Timeout = 10000
 
 #Constants used for event logging
-$SCRIPT_NAME			= 'Get-TempSensorInfo.ps1'
+$SCRIPT_NAME			= 'Get-ProcessorInfo.ps1'
 $EVENT_LEVEL_ERROR      = 1
 $EVENT_LEVEL_WARNING    = 2
 $EVENT_LEVEL_INFO       = 4
@@ -37,7 +37,10 @@ $SCRIPT_STARTED             = 14611
 $SCRIPT_PROPERTYBAG_CREATED	= 14612
 $SCRIPT_EVENT               = 14613
 $SCRIPT_ERROR               = 14614
-$SCRIPT_ENDED               = 14615
+$SCRIPT_ERROR_NOSNMP        = 14615
+$SCRIPT_ERROR_SNMP2         = 14616
+$SCRIPT_ERROR_SNMP3         = 14617
+$SCRIPT_ENDED               = 14618
 
 #==================================================================================
 # Function:	Get-SnmpV2
@@ -66,7 +69,7 @@ function Get-SnmpV2
     } Catch {
 		# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   		Log-Event $SCRIPT_ERROR $EVENT_LEVEL_ERROR $message $true
+   		Log-Event $SCRIPT_ERROR_SNMP2 $EVENT_LEVEL_INFO $message $true
 	}
 }
 #==================================================================================
@@ -142,7 +145,7 @@ function Get-SnmpV3
     } Catch {
 		# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   		Log-Event $SCRIPT_ERROR $EVENT_LEVEL_ERROR $message $true
+   		Log-Event $SCRIPT_ERROR_SNMP3 $EVENT_LEVEL_INFO $message $true
     }
 }
 #==================================================================================
@@ -172,7 +175,7 @@ function Walk-SnmpV2
     } Catch {
 		# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   		Log-Event $SCRIPT_ERROR $EVENT_LEVEL_ERROR $message $true
+   		Log-Event $SCRIPT_ERROR_SNMP2 $EVENT_LEVEL_INFO $message $true
     }
 }
 #==================================================================================
@@ -243,7 +246,7 @@ function BulkGet-SnmpV3
     } Catch {
 		# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   		Log-Event $SCRIPT_ERROR $EVENT_LEVEL_ERROR $message $true
+   		Log-Event $SCRIPT_ERROR_SNMP3 $EVENT_LEVEL_INFO $message $true
     }                   
 }
 
@@ -272,7 +275,7 @@ function Log-Event
 $api = New-Object -comObject 'MOM.ScriptAPI'
 
 # Log Startup Message
-Log-Event $SCRIPT_STARTED $EVENT_LEVEL_INFO "Collecting Temperature Sensor Info from F5 Device"
+Log-Event $SCRIPT_STARTED $EVENT_LEVEL_INFO "Collecting Processor Info from F5 Device"
 
 # Load SharpSNMPLib
 [void][reflection.assembly]::LoadFrom( (Resolve-Path $SharpSnmpLocation) )
@@ -281,82 +284,79 @@ $walkMode = [Lextm.SharpSnmpLib.Messaging.WalkMode]::WithinSubtree
 # Create endpoint for SNMP server
 $connection = New-Object System.Net.IpEndPoint ([System.Net.IPAddress]::Parse($SNMPAddress), $PortNumber)
 
-# bigipTrafficMgmt.bigipSystem.sysPlatform.sysChassis.sysChassisTemp.sysChassisTempNumber
-$sysChassisTempNumber = New-Object Lextm.SharpSnmpLib.ObjectIdentifier(".1.3.6.1.4.1.3375.2.1.3.2.3.1.0")
-# bigipTrafficMgmt.bigipSystem.sysPlatform.sysChassis.sysChassisTemp.sysChassisTempTable.sysChassisTempEntry.sysChassisTempTemperature
-$sysChassisTempTemperature = New-Object Lextm.SharpSnmpLib.ObjectIdentifier(".1.3.6.1.4.1.3375.2.1.3.2.3.2.1.2")
+# bigipTrafficMgmt.bigipSystem.sysHostInfoStat.sysMultiHostCpu.sysMultiHostCpuNumber
+$sysMultiHostCpuNumber = New-Object Lextm.SharpSnmpLib.ObjectIdentifier(".1.3.6.1.4.1.3375.2.1.7.5.1.0")
+# bigipTrafficMgmt.bigipSystem.sysHostInfoStat.sysMultiHostCpu.sysMultiHostCpuTable.sysMultiHostCpuEntry.sysMultiHostCpuUsageRatio5m
+$sysMultiHostCpuUsageRatio5m = New-Object Lextm.SharpSnmpLib.ObjectIdentifier(".1.3.6.1.4.1.3375.2.1.7.5.2.1.35")
 
 # Get SNMP Data (Version Dependant)
-$TempSensorCount = 0
+$CpuCount = 0
 If ($SNMPVersion -eq "3") {
 	Try {
 
-		# Get Count of Temperature Sensors
-		$TempSensorCount = (Get-SnmpV3 $connection $sysChassisTempNumber).Data
-
+		# Get Count of Processors
+		$CpuCount = (Get-SnmpV3 $connection $sysMultiHostCpuNumber).Data
+		
 		# Did we Get a Reply
-        If ($TempSensorCount -eq $null) 
+        If ($CpuCount -eq $null) 
 		{
-            # Write Warning to Event Log
-            Log-Event $SCRIPT_ERROR $EVENT_LEVEL_WARNING "No SNMP Response" $true
+		    # Write Warning to Event Log
+            Log-Event $SCRIPT_ERROR_NOSNMP $EVENT_LEVEL_WARNING "No SNMP Response" $true
 		}
 		else
 		{
-			# Get Count of Temperature Sensors
-			[int]$TempSensorCount = $TempSensorCount.ToInt32()
-			# Get Temperature Sensor Temp (SNMPv3 0 Based Array)
-			$TempSensorTemp = BulkGet-SnmpV3 $connection $TempSensorCount $sysChassisTempTemperature
-			For ($i=0; $i -lt $TempSensorCount;$i++){
+			[int]$CpuCount = $CpuCount.ToInt32()
+			# Get Processor Usage (SNMPv3 0 Based Array)
+			$CpuUsage = BulkGet-SnmpV3 $connection $CpuCount $sysMultiHostCpuUsageRatio5m
+			For ($i=0; $i -lt $CpuCount;$i++){
 				[int]$index = $i + 1
-				$message = "Created Temperature Sensor Info Property Bag for Temp-"+ $index + "`r`n"
-				$message = $message + "Temperature : " + $TempSensorTemp[$i].Data.ToInt32()
+				$message = "Created Processor Info Property Bag for CPU-"+ $index + "`r`n"
+				$message = $message + "CPU Usage : " + $CpuUsage[$i].Data.ToUInt32()
 				Log-Event $SCRIPT_PROPERTYBAG_CREATED $EVENT_LEVEL_INFO $message
 				$bag = $api.CreatePropertyBag()
 				$bag.AddValue("Index", [int]$index)
-				$bag.AddValue("Temperature", $TempSensorTemp[$i].Data.ToInt32())
+				$bag.AddValue("UsedPercentage", $CpuUsage[$i].Data.ToUInt32())
 				$bag
 			}
-		
 		}
-
 
 	} Catch {
 		# Log Finished Message
 		$message = "SNMPv3 Error : " + $_
-   		Log-Event $SCRIPT_ERROR $EVENT_LEVEL_ERROR $message $true
+		Log-Event $SCRIPT_ERROR_SNMP3 $EVENT_LEVEL_ERROR $message
 	}
 } else {
 	Try {
 
-		# Get Count of Temperature Sensors
-		$TempSensorCount = (Get-SnmpV2 $connection $sysChassisTempNumber).Data
-
+		# Get Count of Processors
+		$CpuCount = (Get-SnmpV2 $connection $sysMultiHostCpuNumber).Data
+		
 		# Did we Get a Reply
-        If ($TempSensorCount -eq $null) 
+        If ($CpuCount -eq $null) 
 		{
-            # Write Warning to Event Log
-            Log-Event $SCRIPT_ERROR $EVENT_LEVEL_WARNING "No SNMP Response" $true
+		    # Write Warning to Event Log
+            Log-Event $SCRIPT_ERROR_NOSNMP $EVENT_LEVEL_WARNING "No SNMP Response" $true
 		}
 		else
 		{
-			# Get Count of Temperature Sensors
-			[int]$TempSensorCount = $TempSensorCount.ToInt32()
-			# Get Temperature Sensor Temp (SNMPv3 0 Based Array)
-			$TempSensorTemp = Walk-SnmpV2 $connection $sysChassisTempTemperature
-			For ($i=1; $i -le $TempSensorCount;$i++){
-				$message = "Created Temperature Sensor Info Property Bag for Temp-"+ $i + "`r`n"
-				$message = $message + "Temperature : " + $TempSensorTemp[$i].Data.ToInt32()
+			[int]$CpuCount = $CpuCount.ToInt32()
+			# Get Processor Usage (SNMPv2 1 Based Array)
+			$CpuUsage = Walk-SnmpV2 $connection $sysMultiHostCpuUsageRatio5m
+			For ($i=1; $i -le $CpuCount;$i++){
+				$message = "Created Processor Info Property Bag for CPU-"+ $i + "`r`n"
+				$message = $message + "CPU Usage : " + $CpuUsage[$i].Data.ToUInt32()
 				Log-Event $SCRIPT_PROPERTYBAG_CREATED $EVENT_LEVEL_INFO $message
 				$bag = $api.CreatePropertyBag()
 				$bag.AddValue("Index", [int]$i)
-				$bag.AddValue("Temperature", $TempSensorTemp[$i].Data.ToInt32())
+				$bag.AddValue("UsedPercentage", $CpuUsage[$i].Data.ToUInt32())
 				$bag
 			}
 		}
+
 	} Catch {
 		# Log error Message
 		$message = "SNMPv2 Error : " + $Error + " : " + $_
-   		Log-Event $SCRIPT_ERROR $EVENT_LEVEL_ERROR $message $true
+		Log-Event $SCRIPT_ERROR_SNMP2 $EVENT_LEVEL_ERROR $message
 	}
 }
 

@@ -103,6 +103,9 @@
     <Compile Include="Classes\Device.TemperatureSensor.mpx">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Classes\DeviceGroup.mpx">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Classes\NetworkDevicesGroup.mpx">
       <SubType>Code</SubType>
     </Compile>
@@ -235,6 +238,7 @@
     <EmbeddedResource Include="Scripts\Discoveries\Discover-PowerSupplies.ps1" />
     <EmbeddedResource Include="Scripts\Discoveries\Discover-Processors.ps1" />
     <EmbeddedResource Include="Scripts\Discoveries\Discover-TemperatureSensors.ps1" />
+    <EmbeddedResource Include="Scripts\Discoveries\Get-DeviceGroups.ps1" />
     <EmbeddedResource Include="Scripts\MonitorsAndRules\Get-DeviceInfo.ps1" />
     <EmbeddedResource Include="Scripts\MonitorsAndRules\Get-DiskPartitionInfo.ps1" />
     <EmbeddedResource Include="Scripts\MonitorsAndRules\Get-FanInfo.ps1" />

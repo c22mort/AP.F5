@@ -36,11 +36,14 @@ $EVENT_LEVEL_ERROR 		= 1
 $EVENT_LEVEL_WARNING 	= 2
 $EVENT_LEVEL_INFO 		= 4
 
-$SCRIPT_STARTED				= 14611
-$SCRIPT_PROPERTYBAG_CREATED	= 14612
-$SCRIPT_EVENT				= 14613
-$SCRIPT_ENDED				= 14614
-$SCRIPT_ERROR				= 14615
+$SCRIPT_STARTED             = 14601
+$SCRIPT_PROPERTYBAG_CREATED	= 14602
+$SCRIPT_EVENT               = 14603
+$SCRIPT_ERROR               = 14604
+$SCRIPT_ERROR_NOSNMP        = 14605
+$SCRIPT_ERROR_SNMP2         = 14606
+$SCRIPT_ERROR_SNMP3         = 14607
+$SCRIPT_ENDED               = 14608
 
 #==================================================================================
 # Function:	Get-SnmpV2
@@ -69,7 +72,7 @@ function Get-SnmpV2
     } Catch {
 		# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_INFO,$message)
+   		Log-Event $SCRIPT_ERROR_SNMP2 $EVENT_LEVEL_INFO $message $true
 	}
 }
 
@@ -146,16 +149,37 @@ function Get-SnmpV3
     } Catch {
 		# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_INFO,$message)
+   		Log-Event $SCRIPT_ERROR_SNMP3 $EVENT_LEVEL_INFO $message $true
     }
+}
+
+##==================================================================================
+# Sub:      LogEvent
+# Purpose:	Logs an informational event to the Operations Manager event log
+#           $writeevent by default is debug value
+#==================================================================================
+function Log-Event
+{
+	param(
+    $eventNo,
+    $eventLevel,
+    $message,
+    $writeEvent = $Debug
+    )
+
+	if ($writeEvent -eq $true)
+	{
+		$message = $SNMPAddress + "`r`n" + $message + $option
+		$api.LogScriptEvent($SCRIPT_NAME,$eventNo,$eventLevel,$message)
+	}
 }
 
 #Start by setting up API object.
 $api = New-Object -comObject 'MOM.ScriptAPI'
 
 # Log Startup Message
-$message =	"Started F5 Device Processor Discovery. `r`n Device : " + $SNMPAddress
-$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_STARTED,$EVENT_LEVEL_INFO,$message)
+$message =	"Started F5 Device Processor Discovery"
+Log-Event $SCRIPT_STARTED $EVENT_LEVEL_INFO $message $true
 
 # Load SharpSNMPLib
 [void][reflection.assembly]::LoadFrom( (Resolve-Path $SharpSnmpLocation) )
@@ -170,45 +194,81 @@ $sysMultiHostCpuNumber = New-Object Lextm.SharpSnmpLib.ObjectIdentifier(".1.3.6.
 # Get SNMP Data (Version Dependant)
 If ($SNMPVersion -eq "3") {
 	Try {
-		$CpuCount = (Get-SnmpV3 $connection $sysMultiHostCpuNumber).Data.ToInt32()
+		# Try to get CpuCount
+		$CpuCount = (Get-SnmpV3 $connection $sysMultiHostCpuNumber).Data
+
+		# Was there a valid response
+		If ($CpuCount -eq $null)
+		{
+			# Write Warning to Event Log
+		    Log-Event $SCRIPT_ERROR_NOSNMP $EVENT_LEVEL_WARNING "No SNMP Response" $true
+		}
+		else
+		{
+			# Create Discovery Data Object
+			$DiscoveryData = $api.CreateDiscoveryData(0, $sourceId,  $managedEntityId)
+	
+			$CpuCount = $CpuCount.ToInt32()
+			For($i=1; $i -le $CpuCount; $i++) {
+
+				# Create a New F5 Device CPU Instance
+				$instance = $DiscoveryData.CreateClassInstance("$MPElement[Name='AP.F5.Device.Processor']$")
+				$instance.AddProperty("$MPElement[Name='AP.F5.Device']/SerialNumber$", $DeviceKey)
+				$instance.AddProperty("$MPElement[Name='AP.F5.Device.Processor']/Index$", $i)
+				$instance.AddProperty("$MPElement[Name='System!System.Entity']/DisplayName$", "CPU-" + $i)	
+
+				# Add to Discovery Data
+				$DiscoveryData.AddInstance($instance)
+			}
+
+			# Write Out Discovery Data
+			$DiscoveryData
+
+		
+		}
 	} Catch {
 		# Log Finished Message
 		$message = "SNMPv3 Error : " + $_
-		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_ERROR,$message)
+		Log-Event $SCRIPT_NAME $SCRIPT_ERROR_SNMP3 $EVENT_LEVEL_ERROR $message $true
 	}
 } else {
 	Try {
-		$CpuCount = (Get-SnmpV2 $connection $sysMultiHostCpuNumber).Data.ToInt32()
+		# Try to get CpuCount
+		$CpuCount = (Get-SnmpV2 $connection $sysMultiHostCpuNumber).Data
+
+		# Was there a valid response
+		If ($CpuCount -eq $null)
+		{
+			# Write Warning to Event Log
+		    Log-Event $SCRIPT_ERROR_NOSNMP $EVENT_LEVEL_WARNING "No SNMP Response" $true
+		}
+		else
+		{
+			# Create Discovery Data Object
+			$DiscoveryData = $api.CreateDiscoveryData(0, $sourceId,  $managedEntityId)
+	
+			$CpuCount = $CpuCount.ToInt32()
+			For($i=1; $i -le $CpuCount; $i++) {
+
+				# Create a New F5 Device CPU Instance
+				$instance = $DiscoveryData.CreateClassInstance("$MPElement[Name='AP.F5.Device.Processor']$")
+				$instance.AddProperty("$MPElement[Name='AP.F5.Device']/SerialNumber$", $DeviceKey)
+				$instance.AddProperty("$MPElement[Name='AP.F5.Device.Processor']/Index$", $i)
+				$instance.AddProperty("$MPElement[Name='System!System.Entity']/DisplayName$", "CPU-" + $i)	
+
+				# Add to Discovery Data
+				$DiscoveryData.AddInstance($instance)
+			}
+
+			# Write Out Discovery Data
+			$DiscoveryData
+		
+		}
 	} Catch {
 		# Log error Message
 		$message = "SNMPv2 Error : " + $Error + " : " + $_
-		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_ERROR,$message)		
+		Log-Event $SCRIPT_NAME $SCRIPT_ERROR_SNMP2 $EVENT_LEVEL_ERROR $message $true
 	}
-}
-
-Try {
-	# Create Discovery Data Object
-	$DiscoveryData = $api.CreateDiscoveryData(0, $sourceId,  $managedEntityId)
-	
-	For($i=1; $i -le $CpuCount; $i++) {
-
-		# Create a New F5 Device CPU Instance
-		$instance = $DiscoveryData.CreateClassInstance("$MPElement[Name='AP.F5.Device.Processor']$")
-		$instance.AddProperty("$MPElement[Name='AP.F5.Device']/SerialNumber$", $DeviceKey)
-		$instance.AddProperty("$MPElement[Name='AP.F5.Device.Processor']/Index$", $i)
-		$instance.AddProperty("$MPElement[Name='System!System.Entity']/DisplayName$", "CPU-" + $i)	
-
-		# Add to Discovery Data
-		$DiscoveryData.AddInstance($instance)
-	}
-
-	# Write Out Discovery Data
-	$DiscoveryData
-
-} Catch {
-	# Log error Message
-	$message = "SCOM Discovery Error : " + $_
-	$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_ERROR,$message)				
 }
 
 # Get End Time For Script
@@ -218,4 +278,4 @@ $Seconds = [math]::Round($TimeTaken.TotalSeconds, 2)
 
 # Log Finished Message
 $message = "Script Finished. Took $Seconds Seconds to Complete!"
-$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ENDED,$EVENT_LEVEL_INFO,$message)
+Log-Event $SCRIPT_ENDED $EVENT_LEVEL_INFO $message $true

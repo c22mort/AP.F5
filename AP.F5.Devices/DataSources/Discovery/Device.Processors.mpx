@@ -2,7 +2,7 @@
   <TypeDefinitions>
     <ModuleTypes>
 
-      <!-- AP.F5.Discovery.DataSource.Device.Processor -->
+      <!-- AP.F5.DataSource.Discovery.Device.Processor -->
       <DataSourceModuleType ID="AP.F5.DataSource.Discovery.Device.Processor" Accessibility="Public" Batching="false">
         <Configuration>
           <xsd:element minOccurs="1" name="IntervalSeconds" type="xsd:integer"/>
@@ -106,7 +106,7 @@
 
       <DisplayStrings>
 
-        <!-- AP.F5.Discovery.DataSource.Device.Processor -->
+        <!-- AP.F5.DataSource.Discovery.Device.Processor -->
         <DisplayString ElementID="AP.F5.DataSource.Discovery.Device.Processor">
           <Name>F5 Device Processor Discovery DataSource</Name>
           <Description>Discover AP.F5 Device CPUs from AP.F5.Device</Description>

@@ -1,39 +1,45 @@
 ﻿<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <TypeDefinitions>
-    <EntityTypes>
-      <ClassTypes>
+	<TypeDefinitions>
+		<EntityTypes>
+			<ClassTypes>
 
-				<!-- AP.F5.Device --> 
-        <ClassType ID="AP.F5.Device" Base="System!System.LogicalEntity" Accessibility="Public" Abstract="false" Hosted="true" Singleton="false">
-					<Property ID="DeviceName" Key="false" Type="string" />
-					<Property ID="SerialNumber" Key="true" Type="string" />
-					<Property ID="SNMPAddress" Key="false" Type="string" />
-					<Property ID="SNMPVersion" Key="false" Type="string" />
-          <Property ID="SNMPPort" Key="false" Type="string" />
-          <Property ID="ProductName" Key="false" Type="string" />
-					<Property ID="ProductVersion" Key="false" Type="string" />
-					<Property ID="ProductBuild" Key="false" Type="string" />
-					<Property ID="ProductEdition" Key="false" Type="string" />
-					<Property ID="ProductDate" Key="false" Type="string" />
-					<Property ID="Model" Key="false" Type="string" />
-					<Property ID="IsVirtual" Key="false" Type="bool" />
-					<Property ID="IsStandalone" Key="false" Type="bool" />                    
-        </ClassType>
+			<!-- AP.F5.Device --> 
+			<ClassType ID="AP.F5.Device" Base="System!System.LogicalEntity" Accessibility="Public" Abstract="false" Hosted="true" Singleton="false">
+				<Property ID="DeviceName" Key="false" Type="string" />
+				<Property ID="SerialNumber" Key="true" Type="string" />
+				<Property ID="SNMPAddress" Key="false" Type="string" />
+				<Property ID="SNMPVersion" Key="false" Type="string" />
+				<Property ID="SNMPPort" Key="false" Type="string" />
+				<Property ID="ProductName" Key="false" Type="string" />
+				<Property ID="ProductVersion" Key="false" Type="string" />
+				<Property ID="ProductBuild" Key="false" Type="string" />
+				<Property ID="ProductEdition" Key="false" Type="string" />
+				<Property ID="ProductDate" Key="false" Type="string" />
+				<Property ID="Model" Key="false" Type="string" />
+				<Property ID="IsVirtual" Key="false" Type="bool" />
+				<Property ID="IsStandalone" Key="false" Type="bool" />                    
+			</ClassType>
       
-      </ClassTypes>
+			</ClassTypes>
 
 			<RelationshipTypes>
 				
-				<!-- AP.F5.Root.Contains.Devices -->
+				<!-- AP.F5.Root.Hosts.Devices -->
 				<RelationshipType ID="AP.F5.Root.Hosts.Devices" Base="System!System.Hosting" Abstract="false" Accessibility="Public">
 					<Source ID="Source" Type="AP.F5.Root"/>
 					<Target ID="Target" Type="AP.F5.Device"/>
 				</RelationshipType>
-				
+
+				<!-- AP.F5.DeviceGroup.Contains.Devices -->
+				<RelationshipType ID="AP.F5.DeviceGroup.Contains.Devices" Base="System!System.Containment" Abstract="false" Accessibility="Public">
+					<Source ID="Source" Type="AP.F5.DeviceGroup"/>
+					<Target ID="Target" Type="AP.F5.Device"/>
+				</RelationshipType>
+
 			</RelationshipTypes>
-    </EntityTypes>
+		</EntityTypes>
 		
-  </TypeDefinitions>
+	</TypeDefinitions>
 	
   <LanguagePacks>
     <LanguagePack ID="ENU" IsDefault="true">
@@ -60,11 +66,11 @@
 					<Name>SNMP Version</Name>
 					<Description>SNMP Version of F5 Device</Description>
 				</DisplayString>
-        <DisplayString ElementID="AP.F5.Device" SubElementID="SNMPPort">
-          <Name>SNMP Port Number</Name>
-          <Description>SNMP Port Number of F5 Device</Description>
-        </DisplayString>
-        <DisplayString ElementID="AP.F5.Device" SubElementID="ProductName">
+				<DisplayString ElementID="AP.F5.Device" SubElementID="SNMPPort">
+					<Name>SNMP Port Number</Name>
+					<Description>SNMP Port Number of F5 Device</Description>
+				</DisplayString>
+				<DisplayString ElementID="AP.F5.Device" SubElementID="ProductName">
 					<Name>Product Name</Name>
 					<Description>Product Name of F5 Device</Description>
 				</DisplayString>
@@ -97,12 +103,18 @@
 					<Description>Is F5 Device a Standalone Appliance or part of a Device Group</Description>
 				</DisplayString>
 
-				<!-- AP.F5.Root.Contains.Devices -->
+				<!-- AP.F5.Root.Hosts.Devices -->
 				<DisplayString ElementID="AP.F5.Root.Hosts.Devices">
 					<Name>F5 Devices Root Hosting</Name>
 					<Description>Describes the Relationship Between the Root and F5 Devices</Description>
 				</DisplayString>
-			</DisplayStrings>
+
+				<!-- AP.F5.DeviceGroup.Contains.Devices -->
+				<DisplayString ElementID="AP.F5.DeviceGroup.Contains.Devices">
+					<Name>F5 DeviceGroup Contains Devices</Name>
+					<Description>Describes the Containment Relationship Between DeviceGroups and F5 Devices</Description>
+				</DisplayString>
+	  </DisplayStrings>
     </LanguagePack>
   </LanguagePacks>
 </ManagementPackFragment>

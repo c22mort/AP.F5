@@ -10,8 +10,8 @@
           <DiscoveryRelationship TypeID="AP.F5.Device.Hosts.Processors" />
         </DiscoveryTypes>
         <DataSource ID="DS" TypeID="AP.F5.DataSource.Discovery.Device.Processor">
-          <IntervalSeconds>1800</IntervalSeconds>
-          <SyncTime>00:01</SyncTime>
+          <IntervalSeconds>600</IntervalSeconds>
+          <SyncTime>00:05</SyncTime>
           <Debug>false</Debug>
           <TimeoutSeconds>60</TimeoutSeconds>
           <IPAddress>$Target/Property[Type="AP.F5.Device"]/SNMPAddress$</IPAddress>

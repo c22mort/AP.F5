@@ -2,7 +2,7 @@
   <TypeDefinitions>
     <ModuleTypes>
 
-      <!-- AP.F5.Discovery.DataSource.Device.TempSensor -->
+      <!-- AP.F5.DataSource.Discovery.Device.TempSensor -->
       <DataSourceModuleType ID="AP.F5.DataSource.Discovery.Device.TempSensor" Accessibility="Public" Batching="false">
         <Configuration>
           <xsd:element minOccurs="1" name="IntervalSeconds" type="xsd:integer"/>
@@ -106,7 +106,7 @@
 
       <DisplayStrings>
 
-        <!-- AP.F5.Discovery.DataSource.Device.TempSensor -->
+        <!-- AP.F5.DataSource.Discovery.Device.TempSensor -->
         <DisplayString ElementID="AP.F5.DataSource.Discovery.Device.TempSensor">
           <Name>F5 Device Temperature Sensor Discovery DataSource</Name>
           <Description>Discover AP.F5 Device Temperature Sensor from AP.F5.Device</Description>

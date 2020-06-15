@@ -36,11 +36,14 @@ $EVENT_LEVEL_ERROR 		= 1
 $EVENT_LEVEL_WARNING 	= 2
 $EVENT_LEVEL_INFO 		= 4
 
-$SCRIPT_STARTED				= 14636
-$SCRIPT_PROPERTYBAG_CREATED	= 14637
-$SCRIPT_EVENT				= 14638
-$SCRIPT_ENDED				= 14639
-$SCRIPT_ERROR				= 14640
+$SCRIPT_STARTED             = 14601
+$SCRIPT_PROPERTYBAG_CREATED	= 14602
+$SCRIPT_EVENT               = 14603
+$SCRIPT_ERROR               = 14604
+$SCRIPT_ERROR_NOSNMP        = 14605
+$SCRIPT_ERROR_SNMP2         = 14606
+$SCRIPT_ERROR_SNMP3         = 14607
+$SCRIPT_ENDED               = 14608
 
 #==================================================================================
 # Function:	Get-SnmpV2
@@ -69,7 +72,7 @@ function Get-SnmpV2
     } Catch {
 		# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_INFO,$message)
+   		Log-Event $SCRIPT_ERROR_SNMP2 $EVENT_LEVEL_INFO $message $true
 	}
 }
 #==================================================================================
@@ -145,7 +148,7 @@ function Get-SnmpV3
     } Catch {
 		# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_INFO,$message)
+   		Log-Event $SCRIPT_ERROR_SNMP3 $EVENT_LEVEL_INFO $message $true
     }
 }
 #==================================================================================
@@ -175,7 +178,7 @@ function Walk-SnmpV2
     } Catch {
 		# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_INFO,$message)
+   		Log-Event $SCRIPT_ERROR_SNMP2 $EVENT_LEVEL_INFO $message $true
     }
 }
 #==================================================================================
@@ -246,12 +249,37 @@ function BulkGet-SnmpV3
     } Catch {
 		# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_INFO,$message)
+   		Log-Event $SCRIPT_ERROR_SNMP3 $EVENT_LEVEL_INFO $message $true
     }                   
 
 }
+
+##==================================================================================
+# Sub:      LogEvent
+# Purpose:	Logs an informational event to the Operations Manager event log
+#           $writeevent by default is debug value
+#==================================================================================
+function Log-Event
+{
+	param(
+    $eventNo,
+    $eventLevel,
+    $message,
+    $writeEvent = $Debug
+    )
+
+	if ($writeEvent -eq $true)
+	{
+		$message = $SNMPAddress + "`r`n" + $message + $option
+		$api.LogScriptEvent($SCRIPT_NAME,$eventNo,$eventLevel,$message)
+	}
+}
+
 #Start by setting up API object.
 $api = New-Object -comObject 'MOM.ScriptAPI'
+
+# Log Startup Message
+Log-Event $SCRIPT_STARTED $EVENT_LEVEL_INFO "Started F5 Disk Partition Discovery" $true
 
 # Load SharpSNMPLib
 [void][reflection.assembly]::LoadFrom( (Resolve-Path $SharpSnmpLocation) )
@@ -272,74 +300,98 @@ $sysHostDiskTotalBlocks = New-Object Lextm.SharpSnmpLib.ObjectIdentifier(".1.3.6
 # Get SNMP Data (Version Dependant)
 If ($SNMPVersion -eq "3") {
 	Try {
+
 		# Create Discovery Data Object
 		$DiscoveryData = $api.CreateDiscoveryData(0, $sourceId,  $managedEntityId)
-		
-		[int]$DiskCount = (Get-SnmpV3 $connection $sysHostDiskNumber).Data.ToInt32()
-		$DiskPaths = BulkGet-SnmpV3 $connection 10000 $sysHostDiskPartition
-		$DiskBlockSize = BulkGet-SnmpV3 $connection 10000 $sysHostDiskBlockSize		
-		$DiskTotalBlocks = BulkGet-SnmpV3 $connection 10000 $sysHostDiskTotalBlocks
-		For($i=0; $i -lt $DiskCount; $i++){
-			$Path = $DiskPaths[$i].Data.ToString()
-			$Suffix = $DiskPaths[$i].Id.ToString().Replace($sysHostDiskPartition.ToString(),"")
-			If ($DiskBlockSize[$i].Data.TypeCode -eq "Gauge32") {
-				$Size = $DiskBlockSize[$i].Data.ToUInt32() * $DiskTotalBlocks[$i].Data.ToUInt32()
-				$Size = [Math]::Round((($Size / 1024) / 1024) / 1024, 1)
-			} else {
-				$Size = $DiskBlockSize[$i].Data.ToInt32() * $DiskTotalBlocks[$i].Data.ToInt32()
-				$Size = [Math]::Round((($Size / 1024) / 1024) / 1024, 1)			
-			}
-			# Create a New F5 Device Disk Partition Instance
-			$instance = $DiscoveryData.CreateClassInstance("$MPElement[Name='AP.F5.Device.DiskPartition']$")
-			$instance.AddProperty("$MPElement[Name='AP.F5.Device']/SerialNumber$", $DeviceKey)
-			$instance.AddProperty("$MPElement[Name='AP.F5.Device.DiskPartition']/Path$", $Path)
-			$instance.AddProperty("$MPElement[Name='AP.F5.Device.DiskPartition']/Size$", $Size)
-			$instance.AddProperty("$MPElement[Name='System!System.Entity']/DisplayName$", $Path)	
+	
+		# Try Getting Disk Count from SNMP
+		$DiskCount = (Get-SnmpV3 $connection $sysHostDiskNumber).Data
+		If ($DiskCount -eq $null) {
 
-			# Add to Discovery Data
-			$DiscoveryData.AddInstance($instance)		
+			# Write Warning to Event Log
+		    Log-Event $SCRIPT_ERROR_NOSNMP $EVENT_LEVEL_WARNING "No SNMP Response" $true
+
 		}
-		$DiscoveryData
+		else
+		{
+			[int]$DiskCount = $DiskCount.ToInt32()
+			$DiskPaths = BulkGet-SnmpV3 $connection $DiskCount $sysHostDiskPartition
+			$DiskBlockSize = BulkGet-SnmpV3 $connection $DiskCount $sysHostDiskBlockSize		
+			$DiskTotalBlocks = BulkGet-SnmpV3 $connection $DiskCount $sysHostDiskTotalBlocks
+			For($i=0; $i -lt $DiskCount; $i++){
+				$Path = $DiskPaths[$i].Data.ToString()
+				$Suffix = $DiskPaths[$i].Id.ToString().Replace($sysHostDiskPartition.ToString(),"")
+				If ($DiskBlockSize[$i].Data.TypeCode -eq "Gauge32") {
+					$Size = $DiskBlockSize[$i].Data.ToUInt32() * $DiskTotalBlocks[$i].Data.ToUInt32()
+					$Size = [Math]::Round((($Size / 1024) / 1024) / 1024, 1)
+				} else {
+					$Size = $DiskBlockSize[$i].Data.ToInt32() * $DiskTotalBlocks[$i].Data.ToInt32()
+					$Size = [Math]::Round((($Size / 1024) / 1024) / 1024, 1)			
+				}
+
+				# Create a New F5 Device Disk Partition Instance
+				$instance = $DiscoveryData.CreateClassInstance("$MPElement[Name='AP.F5.Device.DiskPartition']$")
+				$instance.AddProperty("$MPElement[Name='AP.F5.Device']/SerialNumber$", $DeviceKey)
+				$instance.AddProperty("$MPElement[Name='AP.F5.Device.DiskPartition']/Path$", $Path)
+				$instance.AddProperty("$MPElement[Name='AP.F5.Device.DiskPartition']/Size$", $Size)
+				$instance.AddProperty("$MPElement[Name='System!System.Entity']/DisplayName$", $Path)	
+
+				# Add to Discovery Data
+				$DiscoveryData.AddInstance($instance)		
+		
+			}
+			$DiscoveryData
+		}
 	} Catch {
 		# Log Finished Message
 		$message = "SNMPv3 Error : " + $_
-		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_ERROR,$message)
+   		Log-Event $SCRIPT_ERROR_SNMP3 $EVENT_LEVEL_INFO $message $true
 	}
 } else {
 	Try {
 		# Create Discovery Data Object
 		$DiscoveryData = $api.CreateDiscoveryData(0, $sourceId,  $managedEntityId)
 
-		[int]$DiskCount = (Get-SnmpV2 $connection $sysHostDiskNumber).Data.ToInt32()
-		$DiskPaths = Walk-SnmpV2 $connection $sysHostDiskPartition
-		$DiskBlockSize = Walk-SnmpV2 $connection $sysHostDiskBlockSize		
-		$DiskTotalBlocks = Walk-SnmpV2 $connection $sysHostDiskTotalBlocks
-		For($i=1; $i -le $DiskCount; $i++){		
-			$Path = $DiskPaths[$i].Data.ToString()
-			$Suffix = $DiskPaths[$i].Id.ToString().Replace($sysHostDiskPartition.ToString(),"")
-			If ($DiskBlockSize[$i].Data.TypeCode -eq "Gauge32") {
-				$Size = $DiskBlockSize[$i].Data.ToUInt32() * $DiskTotalBlocks[$i].Data.ToUInt32()
-				$Size = [Math]::Round((($Size / 1024) / 1024) / 1024, 1)
-			} else {
-				$Size = $DiskBlockSize[$i].Data.ToInt32() * $DiskTotalBlocks[$i].Data.ToInt32()
-				$Size = [Math]::Round((($Size / 1024) / 1024) / 1024, 1)			
-			}
-			# Create a New F5 Device Disk Partition Instance
-			$instance = $DiscoveryData.CreateClassInstance("$MPElement[Name='AP.F5.Device.DiskPartition']$")
-			$instance.AddProperty("$MPElement[Name='AP.F5.Device']/SerialNumber$", $DeviceKey)
-			$instance.AddProperty("$MPElement[Name='AP.F5.Device.DiskPartition']/Path$", $Path)
-			$instance.AddProperty("$MPElement[Name='AP.F5.Device.DiskPartition']/Size$", $Size)
-			$instance.AddProperty("$MPElement[Name='System!System.Entity']/DisplayName$", $Path)	
+		# Try Getting Disk Count from SNMP
+		$DiskCount = (Get-SnmpV2 $connection $sysHostDiskNumber).Data
+		If ($DiskCount -eq $null) {
 
-			# Add to Discovery Data
-			$DiscoveryData.AddInstance($instance)
+			# Write Warning to Event Log
+		    Log-Event $SCRIPT_ERROR_NOSNMP $EVENT_LEVEL_WARNING "No SNMP Response" $true
+
 		}
-		$DiscoveryData
+		else
+		{
+			[int]$DiskCount = $DiskCount.ToInt32()
+			$DiskPaths = Walk-SnmpV2 $connection $sysHostDiskPartition
+			$DiskBlockSize = Walk-SnmpV2 $connection $sysHostDiskBlockSize		
+			$DiskTotalBlocks = Walk-SnmpV2 $connection $sysHostDiskTotalBlocks
+			For($i=1; $i -le $DiskCount; $i++){		
+				$Path = $DiskPaths[$i].Data.ToString()
+				$Suffix = $DiskPaths[$i].Id.ToString().Replace($sysHostDiskPartition.ToString(),"")
+				If ($DiskBlockSize[$i].Data.TypeCode -eq "Gauge32") {
+					$Size = $DiskBlockSize[$i].Data.ToUInt32() * $DiskTotalBlocks[$i].Data.ToUInt32()
+					$Size = [Math]::Round((($Size / 1024) / 1024) / 1024, 1)
+				} else {
+					$Size = $DiskBlockSize[$i].Data.ToInt32() * $DiskTotalBlocks[$i].Data.ToInt32()
+					$Size = [Math]::Round((($Size / 1024) / 1024) / 1024, 1)			
+				}
+				# Create a New F5 Device Disk Partition Instance
+				$instance = $DiscoveryData.CreateClassInstance("$MPElement[Name='AP.F5.Device.DiskPartition']$")
+				$instance.AddProperty("$MPElement[Name='AP.F5.Device']/SerialNumber$", $DeviceKey)
+				$instance.AddProperty("$MPElement[Name='AP.F5.Device.DiskPartition']/Path$", $Path)
+				$instance.AddProperty("$MPElement[Name='AP.F5.Device.DiskPartition']/Size$", $Size)
+				$instance.AddProperty("$MPElement[Name='System!System.Entity']/DisplayName$", $Path)	
 
+				# Add to Discovery Data
+				$DiscoveryData.AddInstance($instance)
+			}
+			$DiscoveryData
+		}
 	} Catch {
 		# Log error Message
 		$message = "SNMPv2 Error : " + $Error + " : " + $_
-		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_ERROR,$message)	
+   		Log-Event $SCRIPT_ERROR_SNMP2 $EVENT_LEVEL_INFO $message $true
 	}
 }
 
@@ -350,4 +402,4 @@ $Seconds = [math]::Round($TimeTaken.TotalSeconds, 2)
 
 # Log Finished Message
 $message = "Script Finished. Took $Seconds Seconds to Complete!"
-$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ENDED,$EVENT_LEVEL_INFO,$message)
+Log-Event $SCRIPT_ENDED $EVENT_LEVEL_INFO $message

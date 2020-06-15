@@ -4,9 +4,9 @@
 
 
       <!-- FILTERED MONITOR DATASOURCES -->
-      <!-- AP.F5.DataSource.Monitor.Device.PowerSupplyInfo.Filtered -->
-      <!-- AP.F5.DataSource.Monitor.Device.PowerSupplyInfo, Filters results by PowerSupplyIndex -->
-      <DataSourceModuleType ID="AP.F5.DataSource.Monitor.Device.PowerSupplyInfo.Filtered" Accessibility="Public" Batching="false">
+      <!-- AP.F5.DataSource.Device.PowerSupply.Info.Filtered -->
+      <!-- AP.F5.DataSource.Device.PowerSupply.Info, Filters results by PowerSupplyIndex -->
+      <DataSourceModuleType ID="AP.F5.DataSource.Device.PowerSupply.Info.Filtered" Accessibility="Public" Batching="false">
         <Configuration>
           <IncludeSchemaTypes>
             <SchemaType>Windows!Microsoft.Windows.PowerShellSchema</SchemaType>
@@ -35,7 +35,7 @@
         <ModuleImplementation>
           <Composite>
             <MemberModules>
-              <DataSource ID="Script" TypeID="AP.F5.DataSource.Monitor.Device.PowerSupplyInfo">
+              <DataSource ID="Script" TypeID="AP.F5.DataSource.Device.PowerSupply.Info">
                 <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
                 <SyncTime>$Config/SyncTime$</SyncTime>
                 <Debug>$Config/Debug$</Debug>
@@ -76,9 +76,9 @@
       </DataSourceModuleType>
 
       <!-- MONITOR DATA SOURCES -->
-      <!-- AP.F5.DataSource.Monitor.Device.PowerSupplyInfo -->
-      <!-- Calls AP.F5.Probe.Device.PowerSupplyInfo wraps it with a scheduler -->
-      <DataSourceModuleType ID="AP.F5.DataSource.Monitor.Device.PowerSupplyInfo" Accessibility="Public" Batching="false">
+      <!-- AP.F5.DataSource.Device.PowerSupply.Info -->
+      <!-- Calls AP.F5.Probe.Device.PowerSupply.Info wraps it with a scheduler -->
+      <DataSourceModuleType ID="AP.F5.DataSource.Device.PowerSupply.Info" Accessibility="Public" Batching="false">
         <Configuration>
           <IncludeSchemaTypes>
             <SchemaType>Windows!Microsoft.Windows.PowerShellSchema</SchemaType>
@@ -110,7 +110,7 @@
                 <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
                 <SyncTime>$Config/SyncTime$</SyncTime>
               </DataSource>
-              <ProbeAction ID="PSScript" TypeID="AP.F5.Probe.Device.PowerSupplyInfo">
+              <ProbeAction ID="PSScript" TypeID="AP.F5.Probe.Device.PowerSupply.Info">
                 <Debug>$Config/Debug$</Debug>
                 <SNMPAddress>$Config/SNMPAddress$</SNMPAddress>
                 <SNMPPort>$Config/SNMPPort$</SNMPPort>
@@ -136,9 +136,9 @@
       </DataSourceModuleType>
 
       <!-- PROBES -->
-      <!-- AP.F5.Probe.Device.PowerSupplyInfo -->
+      <!-- AP.F5.Probe.Device.PowerSupply.Info -->
       <!-- Runs script to Return Device PowerSupply Info in a property bag-->
-      <ProbeActionModuleType ID="AP.F5.Probe.Device.PowerSupplyInfo" Accessibility="Public" Batching="false">
+      <ProbeActionModuleType ID="AP.F5.Probe.Device.PowerSupply.Info" Accessibility="Public" Batching="false">
         <Configuration>
           <IncludeSchemaTypes>
             <SchemaType>Windows!Microsoft.Windows.PowerShellSchema</SchemaType>
@@ -233,9 +233,9 @@
 
     <MonitorTypes>
 
-      <!-- AP.F5.UnitMonitor.Device.PowerSupplyHealth -->
+      <!-- AP.F5.UnitMonitor.Device.PowerSupply.Health -->
       <!-- Uses SNMP via Powershell to Get Health of Device PowerSupply -->
-      <UnitMonitorType ID="AP.F5.UnitMonitor.Device.PowerSupplyHealth" Accessibility="Public">
+      <UnitMonitorType ID="AP.F5.UnitMonitor.Device.PowerSupply.Health" Accessibility="Public">
         <MonitorTypeStates>
           <MonitorTypeState ID="PowerSupplyGood" NoDetection="false"/>
           <MonitorTypeState ID="PowerSupplyBad" NoDetection="false"/>
@@ -265,7 +265,7 @@
         </OverrideableParameters>
         <MonitorImplementation>
           <MemberModules>
-            <DataSource ID="DS" TypeID="AP.F5.DataSource.Monitor.Device.PowerSupplyInfo.Filtered">
+            <DataSource ID="DS" TypeID="AP.F5.DataSource.Device.PowerSupply.Info.Filtered">
               <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
               <SyncTime>$Config/SyncTime$</SyncTime>
               <Debug>$Config/Debug$</Debug>
@@ -282,7 +282,7 @@
               <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
               <PowerSupplyIndex>$Config/PowerSupplyIndex$</PowerSupplyIndex>
             </DataSource>
-            <ProbeAction ID="Probe" TypeID="AP.F5.Probe.Device.PowerSupplyInfo">
+            <ProbeAction ID="Probe" TypeID="AP.F5.Probe.Device.PowerSupply.Info">
               <Debug>$Config/Debug$</Debug>
               <SNMPAddress>$Config/SNMPAddress$</SNMPAddress>
               <SNMPPort>$Config/SNMPPort$</SNMPPort>
@@ -364,66 +364,66 @@
 
       <DisplayStrings>
 
-        <!-- AP.F5.DataSource.Monitor.Device.PowerSupplyInfo.Filtered -->
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.PowerSupplyInfo.Filtered">
-          <Name>Filtered Power Supply Info Monitor DataSource</Name>
-          <Description>Runs AP.F5.DataSource.Monitor.Device.PowerSupplyInfo, filters out the Power Supply needed</Description>
+        <!-- AP.F5.DataSource.Device.PowerSupply.Info.Filtered -->
+        <DisplayString ElementID="AP.F5.DataSource.Device.PowerSupply.Info.Filtered">
+          <Name>Filtered Power Supply Info DataSource</Name>
+          <Description>Runs AP.F5.DataSource.Monitor.Device.PowerSupply.Info, filters out the Power Supply needed</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.PowerSupplyInfo.Filtered" SubElementID="IntervalSeconds">
+        <DisplayString ElementID="AP.F5.DataSource.Device.PowerSupply.Info.Filtered" SubElementID="IntervalSeconds">
           <Name>Interval Seconds</Name>
           <Description>Frequency in seconds that module is run.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.PowerSupplyInfo.Filtered" SubElementID="SyncTime">
+        <DisplayString ElementID="AP.F5.DataSource.Device.PowerSupply.Info.Filtered" SubElementID="SyncTime">
           <Name>Synchronisation Time</Name>
           <Description>Offset that this module is started from.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.PowerSupplyInfo.Filtered" SubElementID="Debug">
+        <DisplayString ElementID="AP.F5.DataSource.Device.PowerSupply.Info.Filtered" SubElementID="Debug">
           <Name>Debug</Name>
           <Description>Debug Flag, if true then additional info is posted to event log.</Description>
         </DisplayString>
 
-        <!-- AP.F5.DataSource.Monitor.Device.PowerSupplyInfo -->
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.PowerSupplyInfo">
-          <Name>Power Supply Info Monitor DataSource</Name>
-          <Description>Wraps Power Supply Info Probe in scheduler and returns as PropertyBag for Monitors</Description>
+        <!-- AP.F5.DataSource.Device.PowerSupply.Info -->
+        <DisplayString ElementID="AP.F5.DataSource.Device.PowerSupply.Info">
+          <Name>Power Supply Info DataSource</Name>
+          <Description>Wraps Power Supply Info Probe in scheduler and returns as PropertyBag</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.PowerSupplyInfo" SubElementID="IntervalSeconds">
+        <DisplayString ElementID="AP.F5.DataSource.Device.PowerSupply.Info" SubElementID="IntervalSeconds">
           <Name>Interval Seconds</Name>
           <Description>Frequency in seconds that module is run.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.PowerSupplyInfo" SubElementID="SyncTime">
+        <DisplayString ElementID="AP.F5.DataSource.Device.PowerSupply.Info" SubElementID="SyncTime">
           <Name>Synchronisation Time</Name>
           <Description>Offset that this module is started from.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.PowerSupplyInfo" SubElementID="Debug">
+        <DisplayString ElementID="AP.F5.DataSource.Device.PowerSupply.Info" SubElementID="Debug">
           <Name>Debug</Name>
           <Description>Debug Flag, if true then additional info is posted to event log.</Description>
         </DisplayString>
 
-        <!-- AP.F5.Probe.Device.PowerSupplyInfo -->
-        <DisplayString ElementID="AP.F5.Probe.Device.PowerSupplyInfo">
+        <!-- AP.F5.Probe.Device.PowerSupply.Info -->
+        <DisplayString ElementID="AP.F5.Probe.Device.PowerSupply.Info">
           <Name>Powershell Power Supply Probe</Name>
           <Description>Runs Powershell SNMP Script to collect Power Supply Info</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.Probe.Device.PowerSupplyInfo" SubElementID="Debug">
+        <DisplayString ElementID="AP.F5.Probe.Device.PowerSupply.Info" SubElementID="Debug">
           <Name>Debug</Name>
           <Description>Debug Flag, if true then additional info is posted to event log.</Description>
         </DisplayString>
 
-        <!-- AP.F5.UnitMonitor.Device.PowerSupplyHealth -->
-        <DisplayString ElementID="AP.F5.UnitMonitor.Device.PowerSupplyHealth">
+        <!-- AP.F5.UnitMonitor.Device.PowerSuppl.yHealth -->
+        <DisplayString ElementID="AP.F5.UnitMonitor.Device.PowerSupply.Health">
           <Name>Device Power Supply Health Monitor</Name>
           <Description>Compares used Power Supply Percentage against given thresholds</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.UnitMonitor.Device.PowerSupplyHealth" SubElementID="IntervalSeconds">
+        <DisplayString ElementID="AP.F5.UnitMonitor.Device.PowerSupply.Health" SubElementID="IntervalSeconds">
           <Name>Interval Seconds</Name>
           <Description>Frequency in seconds that module is run.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.UnitMonitor.Device.PowerSupplyHealth" SubElementID="SyncTime">
+        <DisplayString ElementID="AP.F5.UnitMonitor.Device.PowerSupply.Health" SubElementID="SyncTime">
           <Name>Synchronisation Time</Name>
           <Description>Offset that this module is started from.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.UnitMonitor.Device.PowerSupplyHealth" SubElementID="Debug">
+        <DisplayString ElementID="AP.F5.UnitMonitor.Device.PowerSupply.Health" SubElementID="Debug">
           <Name>Debug</Name>
           <Description>Debug Flag, if true then additional info is posted to event log.</Description>
         </DisplayString>

@@ -1,77 +1,211 @@
 ﻿<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <Monitoring>
-    <Rules>
-      <!-- AP.F5.Device.Perf.ClientSideConenctions -->
-      <Rule ID="AP.F5.Perf.Device.ClientSideConenctions" Target="AP.F5.Device" Enabled="true" ConfirmDelivery="false" Remotable="true" Priority="Normal" DiscardLevel="100">
-        <Category>PerformanceCollection</Category>
-        <DataSources>
-          <DataSource ID="DS" TypeID="AP.F5.DataSource.Perf.Device.ClientSideConnections">
-            <IntervalSeconds>300</IntervalSeconds>
-            <SyncTime />
-            <Debug>false</Debug>
-            <SNMPAddress>$Target/Property[Type="AP.F5.Device"]/SNMPAddress$</SNMPAddress>
-            <SNMPPort>$Target/Property[Type="AP.F5.Device"]/SNMPPort$</SNMPPort>
-            <SNMPVersion>$Target/Property[Type="AP.F5.Device"]/SNMPVersion$</SNMPVersion>
-            <SNMPCommunity>$RunAs[Name="AP.F5.Login.SNMPv2"]/CommunityString$</SNMPCommunity>
-            <SNMPv3UserName>$RunAs[Name="AP.F5.Login.SNMPv3"]/UserName$</SNMPv3UserName>
-            <SNMPv3AuthProtocol>$RunAs[Name="AP.F5.Login.SNMPv3"]/AuthenticationProtocol$</SNMPv3AuthProtocol>
-            <SNMPv3AuthPassword>$RunAs[Name="AP.F5.Login.SNMPv3"]/AuthenticationKey$</SNMPv3AuthPassword>
-            <SNMPv3PrivProtocol>$RunAs[Name="AP.F5.Login.SNMPv3"]/PrivacyProtocol$</SNMPv3PrivProtocol>
-            <SNMPv3PrivPassword>$RunAs[Name="AP.F5.Login.SNMPv3"]/PrivacyKey$</SNMPv3PrivPassword>
-            <SNMPv3ContextName>$RunAs[Name="AP.F5.Login.SNMPv3"]/ContextName$</SNMPv3ContextName>
-            <TimeoutSeconds>60</TimeoutSeconds>
-          </DataSource>
-        </DataSources>
-        <WriteActions>
-          <WriteAction ID="CollectToDB" TypeID="SC!Microsoft.SystemCenter.CollectPerformanceData" />
-          <WriteAction ID="CollectToDW" TypeID="MSDL!Microsoft.SystemCenter.DataWarehouse.PublishPerformanceData" />
-        </WriteActions>
-      </Rule>
-      <!-- AP.F5.Device.Perf.ServerSideConenctions -->
-      <Rule ID="AP.F5.Perf.Device.ServerSideConenctions" Target="AP.F5.Device" Enabled="true" ConfirmDelivery="false" Remotable="true" Priority="Normal" DiscardLevel="100">
-        <Category>PerformanceCollection</Category>
-        <DataSources>
-          <DataSource ID="DS" TypeID="AP.F5.DataSource.Perf.Device.ServerSideConnections">
-            <IntervalSeconds>300</IntervalSeconds>
-            <SyncTime />
-            <Debug>false</Debug>
-            <SNMPAddress>$Target/Property[Type="AP.F5.Device"]/SNMPAddress$</SNMPAddress>
-            <SNMPPort>$Target/Property[Type="AP.F5.Device"]/SNMPPort$</SNMPPort>
-            <SNMPVersion>$Target/Property[Type="AP.F5.Device"]/SNMPVersion$</SNMPVersion>
-            <SNMPCommunity>$RunAs[Name="AP.F5.Login.SNMPv2"]/CommunityString$</SNMPCommunity>
-            <SNMPv3UserName>$RunAs[Name="AP.F5.Login.SNMPv3"]/UserName$</SNMPv3UserName>
-            <SNMPv3AuthProtocol>$RunAs[Name="AP.F5.Login.SNMPv3"]/AuthenticationProtocol$</SNMPv3AuthProtocol>
-            <SNMPv3AuthPassword>$RunAs[Name="AP.F5.Login.SNMPv3"]/AuthenticationKey$</SNMPv3AuthPassword>
-            <SNMPv3PrivProtocol>$RunAs[Name="AP.F5.Login.SNMPv3"]/PrivacyProtocol$</SNMPv3PrivProtocol>
-            <SNMPv3PrivPassword>$RunAs[Name="AP.F5.Login.SNMPv3"]/PrivacyKey$</SNMPv3PrivPassword>
-            <SNMPv3ContextName>$RunAs[Name="AP.F5.Login.SNMPv3"]/ContextName$</SNMPv3ContextName>
-            <TimeoutSeconds>60</TimeoutSeconds>
-          </DataSource>
-        </DataSources>
-        <WriteActions>
-          <WriteAction ID="CollectToDB" TypeID="SC!Microsoft.SystemCenter.CollectPerformanceData" />
-          <WriteAction ID="CollectToDW" TypeID="MSDL!Microsoft.SystemCenter.DataWarehouse.PublishPerformanceData" />
-        </WriteActions>
-      </Rule>
-    </Rules>
-  </Monitoring>
-  <LanguagePacks>
-    <LanguagePack ID="ENU" IsDefault="true">
-      <DisplayStrings>
+    <Monitoring>
+        <Rules>
+			
+            <!-- AP.F5.Device.Perf.ClientSideConnections -->
+            <Rule ID="AP.F5.Perf.Device.ClientSideConnections" Target="AP.F5.Device" Enabled="true" ConfirmDelivery="false" Remotable="true" Priority="Normal" DiscardLevel="100">
+                <Category>PerformanceCollection</Category>
+                <DataSources>
+                    <DataSource ID="DS" TypeID="AP.F5.DataSource.Perf.Device.ClientSideConnections">
+                    <IntervalSeconds>300</IntervalSeconds>
+                    <SyncTime />
+                    <Debug>false</Debug>
+                    <SNMPAddress>$Target/Property[Type="AP.F5.Device"]/SNMPAddress$</SNMPAddress>
+                    <SNMPPort>$Target/Property[Type="AP.F5.Device"]/SNMPPort$</SNMPPort>
+                    <SNMPVersion>$Target/Property[Type="AP.F5.Device"]/SNMPVersion$</SNMPVersion>
+                    <SNMPCommunity>$RunAs[Name="AP.F5.Login.SNMPv2"]/CommunityString$</SNMPCommunity>
+                    <SNMPv3UserName>$RunAs[Name="AP.F5.Login.SNMPv3"]/UserName$</SNMPv3UserName>
+                    <SNMPv3AuthProtocol>$RunAs[Name="AP.F5.Login.SNMPv3"]/AuthenticationProtocol$</SNMPv3AuthProtocol>
+                    <SNMPv3AuthPassword>$RunAs[Name="AP.F5.Login.SNMPv3"]/AuthenticationKey$</SNMPv3AuthPassword>
+                    <SNMPv3PrivProtocol>$RunAs[Name="AP.F5.Login.SNMPv3"]/PrivacyProtocol$</SNMPv3PrivProtocol>
+                    <SNMPv3PrivPassword>$RunAs[Name="AP.F5.Login.SNMPv3"]/PrivacyKey$</SNMPv3PrivPassword>
+                    <SNMPv3ContextName>$RunAs[Name="AP.F5.Login.SNMPv3"]/ContextName$</SNMPv3ContextName>
+                    <TimeoutSeconds>60</TimeoutSeconds>
+                    </DataSource>
+                </DataSources>
+                <WriteActions>
+                    <WriteAction ID="CollectToDB" TypeID="SC!Microsoft.SystemCenter.CollectPerformanceData" />
+                    <WriteAction ID="CollectToDW" TypeID="MSDL!Microsoft.SystemCenter.DataWarehouse.PublishPerformanceData" />
+                </WriteActions>
+            </Rule>
 
-        <!-- AP.F5.Device.Perf.ClientSideConenctions -->
-        <DisplayString ElementID="AP.F5.Perf.Device.ClientSideConenctions">
-          <Name>Device Client Side Connections Performance Rule</Name>
-          <Description>Collects Device Client Side Connections Performance Data</Description>
-        </DisplayString>
+			<!-- AP.F5.Device.Perf.ClientSideBytesIn -->
+			<Rule ID="AP.F5.Perf.Device.ClientSideBytesIn" Target="AP.F5.Device" Enabled="true" ConfirmDelivery="false" Remotable="true" Priority="Normal" DiscardLevel="100">
+				<Category>PerformanceCollection</Category>
+				<DataSources>
+					<DataSource ID="DS" TypeID="AP.F5.DataSource.Perf.Device.ClientSideBytesIn">
+						<IntervalSeconds>300</IntervalSeconds>
+						<SyncTime />
+						<Debug>false</Debug>
+						<SNMPAddress>$Target/Property[Type="AP.F5.Device"]/SNMPAddress$</SNMPAddress>
+						<SNMPPort>$Target/Property[Type="AP.F5.Device"]/SNMPPort$</SNMPPort>
+						<SNMPVersion>$Target/Property[Type="AP.F5.Device"]/SNMPVersion$</SNMPVersion>
+						<SNMPCommunity>$RunAs[Name="AP.F5.Login.SNMPv2"]/CommunityString$</SNMPCommunity>
+						<SNMPv3UserName>$RunAs[Name="AP.F5.Login.SNMPv3"]/UserName$</SNMPv3UserName>
+						<SNMPv3AuthProtocol>$RunAs[Name="AP.F5.Login.SNMPv3"]/AuthenticationProtocol$</SNMPv3AuthProtocol>
+						<SNMPv3AuthPassword>$RunAs[Name="AP.F5.Login.SNMPv3"]/AuthenticationKey$</SNMPv3AuthPassword>
+						<SNMPv3PrivProtocol>$RunAs[Name="AP.F5.Login.SNMPv3"]/PrivacyProtocol$</SNMPv3PrivProtocol>
+						<SNMPv3PrivPassword>$RunAs[Name="AP.F5.Login.SNMPv3"]/PrivacyKey$</SNMPv3PrivPassword>
+						<SNMPv3ContextName>$RunAs[Name="AP.F5.Login.SNMPv3"]/ContextName$</SNMPv3ContextName>
+						<TimeoutSeconds>60</TimeoutSeconds>
+					</DataSource>
+				</DataSources>
+				<WriteActions>
+					<WriteAction ID="CollectToDB" TypeID="SC!Microsoft.SystemCenter.CollectPerformanceData" />
+					<WriteAction ID="CollectToDW" TypeID="MSDL!Microsoft.SystemCenter.DataWarehouse.PublishPerformanceData" />
+				</WriteActions>
+			</Rule>
 
-        <!-- AP.F5.Device.Perf.ServerSideConenctions -->
-        <DisplayString ElementID="AP.F5.Perf.Device.ServerSideConenctions">
-          <Name>Device Server Side Connections Performance Rule</Name>
-          <Description>Collects Device Server Side Connections Performance Data</Description>
-        </DisplayString>
+			<!-- AP.F5.Device.Perf.ClientSideBytesOut -->
+			<Rule ID="AP.F5.Perf.Device.ClientSideBytesOut" Target="AP.F5.Device" Enabled="true" ConfirmDelivery="false" Remotable="true" Priority="Normal" DiscardLevel="100">
+				<Category>PerformanceCollection</Category>
+				<DataSources>
+					<DataSource ID="DS" TypeID="AP.F5.DataSource.Perf.Device.ClientSideBytesOut">
+						<IntervalSeconds>300</IntervalSeconds>
+						<SyncTime />
+						<Debug>false</Debug>
+						<SNMPAddress>$Target/Property[Type="AP.F5.Device"]/SNMPAddress$</SNMPAddress>
+						<SNMPPort>$Target/Property[Type="AP.F5.Device"]/SNMPPort$</SNMPPort>
+						<SNMPVersion>$Target/Property[Type="AP.F5.Device"]/SNMPVersion$</SNMPVersion>
+						<SNMPCommunity>$RunAs[Name="AP.F5.Login.SNMPv2"]/CommunityString$</SNMPCommunity>
+						<SNMPv3UserName>$RunAs[Name="AP.F5.Login.SNMPv3"]/UserName$</SNMPv3UserName>
+						<SNMPv3AuthProtocol>$RunAs[Name="AP.F5.Login.SNMPv3"]/AuthenticationProtocol$</SNMPv3AuthProtocol>
+						<SNMPv3AuthPassword>$RunAs[Name="AP.F5.Login.SNMPv3"]/AuthenticationKey$</SNMPv3AuthPassword>
+						<SNMPv3PrivProtocol>$RunAs[Name="AP.F5.Login.SNMPv3"]/PrivacyProtocol$</SNMPv3PrivProtocol>
+						<SNMPv3PrivPassword>$RunAs[Name="AP.F5.Login.SNMPv3"]/PrivacyKey$</SNMPv3PrivPassword>
+						<SNMPv3ContextName>$RunAs[Name="AP.F5.Login.SNMPv3"]/ContextName$</SNMPv3ContextName>
+						<TimeoutSeconds>60</TimeoutSeconds>
+					</DataSource>
+				</DataSources>
+				<WriteActions>
+					<WriteAction ID="CollectToDB" TypeID="SC!Microsoft.SystemCenter.CollectPerformanceData" />
+					<WriteAction ID="CollectToDW" TypeID="MSDL!Microsoft.SystemCenter.DataWarehouse.PublishPerformanceData" />
+				</WriteActions>
+			</Rule>
 
-    </DisplayStrings>
-    </LanguagePack>
-  </LanguagePacks>
+			<!-- AP.F5.Device.Perf.ServerSideConnections -->
+            <Rule ID="AP.F5.Perf.Device.ServerSideConnections" Target="AP.F5.Device" Enabled="true" ConfirmDelivery="false" Remotable="true" Priority="Normal" DiscardLevel="100">
+                <Category>PerformanceCollection</Category>
+                <DataSources>
+                    <DataSource ID="DS" TypeID="AP.F5.DataSource.Perf.Device.ServerSideConnections">
+                    <IntervalSeconds>300</IntervalSeconds>
+                    <SyncTime />
+                    <Debug>false</Debug>
+                    <SNMPAddress>$Target/Property[Type="AP.F5.Device"]/SNMPAddress$</SNMPAddress>
+                    <SNMPPort>$Target/Property[Type="AP.F5.Device"]/SNMPPort$</SNMPPort>
+                    <SNMPVersion>$Target/Property[Type="AP.F5.Device"]/SNMPVersion$</SNMPVersion>
+                    <SNMPCommunity>$RunAs[Name="AP.F5.Login.SNMPv2"]/CommunityString$</SNMPCommunity>
+                    <SNMPv3UserName>$RunAs[Name="AP.F5.Login.SNMPv3"]/UserName$</SNMPv3UserName>
+                    <SNMPv3AuthProtocol>$RunAs[Name="AP.F5.Login.SNMPv3"]/AuthenticationProtocol$</SNMPv3AuthProtocol>
+                    <SNMPv3AuthPassword>$RunAs[Name="AP.F5.Login.SNMPv3"]/AuthenticationKey$</SNMPv3AuthPassword>
+                    <SNMPv3PrivProtocol>$RunAs[Name="AP.F5.Login.SNMPv3"]/PrivacyProtocol$</SNMPv3PrivProtocol>
+                    <SNMPv3PrivPassword>$RunAs[Name="AP.F5.Login.SNMPv3"]/PrivacyKey$</SNMPv3PrivPassword>
+                    <SNMPv3ContextName>$RunAs[Name="AP.F5.Login.SNMPv3"]/ContextName$</SNMPv3ContextName>
+                    <TimeoutSeconds>60</TimeoutSeconds>
+                    </DataSource>
+                </DataSources>
+                <WriteActions>
+                    <WriteAction ID="CollectToDB" TypeID="SC!Microsoft.SystemCenter.CollectPerformanceData" />
+                    <WriteAction ID="CollectToDW" TypeID="MSDL!Microsoft.SystemCenter.DataWarehouse.PublishPerformanceData" />
+                </WriteActions>
+            </Rule>
+
+			<!-- AP.F5.Device.Perf.ServerSideBytesIn -->
+			<Rule ID="AP.F5.Perf.Device.ServerSideBytesIn" Target="AP.F5.Device" Enabled="true" ConfirmDelivery="false" Remotable="true" Priority="Normal" DiscardLevel="100">
+				<Category>PerformanceCollection</Category>
+				<DataSources>
+					<DataSource ID="DS" TypeID="AP.F5.DataSource.Perf.Device.ServerSideBytesIn">
+						<IntervalSeconds>300</IntervalSeconds>
+						<SyncTime />
+						<Debug>false</Debug>
+						<SNMPAddress>$Target/Property[Type="AP.F5.Device"]/SNMPAddress$</SNMPAddress>
+						<SNMPPort>$Target/Property[Type="AP.F5.Device"]/SNMPPort$</SNMPPort>
+						<SNMPVersion>$Target/Property[Type="AP.F5.Device"]/SNMPVersion$</SNMPVersion>
+						<SNMPCommunity>$RunAs[Name="AP.F5.Login.SNMPv2"]/CommunityString$</SNMPCommunity>
+						<SNMPv3UserName>$RunAs[Name="AP.F5.Login.SNMPv3"]/UserName$</SNMPv3UserName>
+						<SNMPv3AuthProtocol>$RunAs[Name="AP.F5.Login.SNMPv3"]/AuthenticationProtocol$</SNMPv3AuthProtocol>
+						<SNMPv3AuthPassword>$RunAs[Name="AP.F5.Login.SNMPv3"]/AuthenticationKey$</SNMPv3AuthPassword>
+						<SNMPv3PrivProtocol>$RunAs[Name="AP.F5.Login.SNMPv3"]/PrivacyProtocol$</SNMPv3PrivProtocol>
+						<SNMPv3PrivPassword>$RunAs[Name="AP.F5.Login.SNMPv3"]/PrivacyKey$</SNMPv3PrivPassword>
+						<SNMPv3ContextName>$RunAs[Name="AP.F5.Login.SNMPv3"]/ContextName$</SNMPv3ContextName>
+						<TimeoutSeconds>60</TimeoutSeconds>
+					</DataSource>
+				</DataSources>
+				<WriteActions>
+					<WriteAction ID="CollectToDB" TypeID="SC!Microsoft.SystemCenter.CollectPerformanceData" />
+					<WriteAction ID="CollectToDW" TypeID="MSDL!Microsoft.SystemCenter.DataWarehouse.PublishPerformanceData" />
+				</WriteActions>
+			</Rule>
+
+			<!-- AP.F5.Device.Perf.ServerSideBytesOut -->
+			<Rule ID="AP.F5.Perf.Device.ServerSideBytesOut" Target="AP.F5.Device" Enabled="true" ConfirmDelivery="false" Remotable="true" Priority="Normal" DiscardLevel="100">
+				<Category>PerformanceCollection</Category>
+				<DataSources>
+					<DataSource ID="DS" TypeID="AP.F5.DataSource.Perf.Device.ServerSideBytesOut">
+						<IntervalSeconds>300</IntervalSeconds>
+						<SyncTime />
+						<Debug>false</Debug>
+						<SNMPAddress>$Target/Property[Type="AP.F5.Device"]/SNMPAddress$</SNMPAddress>
+						<SNMPPort>$Target/Property[Type="AP.F5.Device"]/SNMPPort$</SNMPPort>
+						<SNMPVersion>$Target/Property[Type="AP.F5.Device"]/SNMPVersion$</SNMPVersion>
+						<SNMPCommunity>$RunAs[Name="AP.F5.Login.SNMPv2"]/CommunityString$</SNMPCommunity>
+						<SNMPv3UserName>$RunAs[Name="AP.F5.Login.SNMPv3"]/UserName$</SNMPv3UserName>
+						<SNMPv3AuthProtocol>$RunAs[Name="AP.F5.Login.SNMPv3"]/AuthenticationProtocol$</SNMPv3AuthProtocol>
+						<SNMPv3AuthPassword>$RunAs[Name="AP.F5.Login.SNMPv3"]/AuthenticationKey$</SNMPv3AuthPassword>
+						<SNMPv3PrivProtocol>$RunAs[Name="AP.F5.Login.SNMPv3"]/PrivacyProtocol$</SNMPv3PrivProtocol>
+						<SNMPv3PrivPassword>$RunAs[Name="AP.F5.Login.SNMPv3"]/PrivacyKey$</SNMPv3PrivPassword>
+						<SNMPv3ContextName>$RunAs[Name="AP.F5.Login.SNMPv3"]/ContextName$</SNMPv3ContextName>
+						<TimeoutSeconds>60</TimeoutSeconds>
+					</DataSource>
+				</DataSources>
+				<WriteActions>
+					<WriteAction ID="CollectToDB" TypeID="SC!Microsoft.SystemCenter.CollectPerformanceData" />
+					<WriteAction ID="CollectToDW" TypeID="MSDL!Microsoft.SystemCenter.DataWarehouse.PublishPerformanceData" />
+				</WriteActions>
+			</Rule>
+		</Rules>
+    </Monitoring>
+    <LanguagePacks>
+        <LanguagePack ID="ENU" IsDefault="true">
+            <DisplayStrings>
+
+		        <!-- AP.F5.Device.Perf.ClientSideConnections -->
+		        <DisplayString ElementID="AP.F5.Perf.Device.ClientSideConnections">
+			        <Name>Device Client Side Connections Performance Rule</Name>
+			        <Description>Collects Device Client Side Connections Performance Data</Description>
+		        </DisplayString>
+
+				<!-- AP.F5.Device.Perf.ClientSideBytesIn -->
+				<DisplayString ElementID="AP.F5.Perf.Device.ClientSideBytesIn">
+					<Name>Device Client-Side Bytes Inbound Performance Rule</Name>
+					<Description>Collects Device Client Side Bytes Inbound Performance Data</Description>
+				</DisplayString>
+
+				<!-- AP.F5.Device.Perf.ClientSideBytesOut -->
+				<DisplayString ElementID="AP.F5.Perf.Device.ClientSideBytesOut">
+					<Name>Device Client-Side Bytes Outbound Performance Rule</Name>
+					<Description>Collects Device Client Side Bytes Outbound Performance Data</Description>
+				</DisplayString>
+
+				<!-- AP.F5.Device.Perf.ServerSideConnections -->
+                <DisplayString ElementID="AP.F5.Perf.Device.ServerSideConnections">
+                    <Name>Device Server Side Connections Performance Rule</Name>
+                    <Description>Collects Device Server Side Connections Performance Data</Description>
+                </DisplayString>
+
+				<!-- AP.F5.Device.Perf.ServerSideBytesIn -->
+				<DisplayString ElementID="AP.F5.Perf.Device.ServerSideBytesIn">
+					<Name>Device Server-Side Bytes Inbound Performance Rule</Name>
+					<Description>Collects Device Client Side Bytes Inbound Performance Data</Description>
+				</DisplayString>
+
+				<!-- AP.F5.Device.Perf.ServerSideBytesOut -->
+				<DisplayString ElementID="AP.F5.Perf.Device.ServerSideBytesOut">
+					<Name>Device Server-Side Bytes Outbound Performance Rule</Name>
+					<Description>Collects Device Client Side Bytes Outbound Performance Data</Description>
+				</DisplayString>
+
+		</DisplayStrings>
+        </LanguagePack>
+    </LanguagePacks>
 </ManagementPackFragment>

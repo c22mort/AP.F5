@@ -2,7 +2,7 @@
   <TypeDefinitions>
     <ModuleTypes>
 
-      <!-- AP.F5.Discovery.DataSource.Device.DiskPartitions -->
+      <!-- AP.F5.DataSource.Device.DiskPartitions -->
       <DataSourceModuleType ID="AP.F5.DataSource.Discovery.Device.DiskPartitions" Accessibility="Public" Batching="false">
         <Configuration>
           <xsd:element minOccurs="1" name="IntervalSeconds" type="xsd:integer"/>
@@ -106,7 +106,7 @@
 
       <DisplayStrings>
 
-        <!-- AP.F5.Discovery.DataSource.Device.DiskPartitions -->
+        <!-- AP.F5.DataSource.Discovery.Device.DiskPartitions -->
         <DisplayString ElementID="AP.F5.DataSource.Discovery.Device.DiskPartitions">
           <Name>F5 Device Disk Partition Discovery DataSource</Name>
           <Description>Discover AP.F5 Device Disk Partitions from AP.F5.Device</Description>

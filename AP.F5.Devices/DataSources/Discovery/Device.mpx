@@ -2,7 +2,7 @@
   <TypeDefinitions>
     <ModuleTypes>
 
-      <!-- AP.F5.Discovery.DataSource.Device.Filtered -->
+      <!-- AP.F5.DataSource.Discovery.Device.Filtered -->
       <DataSourceModuleType ID="AP.F5.DataSource.Discovery.Device.Filtered" Accessibility="Public" Batching="false">
         <Configuration>
           <xsd:element minOccurs="1" name="IntervalSeconds" type="xsd:integer"/>
@@ -115,7 +115,7 @@
 
       <DisplayStrings>
 
-        <!-- AP.F5.Discovery.DataSource.Device.Filtered -->
+        <!-- AP.F5.DataSource.Discovery.Device.Filtered -->
         <DisplayString ElementID="AP.F5.DataSource.Discovery.Device.Filtered">
           <Name>Device Discovery DataSource</Name>
           <Description>Discover Ap.F5 Devices from Network Management Nodes</Description>

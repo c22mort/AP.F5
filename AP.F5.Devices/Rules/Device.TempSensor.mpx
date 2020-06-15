@@ -5,7 +5,7 @@
       <Rule ID="AP.F5.Device.Perf.TempSensor.Temp" Target="AP.F5.Device.TempSensor" Enabled="true" ConfirmDelivery="false" Remotable="true" Priority="Normal" DiscardLevel="100">
         <Category>PerformanceCollection</Category>
         <DataSources>
-          <DataSource ID="DS" TypeID="AP.F5.DataSource.Perf.Device.TempSensorTemp.Filtered">
+          <DataSource ID="DS" TypeID="AP.F5.DataSource.Perf.Device.TempSensor.Temp.Filtered">
             <IntervalSeconds>300</IntervalSeconds>
             <SyncTime />
             <Debug>false</Debug>

@@ -4,9 +4,9 @@
 
 
       <!-- FILTERED MONITOR DATASOURCES -->
-      <!-- AP.F5.DataSource.Monitor.Device.ProcessorInfo.Filtered -->
-      <!-- AP.F5.DataSource.Monitor.Device.ProcessorInfo, Filters results by ProcessorIndex -->
-      <DataSourceModuleType ID="AP.F5.DataSource.Monitor.Device.ProcessorInfo.Filtered" Accessibility="Public" Batching="false">
+      <!-- AP.F5.DataSource.Device.Processor.Info.Filtered -->
+      <!-- AP.F5.DataSource.Device.Processor.Info, Filters results by ProcessorIndex -->
+      <DataSourceModuleType ID="AP.F5.DataSource.Device.Processor.Info.Filtered" Accessibility="Public" Batching="false">
         <Configuration>
           <IncludeSchemaTypes>
             <SchemaType>Windows!Microsoft.Windows.PowerShellSchema</SchemaType>
@@ -35,7 +35,7 @@
         <ModuleImplementation>
           <Composite>
             <MemberModules>
-              <DataSource ID="Script" TypeID="AP.F5.DataSource.Monitor.Device.ProcessorInfo">
+              <DataSource ID="Script" TypeID="AP.F5.DataSource.Device.Processor.Info">
                 <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
                 <SyncTime>$Config/SyncTime$</SyncTime>
                 <Debug>$Config/Debug$</Debug>
@@ -76,9 +76,9 @@
       </DataSourceModuleType>
       
       <!-- MONITOR DATA SOURCES -->
-      <!-- AP.F5.DataSource.Monitor.Device.ProcessorInfo -->
-      <!-- Calls AP.F5.Probe.Device.ProcessorInfo wraps it with a scheduler -->
-      <DataSourceModuleType ID="AP.F5.DataSource.Monitor.Device.ProcessorInfo" Accessibility="Public" Batching="false">
+      <!-- AP.F5.DataSource.Device.Processor.Info -->
+      <!-- Calls AP.F5.Probe.Device.Processor.Info wraps it with a scheduler -->
+      <DataSourceModuleType ID="AP.F5.DataSource.Device.Processor.Info" Accessibility="Public" Batching="false">
         <Configuration>
           <IncludeSchemaTypes>
             <SchemaType>Windows!Microsoft.Windows.PowerShellSchema</SchemaType>
@@ -110,7 +110,7 @@
                 <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
                 <SyncTime>$Config/SyncTime$</SyncTime>
               </DataSource>
-              <ProbeAction ID="PSScript" TypeID="AP.F5.Probe.Device.ProcessorInfo">
+              <ProbeAction ID="PSScript" TypeID="AP.F5.Probe.Device.Processor.Info">
                 <Debug>$Config/Debug$</Debug>
                 <SNMPAddress>$Config/SNMPAddress$</SNMPAddress>
                 <SNMPPort>$Config/SNMPPort$</SNMPPort>
@@ -136,9 +136,9 @@
       </DataSourceModuleType>
 
       <!-- PERFORMANCE DATA SOURCES -->
-      <!-- AP.F5.DataSource.Perf.Device.ProcessorUsage.Filtered -->
-      <!-- Calls AP.F5.DataSource.ProcessorUsage.Powershell, Filters results by Processor Index -->
-      <DataSourceModuleType ID="AP.F5.DataSource.Perf.Device.ProcessorUsage.Filtered" Accessibility="Public" Batching="false">
+      <!-- AP.F5.DataSource.Perf.Device.Processor.Usage.Filtered -->
+      <!-- Calls AP.F5.DataSource.Device.Processor.Info, Filters results by Processor Index -->
+      <DataSourceModuleType ID="AP.F5.DataSource.Perf.Device.Processor.Usage.Filtered" Accessibility="Public" Batching="false">
         <Configuration>
           <IncludeSchemaTypes>
             <SchemaType>Windows!Microsoft.Windows.PowerShellSchema</SchemaType>
@@ -167,7 +167,7 @@
         <ModuleImplementation>
           <Composite>
             <MemberModules>
-              <DataSource ID="Script" TypeID="AP.F5.DataSource.Monitor.Device.ProcessorInfo">
+              <DataSource ID="Script" TypeID="AP.F5.DataSource.Device.Processor.Info">
                 <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
                 <SyncTime>$Config/SyncTime$</SyncTime>
                 <Debug>$Config/Debug$</Debug>
@@ -216,9 +216,9 @@
       </DataSourceModuleType>
       
       <!-- PROBES -->
-      <!-- AP.F5.Probe.Device.ProcessorInfo -->
+      <!-- AP.F5.Probe.Device.Processor.Info -->
       <!-- Runs script to Return Device Processor Info in a property bag-->
-      <ProbeActionModuleType ID="AP.F5.Probe.Device.ProcessorInfo" Accessibility="Public" Batching="false">
+      <ProbeActionModuleType ID="AP.F5.Probe.Device.Processor.Info" Accessibility="Public" Batching="false">
         <Configuration>
           <IncludeSchemaTypes>
             <SchemaType>Windows!Microsoft.Windows.PowerShellSchema</SchemaType>
@@ -313,9 +313,9 @@
 
     <MonitorTypes>
 
-      <!-- AP.F5.UnitMonitor.Device.ProcessorHealth -->
+      <!-- AP.F5.UnitMonitor.Device.Processor.Health -->
       <!-- Uses SNMP via Powershell to Get Health of Device Processor -->
-      <UnitMonitorType ID="AP.F5.UnitMonitor.Device.ProcessorHealth" Accessibility="Public">
+      <UnitMonitorType ID="AP.F5.UnitMonitor.Device.Processor.Health" Accessibility="Public">
         <MonitorTypeStates>
           <MonitorTypeState ID="ProcessorHealthy" NoDetection="false" />
           <MonitorTypeState ID="ProcessorWarning" NoDetection="false" />
@@ -349,7 +349,7 @@
         </OverrideableParameters>
         <MonitorImplementation>
           <MemberModules>
-            <DataSource ID="DS" TypeID="AP.F5.DataSource.Monitor.Device.ProcessorInfo.Filtered">
+            <DataSource ID="DS" TypeID="AP.F5.DataSource.Device.Processor.Info.Filtered">
               <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
               <SyncTime>$Config/SyncTime$</SyncTime>
               <Debug>$Config/Debug$</Debug>
@@ -366,7 +366,7 @@
               <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
               <ProcessorIndex>$Config/ProcessorIndex$</ProcessorIndex>
             </DataSource>
-            <ProbeAction ID="Probe" TypeID="AP.F5.Probe.Device.ProcessorInfo">
+            <ProbeAction ID="Probe" TypeID="AP.F5.Probe.Device.Processor.Info">
               <Debug>$Config/Debug$</Debug>
               <SNMPAddress>$Config/SNMPAddress$</SNMPAddress>
               <SNMPPort>$Config/SNMPPort$</SNMPPort>
@@ -463,92 +463,92 @@
 
       <DisplayStrings>
 
-        <!-- AP.F5.DataSource.Monitor.Device.ProcessorInfo.Filtered -->
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.ProcessorInfo.Filtered">
-          <Name>Filtered Processor Info Monitor DataSource</Name>
-          <Description>Runs AP.F5.DataSource.Monitor.Device.ProcessorInfo, filters out the Processor needed</Description>
+        <!-- AP.F5.DataSource.Device.Processor.Info.Filtered -->
+        <DisplayString ElementID="AP.F5.DataSource.Device.Processor.Info.Filtered">
+          <Name>Filtered Processor Info DataSource</Name>
+          <Description>Runs AP.F5.DataSource.Device.Processor.Info, filters out the Processor needed</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.ProcessorInfo.Filtered" SubElementID="IntervalSeconds">
+        <DisplayString ElementID="AP.F5.DataSource.Device.Processor.Info.Filtered" SubElementID="IntervalSeconds">
           <Name>Interval Seconds</Name>
           <Description>Frequency in seconds that module is run.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.ProcessorInfo.Filtered" SubElementID="SyncTime">
+        <DisplayString ElementID="AP.F5.DataSource.Device.Processor.Info.Filtered" SubElementID="SyncTime">
           <Name>Synchronisation Time</Name>
           <Description>Offset that this module is started from.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.ProcessorInfo.Filtered" SubElementID="Debug">
+        <DisplayString ElementID="AP.F5.DataSource.Device.Processor.Info.Filtered" SubElementID="Debug">
           <Name>Debug</Name>
           <Description>Debug Flag, if true then additional info is posted to event log.</Description>
         </DisplayString>
 
-        <!-- AP.F5.DataSource.Monitor.Device.ProcessorUsage.Filtered -->
-        <DisplayString ElementID="AP.F5.DataSource.Perf.Device.ProcessorUsage.Filtered">
+        <!-- AP.F5.DataSource.Perf.Device.Processor.Usage.Filtered -->
+        <DisplayString ElementID="AP.F5.DataSource.Perf.Device.Processor.Usage.Filtered">
           <Name>Filtered Processor Usage Performance DataSource</Name>
           <Description>Runs AP.F5.DataSource.Monitor.Device.ProcessorInfo, filters out the Processor needed</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Perf.Device.ProcessorUsage.Filtered" SubElementID="IntervalSeconds">
+        <DisplayString ElementID="AP.F5.DataSource.Perf.Device.Processor.Usage.Filtered" SubElementID="IntervalSeconds">
           <Name>Interval Seconds</Name>
           <Description>Frequency in seconds that module is run.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Perf.Device.ProcessorUsage.Filtered" SubElementID="SyncTime">
+        <DisplayString ElementID="AP.F5.DataSource.Perf.Device.Processor.Usage.Filtered" SubElementID="SyncTime">
           <Name>Synchronisation Time</Name>
           <Description>Offset that this module is started from.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Perf.Device.ProcessorUsage.Filtered" SubElementID="Debug">
+        <DisplayString ElementID="AP.F5.DataSource.Perf.Device.Processor.Usage.Filtered" SubElementID="Debug">
           <Name>Debug</Name>
           <Description>Debug Flag, if true then additional info is posted to event log.</Description>
         </DisplayString>
 
-        <!-- AP.F5.DataSource.Monitor.Device.ProcessorInfo -->
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.ProcessorInfo">
+        <!-- AP.F5.DataSource.Device.Processor.Info -->
+        <DisplayString ElementID="AP.F5.DataSource.Device.Processor.Info">
           <Name>Processor Info Monitor DataSource</Name>
-          <Description>Wraps Processor Info Probe in scheduler and returns as PropertyBag for Monitors</Description>
+          <Description>Wraps Processor Info Probe in scheduler and returns as PropertyBag</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.ProcessorInfo" SubElementID="IntervalSeconds">
+        <DisplayString ElementID="AP.F5.DataSource.Device.Processor.Info" SubElementID="IntervalSeconds">
           <Name>Interval Seconds</Name>
           <Description>Frequency in seconds that module is run.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.ProcessorInfo" SubElementID="SyncTime">
+        <DisplayString ElementID="AP.F5.DataSource.Device.Processor.Info" SubElementID="SyncTime">
           <Name>Synchronisation Time</Name>
           <Description>Offset that this module is started from.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.ProcessorInfo" SubElementID="Debug">
+        <DisplayString ElementID="AP.F5.DataSource.Device.Processor.Info" SubElementID="Debug">
           <Name>Debug</Name>
           <Description>Debug Flag, if true then additional info is posted to event log.</Description>
         </DisplayString>
 
-        <!-- AP.F5.Probe.Device.ProcessorInfo -->
-        <DisplayString ElementID="AP.F5.Probe.Device.ProcessorInfo">
+        <!-- AP.F5.Probe.Device.Processor.Info -->
+        <DisplayString ElementID="AP.F5.Probe.Device.Processor.Info">
           <Name>Powershell Processor Probe</Name>
           <Description>Runs Powershell SNMP Script to collect Processor Info</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.Probe.Device.ProcessorInfo" SubElementID="Debug">
+        <DisplayString ElementID="AP.F5.Probe.Device.Processor.Info" SubElementID="Debug">
           <Name>Debug</Name>
           <Description>Debug Flag, if true then additional info is posted to event log.</Description>
         </DisplayString>
 
-        <!-- AP.F5.UnitMonitor.Device.ProcessorHealth -->
-        <DisplayString ElementID="AP.F5.UnitMonitor.Device.ProcessorHealth">
+        <!-- AP.F5.UnitMonitor.Device.Processor.Health -->
+        <DisplayString ElementID="AP.F5.UnitMonitor.Device.Processor.Health">
           <Name>Device Processor Health Monitor</Name>
           <Description>Compares used Processor Percentage against given thresholds</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.UnitMonitor.Device.ProcessorHealth" SubElementID="IntervalSeconds">
+        <DisplayString ElementID="AP.F5.UnitMonitor.Device.Processor.Health" SubElementID="IntervalSeconds">
           <Name>Interval Seconds</Name>
           <Description>Frequency in seconds that module is run.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.UnitMonitor.Device.ProcessorHealth" SubElementID="SyncTime">
+        <DisplayString ElementID="AP.F5.UnitMonitor.Device.Processor.Health" SubElementID="SyncTime">
           <Name>Synchronisation Time</Name>
           <Description>Offset that this module is started from.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.UnitMonitor.Device.ProcessorHealth" SubElementID="Debug">
+        <DisplayString ElementID="AP.F5.UnitMonitor.Device.Processor.Health" SubElementID="Debug">
           <Name>Debug</Name>
           <Description>Debug Flag, if true then additional info is posted to event log.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.UnitMonitor.Device.ProcessorHealth" SubElementID="WarningUsage">
+        <DisplayString ElementID="AP.F5.UnitMonitor.Device.Processor.Health" SubElementID="WarningUsage">
           <Name>Warning Usage</Name>
           <Description>The Lower Threshold for memory Usage</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.UnitMonitor.Device.ProcessorHealth" SubElementID="CriticalUsage">
+        <DisplayString ElementID="AP.F5.UnitMonitor.Device.Processor.Health" SubElementID="CriticalUsage">
           <Name>Critical Usage</Name>
           <Description>The Upper Threshold for memory Usage</Description>
         </DisplayString>

@@ -2,7 +2,7 @@
   <TypeDefinitions>
     <ModuleTypes>
 
-      <!-- AP.F5.Discovery.DataSource.Device.Fan -->
+      <!-- AP.F5.DataSource.Discovery.Device.Fan -->
       <DataSourceModuleType ID="AP.F5.DataSource.Discovery.Device.Fan" Accessibility="Public" Batching="false">
         <Configuration>
           <xsd:element minOccurs="1" name="IntervalSeconds" type="xsd:integer"/>
@@ -106,7 +106,7 @@
 
       <DisplayStrings>
 
-        <!-- AP.F5.Discovery.DataSource.Device.Fan -->
+        <!-- AP.F5.DataSource.Discovery.Device.Fan -->
         <DisplayString ElementID="AP.F5.DataSource.Discovery.Device.Fan">
           <Name>F5 Device Fan Discovery DataSource</Name>
           <Description>Discover AP.F5 Device Fans from AP.F5.Device</Description>

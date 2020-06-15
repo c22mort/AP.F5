@@ -4,9 +4,9 @@
 
 
       <!-- FILTERED MONITOR DATASOURCES -->
-      <!-- AP.F5.DataSource.Monitor.Device.TempSensorInfo.Filtered -->
-      <!-- AP.F5.DataSource.Monitor.Device.TempSensorInfo, Filters results by TempSensor Index -->
-      <DataSourceModuleType ID="AP.F5.DataSource.Monitor.Device.TempSensorInfo.Filtered" Accessibility="Public" Batching="false">
+      <!-- AP.F5.DataSource.Device.TempSensor.Info.Filtered -->
+      <!-- AP.F5.DataSource.Device.TempSensor.Info, Filters results by TempSensor Index -->
+      <DataSourceModuleType ID="AP.F5.DataSource.Device.TempSensor.Info.Filtered" Accessibility="Public" Batching="false">
         <Configuration>
           <IncludeSchemaTypes>
             <SchemaType>Windows!Microsoft.Windows.PowerShellSchema</SchemaType>
@@ -35,7 +35,7 @@
         <ModuleImplementation>
           <Composite>
             <MemberModules>
-              <DataSource ID="Script" TypeID="AP.F5.DataSource.Monitor.Device.TempSensorInfo">
+              <DataSource ID="Script" TypeID="AP.F5.DataSource.Device.TempSensor.Info">
                 <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
                 <SyncTime>$Config/SyncTime$</SyncTime>
                 <Debug>$Config/Debug$</Debug>
@@ -76,9 +76,9 @@
       </DataSourceModuleType>
 
       <!-- PERFORMANCE DATA SOURCES -->
-      <!-- AP.F5.DataSource.Perf.Device.TempSensorTemp.Filtered -->
+      <!-- AP.F5.DataSource.Perf.Device.TempSensor.Temp.Filtered -->
       <!-- Calls AP.F5.Probe.Device.TempSensorInfo, Filters By Index and returns as Performance Data -->
-      <DataSourceModuleType ID="AP.F5.DataSource.Perf.Device.TempSensorTemp.Filtered" Accessibility="Public" Batching="false">
+      <DataSourceModuleType ID="AP.F5.DataSource.Perf.Device.TempSensor.Temp.Filtered" Accessibility="Public" Batching="false">
         <Configuration>
           <IncludeSchemaTypes>
             <SchemaType>Windows!Microsoft.Windows.PowerShellSchema</SchemaType>
@@ -107,7 +107,7 @@
         <ModuleImplementation Isolation="Any">
           <Composite>
             <MemberModules>
-              <DataSource ID="Script" TypeID="AP.F5.DataSource.Monitor.Device.TempSensorInfo">
+              <DataSource ID="Script" TypeID="AP.F5.DataSource.Device.TempSensor.Info">
                 <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
                 <SyncTime>$Config/SyncTime$</SyncTime>
                 <Debug>$Config/Debug$</Debug>
@@ -156,9 +156,9 @@
       </DataSourceModuleType>
 
       <!-- MONITOR DATA SOURCES -->
-      <!-- AP.F5.DataSource.Monitor.Device.TempSensorInfo -->
-      <!-- Calls AP.F5.Probe.Device.TempSensorInfo wraps it with a scheduler -->
-      <DataSourceModuleType ID="AP.F5.DataSource.Monitor.Device.TempSensorInfo" Accessibility="Public" Batching="false">
+      <!-- AP.F5.DataSource.Device.TempSensor.Info -->
+      <!-- Calls AP.F5.Probe.Device.TempSensor.Info wraps it with a scheduler -->
+      <DataSourceModuleType ID="AP.F5.DataSource.Device.TempSensor.Info" Accessibility="Public" Batching="false">
         <Configuration>
           <IncludeSchemaTypes>
             <SchemaType>Windows!Microsoft.Windows.PowerShellSchema</SchemaType>
@@ -190,7 +190,7 @@
                 <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
                 <SyncTime>$Config/SyncTime$</SyncTime>
               </DataSource>
-              <ProbeAction ID="PSScript" TypeID="AP.F5.Probe.Device.TempSensorInfo">
+              <ProbeAction ID="PSScript" TypeID="AP.F5.Probe.Device.TempSensor.Info">
                 <Debug>$Config/Debug$</Debug>
                 <SNMPAddress>$Config/SNMPAddress$</SNMPAddress>
                 <SNMPPort>$Config/SNMPPort$</SNMPPort>
@@ -217,9 +217,9 @@
 
       
       <!-- PROBES -->
-      <!-- AP.F5.Probe.Device.TempSensorInfo -->
+      <!-- AP.F5.Probe.Device.TempSensor.Info -->
       <!-- Runs script to Return Device TempSensor Info in a property bag-->
-      <ProbeActionModuleType ID="AP.F5.Probe.Device.TempSensorInfo" Accessibility="Public" Batching="false">
+      <ProbeActionModuleType ID="AP.F5.Probe.Device.TempSensor.Info" Accessibility="Public" Batching="false">
         <Configuration>
           <IncludeSchemaTypes>
             <SchemaType>Windows!Microsoft.Windows.PowerShellSchema</SchemaType>
@@ -314,9 +314,9 @@
 
     <MonitorTypes>
 
-      <!-- AP.F5.UnitMonitor.Device.TempSensorHealth -->
+      <!-- AP.F5.UnitMonitor.Device.TempSensor.Health -->
       <!-- Uses SNMP via Powershell to Get Health of Device TempSensor -->
-      <UnitMonitorType ID="AP.F5.UnitMonitor.Device.TempSensorHealth" Accessibility="Public">
+      <UnitMonitorType ID="AP.F5.UnitMonitor.Device.TempSensor.Health" Accessibility="Public">
         <MonitorTypeStates>
           <MonitorTypeState ID="TempGood" NoDetection="false"/>
           <MonitorTypeState ID="TempWarning" NoDetection="false"/>
@@ -350,7 +350,7 @@
         </OverrideableParameters>
         <MonitorImplementation>
           <MemberModules>
-            <DataSource ID="DS" TypeID="AP.F5.DataSource.Monitor.Device.TempSensorInfo.Filtered">
+            <DataSource ID="DS" TypeID="AP.F5.DataSource.Device.TempSensor.Info.Filtered">
               <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
               <SyncTime>$Config/SyncTime$</SyncTime>
               <Debug>$Config/Debug$</Debug>
@@ -367,7 +367,7 @@
               <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
               <TempSensorIndex>$Config/TempSensorIndex$</TempSensorIndex>
             </DataSource>
-            <ProbeAction ID="Probe" TypeID="AP.F5.Probe.Device.TempSensorInfo">
+            <ProbeAction ID="Probe" TypeID="AP.F5.Probe.Device.TempSensor.Info">
               <Debug>$Config/Debug$</Debug>
               <SNMPAddress>$Config/SNMPAddress$</SNMPAddress>
               <SNMPPort>$Config/SNMPPort$</SNMPPort>
@@ -465,92 +465,92 @@
 
       <DisplayStrings>
 
-        <!-- AP.F5.DataSource.Monitor.Device.TempSensorInfo.Filtered -->
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.TempSensorInfo.Filtered">
+        <!-- AP.F5.DataSource.Device.TempSensor.Info.Filtered -->
+        <DisplayString ElementID="AP.F5.DataSource.Device.TempSensor.Info.Filtered">
           <Name>Filtered Temperature Sensor Info Monitor DataSource</Name>
-          <Description>Runs AP.F5.DataSource.Monitor.Device.TempSensorInfo, filters out the Temperature Sensor needed</Description>
+          <Description>Runs AP.F5.DataSource.Monitor.Device.TempSensor.Info, filters out the Temperature Sensor needed</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.TempSensorInfo.Filtered" SubElementID="IntervalSeconds">
+        <DisplayString ElementID="AP.F5.DataSource.Device.TempSensor.Info.Filtered" SubElementID="IntervalSeconds">
           <Name>Interval Seconds</Name>
           <Description>Frequency in seconds that module is run.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.TempSensorInfo.Filtered" SubElementID="SyncTime">
+        <DisplayString ElementID="AP.F5.DataSource.Device.TempSensor.Info.Filtered" SubElementID="SyncTime">
           <Name>Synchronisation Time</Name>
           <Description>Offset that this module is started from.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.TempSensorInfo.Filtered" SubElementID="Debug">
+        <DisplayString ElementID="AP.F5.DataSource.Device.TempSensor.Info.Filtered" SubElementID="Debug">
           <Name>Debug</Name>
           <Description>Debug Flag, if true then additional info is posted to event log.</Description>
         </DisplayString>
 
-        <!-- AP.F5.DataSource.Perf.Device.TempSensorTemp.Filtered -->
-        <DisplayString ElementID="AP.F5.DataSource.Perf.Device.TempSensorTemp.Filtered">
+        <!-- AP.F5.DataSource.Perf.Device.TempSensor.Temp.Filtered -->
+        <DisplayString ElementID="AP.F5.DataSource.Perf.Device.TempSensor.Temp.Filtered">
           <Name>Filtered Temperature Sensor Info Performance DataSource</Name>
           <Description>Calls AP.F5.Probe.Device.TempSensorInfo, Filters By Index and returns as Performance Data</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Perf.Device.TempSensorTemp.Filtered" SubElementID="IntervalSeconds">
+        <DisplayString ElementID="AP.F5.DataSource.Perf.Device.TempSensor.Temp.Filtered" SubElementID="IntervalSeconds">
           <Name>Interval Seconds</Name>
           <Description>Frequency in seconds that module is run.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Perf.Device.TempSensorTemp.Filtered" SubElementID="SyncTime">
+        <DisplayString ElementID="AP.F5.DataSource.Perf.Device.TempSensor.Temp.Filtered" SubElementID="SyncTime">
           <Name>Synchronisation Time</Name>
           <Description>Offset that this module is started from.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Perf.Device.TempSensorTemp.Filtered" SubElementID="Debug">
+        <DisplayString ElementID="AP.F5.DataSource.Perf.Device.TempSensor.Temp.Filtered" SubElementID="Debug">
           <Name>Debug</Name>
           <Description>Debug Flag, if true then additional info is posted to event log.</Description>
         </DisplayString>
         
-        <!-- AP.F5.DataSource.Monitor.Device.TempSensorInfo -->
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.TempSensorInfo">
-          <Name>Temperature Sensor Info Monitor DataSource</Name>
-          <Description>Wraps Temp Sensor Info Probe in scheduler and returns as PropertyBag for Monitors</Description>
+        <!-- AP.F5.DataSource.Device.TempSensor.Info -->
+        <DisplayString ElementID="AP.F5.DataSource.Device.TempSensor.Info">
+          <Name>Temperature Sensor Info DataSource</Name>
+          <Description>Wraps Temp Sensor Info Probe in scheduler and returns as PropertyBag</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.TempSensorInfo" SubElementID="IntervalSeconds">
+        <DisplayString ElementID="AP.F5.DataSource.Device.TempSensor.Info" SubElementID="IntervalSeconds">
           <Name>Interval Seconds</Name>
           <Description>Frequency in seconds that module is run.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.TempSensorInfo" SubElementID="SyncTime">
+        <DisplayString ElementID="AP.F5.DataSource.Device.TempSensor.Info" SubElementID="SyncTime">
           <Name>Synchronisation Time</Name>
           <Description>Offset that this module is started from.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.TempSensorInfo" SubElementID="Debug">
+        <DisplayString ElementID="AP.F5.DataSource.Device.TempSensor.Info" SubElementID="Debug">
           <Name>Debug</Name>
           <Description>Debug Flag, if true then additional info is posted to event log.</Description>
         </DisplayString>
 
-        <!-- AP.F5.Probe.Device.TempSensorInfo -->
-        <DisplayString ElementID="AP.F5.Probe.Device.TempSensorInfo">
+        <!-- AP.F5.Probe.Device.TempSensor.Info -->
+        <DisplayString ElementID="AP.F5.Probe.Device.TempSensor.Info">
           <Name>Powershell Temperature Sensor Probe</Name>
           <Description>Runs Powershell SNMP Script to collect Temp Sensor Info</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.Probe.Device.TempSensorInfo" SubElementID="Debug">
+        <DisplayString ElementID="AP.F5.Probe.Device.TempSensor.Info" SubElementID="Debug">
           <Name>Debug</Name>
           <Description>Debug Flag, if true then additional info is posted to event log.</Description>
         </DisplayString>
 
-        <!-- AP.F5.UnitMonitor.Device.TempSensorHealth -->
-        <DisplayString ElementID="AP.F5.UnitMonitor.Device.TempSensorHealth">
+        <!-- AP.F5.UnitMonitor.Device.TempSensor.Health -->
+        <DisplayString ElementID="AP.F5.UnitMonitor.Device.TempSensor.Health">
           <Name>Device Temperature Sensor Health Monitor</Name>
           <Description>Compares Temperature against given thresholds</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.UnitMonitor.Device.TempSensorHealth" SubElementID="IntervalSeconds">
+        <DisplayString ElementID="AP.F5.UnitMonitor.Device.TempSensor.Health" SubElementID="IntervalSeconds">
           <Name>Interval Seconds</Name>
           <Description>Frequency in seconds that module is run.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.UnitMonitor.Device.TempSensorHealth" SubElementID="SyncTime">
+        <DisplayString ElementID="AP.F5.UnitMonitor.Device.TempSensor.Health" SubElementID="SyncTime">
           <Name>Synchronisation Time</Name>
           <Description>Offset that this module is started from.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.UnitMonitor.Device.TempSensorHealth" SubElementID="Debug">
+        <DisplayString ElementID="AP.F5.UnitMonitor.Device.TempSensor.Health" SubElementID="Debug">
           <Name>Debug</Name>
           <Description>Debug Flag, if true then additional info is posted to event log.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.UnitMonitor.Device.TempSensorHealth" SubElementID="WarningTemp">
+        <DisplayString ElementID="AP.F5.UnitMonitor.Device.TempSensor.Health" SubElementID="WarningTemp">
           <Name>Warning Temperature</Name>
           <Description>Warning temperature threshold in Degrees Centigrade.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.UnitMonitor.Device.TempSensorHealth" SubElementID="CriticalTemp">
+        <DisplayString ElementID="AP.F5.UnitMonitor.Device.TempSensor.Health" SubElementID="CriticalTemp">
           <Name>Critical Temperature</Name>
           <Description>Critical temperature threshold in Degrees Centigrade.</Description>
         </DisplayString>

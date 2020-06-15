@@ -33,11 +33,14 @@ $EVENT_LEVEL_ERROR 		= 1
 $EVENT_LEVEL_WARNING 	= 2
 $EVENT_LEVEL_INFO 		= 4
 
-$SCRIPT_STARTED				= 14656
-$SCRIPT_PROPERTYBAG_CREATED	= 14657
-$SCRIPT_EVENT				= 14658
-$SCRIPT_ENDED				= 14659
-$SCRIPT_ERROR				= 14660
+$SCRIPT_STARTED             = 14611
+$SCRIPT_PROPERTYBAG_CREATED	= 14612
+$SCRIPT_EVENT               = 14613
+$SCRIPT_ERROR               = 14614
+$SCRIPT_ERROR_NOSNMP        = 14615
+$SCRIPT_ERROR_SNMP2         = 14616
+$SCRIPT_ERROR_SNMP3         = 14617
+$SCRIPT_ENDED               = 14618
 
 #==================================================================================
 # Function:	Get-SnmpV2
@@ -66,7 +69,7 @@ function Get-SnmpV2
     } Catch {
 		# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_INFO,$message)
+   		Log-Event $SCRIPT_ERROR_SNMP2 $EVENT_LEVEL_INFO $message $true
 	}
 }
 #==================================================================================
@@ -142,7 +145,7 @@ function Get-SnmpV3
     } Catch {
 		# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_INFO,$message)
+   		Log-Event $SCRIPT_ERROR_SNMP3 $EVENT_LEVEL_INFO $message $true
     }
 }
 #==================================================================================
@@ -172,7 +175,7 @@ function Walk-SnmpV2
     } Catch {
 		# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_INFO,$message)
+   		Log-Event $SCRIPT_ERROR_SNMP2 $EVENT_LEVEL_INFO $message $true
     }
 }
 #==================================================================================
@@ -243,23 +246,28 @@ function BulkGet-SnmpV3
     } Catch {
 		# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_INFO,$message)
+   		Log-Event $SCRIPT_ERROR $EVENT_LEVEL_INFO $message $true
     }                   
 }
 
-#==================================================================================
-# Sub:		LogDebugEvent
+##==================================================================================
+# Sub:      LogEvent
 # Purpose:	Logs an informational event to the Operations Manager event log
-#			only if Debug argument is true
+#           $writeevent by default is debug value
 #==================================================================================
-function Log-DebugEvent
+function Log-Event
 {
-	param($eventNo,$message, $option)
+	param(
+    $eventNo,
+    $eventLevel,
+    $message,
+    $writeEvent = $Debug
+    )
 
 	$message = $SNMPAddress + "`r`n" + $message + $option
-	if ($Debug -eq $true)
+	if ($writeEvent -eq $true)
 	{
-		$api.LogScriptEvent($SCRIPT_NAME,$eventNo,$EVENT_LEVEL_INFO,$message)
+		$api.LogScriptEvent($SCRIPT_NAME,$eventNo,$eventLevel,$message)
 	}
 }
 
@@ -267,7 +275,7 @@ function Log-DebugEvent
 $api = New-Object -comObject 'MOM.ScriptAPI'
 
 # Log Startup Message
-Log-DebugEvent $SCRIPT_STARTED "Collecting Temperature Sensor Info from F5 Device"
+Log-Event $SCRIPT_STARTED $EVENT_LEVEL_INFO "Collecting Temperature Sensor Info from F5 Device"
 
 # Load SharpSNMPLib
 [void][reflection.assembly]::LoadFrom( (Resolve-Path $SharpSnmpLocation) )
@@ -287,45 +295,70 @@ If ($SNMPVersion -eq "3") {
 	Try {
 
 		# Get Count of Temperature Sensors
-		[int]$TempSensorCount = (Get-SnmpV3 $connection $sysChassisTempNumber).Data.ToInt32()
-		# Get Temperature Sensor Temp (SNMPv3 0 Based Array)
-		$TempSensorTemp = BulkGet-SnmpV3 $connection $TempSensorCount $sysChassisTempTemperature
-		For ($i=0; $i -lt $TempSensorCount;$i++){
-			[int]$index = $i + 1
-			$message = "Created Temperature Sensor Info Property Bag for Temp-"+ $index + "`r`n"
-			$message = $message + "Temperature : " + $TempSensorTemp[$i].Data.ToInt32()
-			Log-DebugEvent $SCRIPT_PROPERTYBAG_CREATED $message
-			$bag = $api.CreatePropertyBag()
-			$bag.AddValue("Index", [int]$index)
-			$bag.AddValue("Temperature", $TempSensorTemp[$i].Data.ToInt32())
-			$bag
+		$TempSensorCount = (Get-SnmpV3 $connection $sysChassisTempNumber).Data
+		
+		# Did we Get a Reply
+        If ($TempSensorCount -eq $null) 
+		{
+		    # Write Warning to Event Log
+            Log-Event $SCRIPT_ERROR_NOSNMP $EVENT_LEVEL_WARNING "No SNMP Response" $true
 		}
+		else
+		{
+			# Get Count of Temperature Sensors
+			[int]$TempSensorCount = $TempSensorCount.ToInt32()
+			# Get Temperature Sensor Temp (SNMPv3 0 Based Array)
+			$TempSensorTemp = BulkGet-SnmpV3 $connection $TempSensorCount $sysChassisTempTemperature
+			For ($i=0; $i -lt $TempSensorCount;$i++){
+				[int]$index = $i + 1
+				$message = "Created Temperature Sensor Info Property Bag for Temp-"+ $index + "`r`n"
+				$message = $message + "Temperature : " + $TempSensorTemp[$i].Data.ToInt32()
+				Log-Event $SCRIPT_PROPERTYBAG_CREATED $EVENT_LEVEL_INFO $message
+				$bag = $api.CreatePropertyBag()
+				$bag.AddValue("Index", [int]$index)
+				$bag.AddValue("Temperature", $TempSensorTemp[$i].Data.ToInt32())
+				$bag
+			}
+		}
+
 	} Catch {
 		# Log Finished Message
 		$message = "SNMPv3 Error : " + $_
-		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_ERROR,$message)
+		Log-Event $SCRIPT_ERROR_SNMP3 $EVENT_LEVEL_ERROR $message $true
 	}
 } else {
 	Try {
 
 		# Get Count of Temperature Sensors
-		[int]$TempSensorCount = (Get-SnmpV2 $connection $sysChassisTempNumber).Data.ToInt32()
-		# Get Temperature Sensor Temp (SNMPv3 0 Based Array)
-		$TempSensorTemp = Walk-SnmpV2 $connection $sysChassisTempTemperature
-		For ($i=1; $i -le $TempSensorCount;$i++){
-			$message = "Created Temperature Sensor Info Property Bag for Temp-"+ $i + "`r`n"
-			$message = $message + "Temperature : " + $TempSensorTemp[$i].Data.ToInt32()
-			Log-DebugEvent $SCRIPT_PROPERTYBAG_CREATED $message
-			$bag = $api.CreatePropertyBag()
-			$bag.AddValue("Index", [int]$i)
-			$bag.AddValue("Temperature", $TempSensorTemp[$i].Data.ToInt32())
-			$bag
+		$TempSensorCount = (Get-SnmpV2 $connection $sysChassisTempNumber).Data
+
+		# Did we Get a Reply
+        If ($TempSensorCount -eq $null) 
+		{
+		    # Write Warning to Event Log
+            Log-Event $SCRIPT_ERROR_NOSNMP $EVENT_LEVEL_WARNING "No SNMP Response" $true
+		}
+		else
+		{
+			# Get Count of Temperature Sensors
+			[int]$TempSensorCount = $TempSensorCount.ToInt32()
+			# Get Temperature Sensor Temp (SNMPv3 0 Based Array)
+			$TempSensorTemp = Walk-SnmpV2 $connection $sysChassisTempTemperature
+			For ($i=1; $i -le $TempSensorCount;$i++){
+				$message = "Created Temperature Sensor Info Property Bag for Temp-"+ $i + "`r`n"
+				$message = $message + "Temperature : " + $TempSensorTemp[$i].Data.ToInt32()
+				Log-Event $SCRIPT_PROPERTYBAG_CREATED $EVENT_LEVEL_INFO $message
+				$bag = $api.CreatePropertyBag()
+				$bag.AddValue("Index", [int]$i)
+				$bag.AddValue("Temperature", $TempSensorTemp[$i].Data.ToInt32())
+				$bag
+			}
 		}
 
 	} Catch {
 		# Log error Message
 		$message = "SNMPv2 Error : " + $Error + " : " + $_
-		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_ERROR,$message)	
+		Log-Event $SCRIPT_ERROR $EVENT_LEVEL_ERROR $message $true	
 	}
 }
 
@@ -336,4 +369,4 @@ $TimeTaken = NEW-TIMESPAN -Start $StartTime -End $EndTime
 $Seconds = [math]::Round($TimeTaken.TotalSeconds, 2)
 
 # Log Finished Message
-Log-DebugEvent $SCRIPT_ENDED "Script Finished. Took $Seconds Seconds to Complete!"
+Log-Event $SCRIPT_ENDED $EVENT_LEVEL_INFO "Script Finished. Took $Seconds Seconds to Complete!"

@@ -37,7 +37,10 @@ $SCRIPT_STARTED             = 14611
 $SCRIPT_PROPERTYBAG_CREATED	= 14612
 $SCRIPT_EVENT               = 14613
 $SCRIPT_ERROR               = 14614
-$SCRIPT_ENDED               = 14615
+$SCRIPT_ERROR_NOSNMP        = 14615
+$SCRIPT_ERROR_SNMP2         = 14616
+$SCRIPT_ERROR_SNMP3         = 14617
+$SCRIPT_ENDED               = 14618
 
 #==================================================================================
 # Function:	Get-SnmpV2
@@ -66,7 +69,7 @@ function Get-SnmpV2
     } Catch {
 		# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   		Log-Event $SCRIPT_ERROR $EVENT_LEVEL_INFO $message $true
+   		Log-Event $SCRIPT_ERROR_SNMP2 $EVENT_LEVEL_INFO $message $true
 	}
 }
 #==================================================================================
@@ -142,7 +145,7 @@ function Get-SnmpV3
     } Catch {
 		# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   		Log-Event $SCRIPT_ERROR $EVENT_LEVEL_INFO $message $true
+   		Log-Event $SCRIPT_ERROR_SNMP3 $EVENT_LEVEL_INFO $message $true
     }
 }
 #==================================================================================
@@ -172,7 +175,7 @@ function Walk-SnmpV2
     } Catch {
 		# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   		Log-Event $SCRIPT_ERROR $EVENT_LEVEL_INFO $message $true
+   		Log-Event $SCRIPT_ERROR_SNMP2 $EVENT_LEVEL_INFO $message $true
     }
 }
 #==================================================================================
@@ -243,7 +246,7 @@ function BulkGet-SnmpV3
     } Catch {
 		# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   		Log-Event $SCRIPT_ERROR $EVENT_LEVEL_INFO $message $true
+   		Log-Event $SCRIPT_ERROR_SNMP3 $EVENT_LEVEL_INFO $message $true
     }                   
 }
 
@@ -296,7 +299,7 @@ If ($SNMPVersion -eq "3") {
         # Did we Get a Reply
         If ($PsuCount -eq $null) {
 		    # Write Warning to Event Log
-            Log-Event $SCRIPT_ERROR $EVENT_LEVEL_WARNING "No SNMP Response" $true
+            Log-Event $SCRIPT_ERROR_NOSNMP $EVENT_LEVEL_WARNING "No SNMP Response" $true
 		}
 		else
 		{
@@ -318,7 +321,7 @@ If ($SNMPVersion -eq "3") {
 	} Catch {
 		# Log Finished Message
 		$message = "SNMPv3 Error : " + $_
-   		Log-Event $SCRIPT_ERROR $EVENT_LEVEL_INFO $message $true
+   		Log-Event $SCRIPT_ERROR_SNMP3 $EVENT_LEVEL_INFO $message $true
 	}
 } else {
 	Try {
@@ -328,7 +331,7 @@ If ($SNMPVersion -eq "3") {
         # Did we Get a Reply
         If ($PsuCount -eq $null) {
 		    # Write Warning to Event Log
-            Log-Event $SCRIPT_ERROR $EVENT_LEVEL_WARNING "No SNMP Response" $true
+            Log-Event $SCRIPT_ERROR_NOSNMP $EVENT_LEVEL_WARNING "No SNMP Response" $true
 		}
 		else
 		{
@@ -347,7 +350,7 @@ If ($SNMPVersion -eq "3") {
 	} Catch {
 		# Log error Message
 		$message = "SNMPv2 Error : " + $Error + " : " + $_
-   		Log-Event $SCRIPT_ERROR $EVENT_LEVEL_INFO $message $true
+   		Log-Event $SCRIPT_ERROR_SNMP2 $EVENT_LEVEL_INFO $message $true
 	}
 }
 

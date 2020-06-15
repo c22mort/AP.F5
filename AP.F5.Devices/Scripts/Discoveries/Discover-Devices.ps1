@@ -35,11 +35,14 @@ $EVENT_LEVEL_ERROR 		= 1
 $EVENT_LEVEL_WARNING 	= 2
 $EVENT_LEVEL_INFO 		= 4
 
-$SCRIPT_STARTED				= 14601
+$SCRIPT_STARTED             = 14601
 $SCRIPT_PROPERTYBAG_CREATED	= 14602
-$SCRIPT_EVENT				= 14603
-$SCRIPT_ENDED				= 14604
-$SCRIPT_ERROR				= 14605
+$SCRIPT_EVENT               = 14603
+$SCRIPT_ERROR               = 14604
+$SCRIPT_ERROR_NOSNMP        = 14605
+$SCRIPT_ERROR_SNMP2         = 14606
+$SCRIPT_ERROR_SNMP3         = 14607
+$SCRIPT_ENDED               = 14608
 
 #==================================================================================
 # Function:	Get-SnmpV2
@@ -68,7 +71,7 @@ function Get-SnmpV2
     } Catch {
 		# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_INFO,$message)
+   		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR_SNMP2,$EVENT_LEVEL_INFO,$message)
 	}
 }
 
@@ -145,7 +148,7 @@ function Get-SnmpV3
     } Catch {
 		# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_INFO,$message)
+   		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR_SNMP3,$EVENT_LEVEL_INFO,$message)
     }
 }
 
@@ -176,7 +179,7 @@ function Walk-SnmpV2
     } Catch {
 		# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_INFO,$message)
+   		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR_SNMP2,$EVENT_LEVEL_INFO,$message)
     }
 }
 
@@ -248,7 +251,7 @@ function BulkGet-SnmpV3
     } Catch {
 		# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_INFO,$message)
+   		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR_SNMP3,$EVENT_LEVEL_INFO,$message)
     }                   
 
 }
@@ -275,13 +278,32 @@ function Get-ResourcePoolName
 	}
 }
 
+##==================================================================================
+# Sub:      LogEvent
+# Purpose:	Logs an informational event to the Operations Manager event log
+#           $writeevent by default is debug value
+#==================================================================================
+function Log-Event
+{
+	param(
+    $eventNo,
+    $eventLevel,
+    $message,
+    $writeEvent = $Debug
+    )
+
+	$message = $SNMPAddress + "`r`n" + $message + $option
+	if ($writeEvent -eq $true)
+	{
+		$api.LogScriptEvent($SCRIPT_NAME,$eventNo,$eventLevel,$message)
+	}
+}
+
 #Start by setting up API object.
 $api = New-Object -comObject 'MOM.ScriptAPI'
 
 # Log Startup Message
-$message =	"Started F5 Device Discovery. `r`n Device : " + $SNMPAddress
-$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_STARTED,$EVENT_LEVEL_INFO,$message)
-
+Log-Event $SCRIPT_STARTED $EVENT_LEVEL_INFO "Started F5 Device Discovery" $true
 
 # Load SharpSNMPLib
 [void][reflection.assembly]::LoadFrom( (Resolve-Path $SharpSnmpLocation) )
@@ -316,6 +338,7 @@ $sysCmSyncStatusId = New-Object Lextm.SharpSnmpLib.ObjectIdentifier(".1.3.6.1.4.
 # Get SNMP Data (Version Dependant)
 If ($SNMPVersion -eq "3") {
 	Try {
+		# Try To Get SerialNumber$
 		$Serial = (Get-SnmpV3 $connection $sysGeneralChassisSerialNum)
 		$SystemNodeName = (Get-SnmpV3 $connection $sysSystemNodeName)
 		$ProductName = (Get-SnmpV3 $connection $sysProductName)
@@ -331,11 +354,11 @@ If ($SNMPVersion -eq "3") {
 		# Is Standalone
 		$SyncStatus = (Get-SnmpV3 $connection $sysCmSyncStatusId).Data.ToInt32()
 		$IsStandalone = $false
-		If ($SyncStatus -eq 6) {$IsStandalone = $true}		
+		If ($SyncStatus -eq 6) {$IsStandalone = $true}				
 	} Catch {
 		# Log Finished Message
 		$message = "SNMPv3 Error : " + $_
-		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_ERROR,$message)
+		Log-Event $SCRIPT_ERROR_SNMP3 $EVENT_LEVEL_ERROR $message $true
 	}
 } else {
 	Try {
@@ -358,11 +381,18 @@ If ($SNMPVersion -eq "3") {
 	} Catch {
 		# Log error Message
 		$message = "SNMPv2 Error : " + $Error + " : " + $_
-		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_ERROR,$message)		
+		Log-Event $SCRIPT_ERROR_SNMP2 $EVENT_LEVEL_ERROR $message $true		
 	}
 }
 
-
+# Was There a Valid Return
+If ($Serial -eq $null)
+{
+	# Write Warning to Event Log
+    Log-Event $SCRIPT_ERROR_NOSNMP $EVENT_LEVEL_WARNING "No SNMP Response" $true
+}
+else
+{
 	Try {
 		# Create a New F5 Device Instance
 		$DiscoveryData = $api.CreateDiscoveryData(0, $sourceId,  $managedEntityId)
@@ -399,7 +429,7 @@ If ($SNMPVersion -eq "3") {
 			$oRel.Target = $instance
 			$DiscoveryData.AddInstance($oRel)
 		} else {
-			$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_EVENT,$EVENT_LEVEL_INFO, "Resource Pool Name : All Management Servers Pool")		
+			Log-Event $SCRIPT_EVENT $EVENT_LEVEL_INFO "Resource Pool Name : All Management Servers Pool" $true
 		}
 		
 		$DiscoveryData
@@ -407,9 +437,9 @@ If ($SNMPVersion -eq "3") {
 	} Catch {
 		# Log error Message
 		$message = "SCOM Discovery Error : " + $_
-		$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ERROR,$EVENT_LEVEL_ERROR,$message)				
+		Log-Event $SCRIPT_ERROR $EVENT_LEVEL_ERROR $message $true				
 	}
-
+}
 
 
 # Get End Time For Script
@@ -419,4 +449,4 @@ $Seconds = [math]::Round($TimeTaken.TotalSeconds, 2)
 
 # Log Finished Message
 $message = "Script Finished. Took $Seconds Seconds to Complete!"
-$api.LogScriptEvent($SCRIPT_NAME,$SCRIPT_ENDED,$EVENT_LEVEL_INFO,$message)
+Log-Event $SCRIPT_ENDED $EVENT_LEVEL_INFO $message $true

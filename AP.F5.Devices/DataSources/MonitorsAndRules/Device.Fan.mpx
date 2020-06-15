@@ -4,9 +4,9 @@
 
 
       <!-- FILTERED MONITOR DATASOURCES -->
-      <!-- AP.F5.DataSource.Monitor.Device.FanInfo.Filtered -->
-      <!-- AP.F5.DataSource.Monitor.Device.FanInfo, Filters results by Fan Index -->
-      <DataSourceModuleType ID="AP.F5.DataSource.Monitor.Device.FanInfo.Filtered" Accessibility="Public" Batching="false">
+      <!-- AP.F5.DataSource.Device.Fan.Info.Filtered -->
+      <!-- AP.F5.DataSource.Device.Fan.Info, Filters results by Fan Index -->
+      <DataSourceModuleType ID="AP.F5.DataSource.Device.Fan.Info.Filtered" Accessibility="Public" Batching="false">
         <Configuration>
           <IncludeSchemaTypes>
             <SchemaType>Windows!Microsoft.Windows.PowerShellSchema</SchemaType>
@@ -35,7 +35,7 @@
         <ModuleImplementation>
           <Composite>
             <MemberModules>
-              <DataSource ID="Script" TypeID="AP.F5.DataSource.Monitor.Device.FanInfo">
+              <DataSource ID="Script" TypeID="AP.F5.DataSource.Device.Fan.Info">
                 <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
                 <SyncTime>$Config/SyncTime$</SyncTime>
                 <Debug>$Config/Debug$</Debug>
@@ -76,9 +76,9 @@
       </DataSourceModuleType>
 
       <!-- MONITOR DATA SOURCES -->
-      <!-- AP.F5.DataSource.Monitor.Device.FanInfo -->
-      <!-- Calls AP.F5.Probe.Device.FanInfo wraps it with a scheduler -->
-      <DataSourceModuleType ID="AP.F5.DataSource.Monitor.Device.FanInfo" Accessibility="Public" Batching="false">
+      <!-- AP.F5.DataSource.Device.Fan.Info -->
+      <!-- Calls AP.F5.Probe.Device.Fan.Info wraps it with a scheduler -->
+      <DataSourceModuleType ID="AP.F5.DataSource.Device.Fan.Info" Accessibility="Public" Batching="false">
         <Configuration>
           <IncludeSchemaTypes>
             <SchemaType>Windows!Microsoft.Windows.PowerShellSchema</SchemaType>
@@ -110,7 +110,7 @@
                 <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
                 <SyncTime>$Config/SyncTime$</SyncTime>
               </DataSource>
-              <ProbeAction ID="PSScript" TypeID="AP.F5.Probe.Device.FanInfo">
+              <ProbeAction ID="PSScript" TypeID="AP.F5.Probe.Device.Fan.Info">
                 <Debug>$Config/Debug$</Debug>
                 <SNMPAddress>$Config/SNMPAddress$</SNMPAddress>
                 <SNMPPort>$Config/SNMPPort$</SNMPPort>
@@ -136,9 +136,9 @@
       </DataSourceModuleType>
 
       <!-- PROBES -->
-      <!-- AP.F5.Probe.Device.FanInfo -->
+      <!-- AP.F5.Probe.Device.Fan.Info -->
       <!-- Runs script to Return Device Fan Info in a property bag-->
-      <ProbeActionModuleType ID="AP.F5.Probe.Device.FanInfo" Accessibility="Public" Batching="false">
+      <ProbeActionModuleType ID="AP.F5.Probe.Device.Fan.Info" Accessibility="Public" Batching="false">
         <Configuration>
           <IncludeSchemaTypes>
             <SchemaType>Windows!Microsoft.Windows.PowerShellSchema</SchemaType>
@@ -233,9 +233,9 @@
 
     <MonitorTypes>
 
-      <!-- AP.F5.UnitMonitor.Device.FanHealth -->
+      <!-- AP.F5.UnitMonitor.Device.Fan.Health -->
       <!-- Uses SNMP via Powershell to Get Health of Device Fan -->
-      <UnitMonitorType ID="AP.F5.UnitMonitor.Device.FanHealth" Accessibility="Public">
+      <UnitMonitorType ID="AP.F5.UnitMonitor.Device.Fan.Health" Accessibility="Public">
         <MonitorTypeStates>
           <MonitorTypeState ID="FanGood" NoDetection="false"/>
           <MonitorTypeState ID="FanBad" NoDetection="false"/>
@@ -265,7 +265,7 @@
         </OverrideableParameters>
         <MonitorImplementation>
           <MemberModules>
-            <DataSource ID="DS" TypeID="AP.F5.DataSource.Monitor.Device.FanInfo.Filtered">
+            <DataSource ID="DS" TypeID="AP.F5.DataSource.Device.Fan.Info.Filtered">
               <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
               <SyncTime>$Config/SyncTime$</SyncTime>
               <Debug>$Config/Debug$</Debug>
@@ -282,7 +282,7 @@
               <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
               <FanIndex>$Config/FanIndex$</FanIndex>
             </DataSource>
-            <ProbeAction ID="Probe" TypeID="AP.F5.Probe.Device.FanInfo">
+            <ProbeAction ID="Probe" TypeID="AP.F5.Probe.Device.Fan.Info">
               <Debug>$Config/Debug$</Debug>
               <SNMPAddress>$Config/SNMPAddress$</SNMPAddress>
               <SNMPPort>$Config/SNMPPort$</SNMPPort>
@@ -364,66 +364,66 @@
 
       <DisplayStrings>
 
-        <!-- AP.F5.DataSource.Monitor.Device.FanInfo.Filtered -->
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.FanInfo.Filtered">
-          <Name>Filtered Fan Info Monitor DataSource</Name>
-          <Description>Runs AP.F5.DataSource.Monitor.Device.FanInfo, filters out the Fan needed</Description>
+        <!-- AP.F5.DataSource.Device.Fan.Info.Filtered -->
+        <DisplayString ElementID="AP.F5.DataSource.Device.Fan.Info.Filtered">
+          <Name>Filtered Fan Info DataSource</Name>
+          <Description>Runs AP.F5.DataSource.Device.Fan.Info, filters out the Fan needed</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.FanInfo.Filtered" SubElementID="IntervalSeconds">
+        <DisplayString ElementID="AP.F5.DataSource.Device.Fan.Info.Filtered" SubElementID="IntervalSeconds">
           <Name>Interval Seconds</Name>
           <Description>Frequency in seconds that module is run.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.FanInfo.Filtered" SubElementID="SyncTime">
+        <DisplayString ElementID="AP.F5.DataSource.Device.Fan.Info.Filtered" SubElementID="SyncTime">
           <Name>Synchronisation Time</Name>
           <Description>Offset that this module is started from.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.FanInfo.Filtered" SubElementID="Debug">
+        <DisplayString ElementID="AP.F5.DataSource.Device.Fan.Info.Filtered" SubElementID="Debug">
           <Name>Debug</Name>
           <Description>Debug Flag, if true then additional info is posted to event log.</Description>
         </DisplayString>
 
-        <!-- AP.F5.DataSource.Monitor.Device.FanInfo -->
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.FanInfo">
-          <Name>Fan Info Monitor DataSource</Name>
+        <!-- AP.F5.DataSource.Device.Fan.Info -->
+        <DisplayString ElementID="AP.F5.DataSource.Device.Fan.Info">
+          <Name>Fan Info DataSource</Name>
           <Description>Wraps Fan Info Probe in scheduler and returns as PropertyBag for Monitors</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.FanInfo" SubElementID="IntervalSeconds">
+        <DisplayString ElementID="AP.F5.DataSource.Device.Fan.Info" SubElementID="IntervalSeconds">
           <Name>Interval Seconds</Name>
           <Description>Frequency in seconds that module is run.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.FanInfo" SubElementID="SyncTime">
+        <DisplayString ElementID="AP.F5.DataSource.Device.Fan.Info" SubElementID="SyncTime">
           <Name>Synchronisation Time</Name>
           <Description>Offset that this module is started from.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.FanInfo" SubElementID="Debug">
+        <DisplayString ElementID="AP.F5.DataSource.Device.Fan.Info" SubElementID="Debug">
           <Name>Debug</Name>
           <Description>Debug Flag, if true then additional info is posted to event log.</Description>
         </DisplayString>
 
-        <!-- AP.F5.Probe.Device.FanInfo -->
-        <DisplayString ElementID="AP.F5.Probe.Device.FanInfo">
+        <!-- AP.F5.Probe.Device.Fan.Info -->
+        <DisplayString ElementID="AP.F5.Probe.Device.Fan.Info">
           <Name>Powershell Fan Probe</Name>
           <Description>Runs Powershell SNMP Script to collect Fan Info</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.Probe.Device.FanInfo" SubElementID="Debug">
+        <DisplayString ElementID="AP.F5.Probe.Device.Fan.Info" SubElementID="Debug">
           <Name>Debug</Name>
           <Description>Debug Flag, if true then additional info is posted to event log.</Description>
         </DisplayString>
 
-        <!-- AP.F5.UnitMonitor.Device.FanHealth -->
-        <DisplayString ElementID="AP.F5.UnitMonitor.Device.FanHealth">
+        <!-- AP.F5.UnitMonitor.Device.Fan.Health -->
+        <DisplayString ElementID="AP.F5.UnitMonitor.Device.Fan.Health">
           <Name>Device Fan Health Monitor</Name>
           <Description>Compares used Fan Percentage against given thresholds</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.UnitMonitor.Device.FanHealth" SubElementID="IntervalSeconds">
+        <DisplayString ElementID="AP.F5.UnitMonitor.Device.Fan.Health" SubElementID="IntervalSeconds">
           <Name>Interval Seconds</Name>
           <Description>Frequency in seconds that module is run.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.UnitMonitor.Device.FanHealth" SubElementID="SyncTime">
+        <DisplayString ElementID="AP.F5.UnitMonitor.Device.Fan.Health" SubElementID="SyncTime">
           <Name>Synchronisation Time</Name>
           <Description>Offset that this module is started from.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.UnitMonitor.Device.FanHealth" SubElementID="Debug">
+        <DisplayString ElementID="AP.F5.UnitMonitor.Device.Fan.Health" SubElementID="Debug">
           <Name>Debug</Name>
           <Description>Debug Flag, if true then additional info is posted to event log.</Description>
         </DisplayString>

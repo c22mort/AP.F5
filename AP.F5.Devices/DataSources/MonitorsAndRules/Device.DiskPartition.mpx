@@ -3,10 +3,10 @@
     <ModuleTypes>
 
 
-      <!-- FILTERED MONITOR DATASOURCES -->
-      <!-- AP.F5.DataSource.Monitor.Device.DiskPartitionInfo.Filtered -->
-      <!-- AP.F5.DataSource.Monitor.Device.FanInfo, Filters results by Fan Index -->
-      <DataSourceModuleType ID="AP.F5.DataSource.Monitor.Device.DiskPartitionInfo.Filtered" Accessibility="Public" Batching="false">
+      <!-- FILTERED DATASOURCES -->
+      <!-- AP.F5.DataSource.Device.DiskPartition.Info.Filtered -->
+      <!-- AP.F5.DataSource.Device.DiskPartition.Info, Filters results by Fan Index -->
+      <DataSourceModuleType ID="AP.F5.DataSource.Device.DiskPartition.Info.Filtered" Accessibility="Public" Batching="false">
         <Configuration>
           <IncludeSchemaTypes>
             <SchemaType>Windows!Microsoft.Windows.PowerShellSchema</SchemaType>
@@ -35,7 +35,7 @@
         <ModuleImplementation>
           <Composite>
             <MemberModules>
-              <DataSource ID="Script" TypeID="AP.F5.DataSource.Monitor.Device.DiskPartitionInfo">
+              <DataSource ID="Script" TypeID="AP.F5.DataSource.Device.DiskPartition.Info">
                 <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
                 <SyncTime>$Config/SyncTime$</SyncTime>
                 <Debug>$Config/Debug$</Debug>
@@ -75,10 +75,10 @@
         <OutputType>System!System.PropertyBagData</OutputType>
       </DataSourceModuleType>
 
-      <!-- MONITOR DATA SOURCES -->
-      <!-- AP.F5.DataSource.Monitor.Device.DiskPartitionInfo -->
-      <!-- Calls AP.F5.Probe.Device.DiskPartitionInfo wraps it with a scheduler -->
-      <DataSourceModuleType ID="AP.F5.DataSource.Monitor.Device.DiskPartitionInfo" Accessibility="Public" Batching="false">
+      <!-- DATA SOURCES -->
+      <!-- AP.F5.DataSource.Device.DiskPartition.Info -->
+      <!-- Calls AP.F5.Probe.Device.DiskPartition.Info wraps it with a scheduler -->
+      <DataSourceModuleType ID="AP.F5.DataSource.Device.DiskPartition.Info" Accessibility="Public" Batching="false">
         <Configuration>
           <IncludeSchemaTypes>
             <SchemaType>Windows!Microsoft.Windows.PowerShellSchema</SchemaType>
@@ -110,7 +110,7 @@
                 <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
                 <SyncTime>$Config/SyncTime$</SyncTime>
               </DataSource>
-              <ProbeAction ID="PSScript" TypeID="AP.F5.Probe.Device.DiskPartitionInfo">
+              <ProbeAction ID="PSScript" TypeID="AP.F5.Probe.Device.DiskPartition.Info">
                 <Debug>$Config/Debug$</Debug>
                 <SNMPAddress>$Config/SNMPAddress$</SNMPAddress>
                 <SNMPPort>$Config/SNMPPort$</SNMPPort>
@@ -136,9 +136,9 @@
       </DataSourceModuleType>
 
       <!-- PROBES -->
-      <!-- AP.F5.Probe.Device.DiskPartitionInfo -->
-      <!-- Runs script to Return Device Fan Info in a property bag-->
-      <ProbeActionModuleType ID="AP.F5.Probe.Device.DiskPartitionInfo" Accessibility="Public" Batching="false">
+      <!-- AP.F5.Probe.Device.DiskPartition.Info -->
+      <!-- Runs script to Return Device Disk partition Info in a property bag-->
+      <ProbeActionModuleType ID="AP.F5.Probe.Device.DiskPartition.Info" Accessibility="Public" Batching="false">
         <Configuration>
           <IncludeSchemaTypes>
             <SchemaType>Windows!Microsoft.Windows.PowerShellSchema</SchemaType>
@@ -233,9 +233,9 @@
 
     <MonitorTypes>
 
-      <!-- AP.F5.UnitMonitor.Device.DiskPartitionFreeSpace -->
+      <!-- AP.F5.UnitMonitor.Device.DiskPartition.FreeSpace -->
       <!-- Uses SNMP via Powershell to Check Free Space of Device Disk Partition -->
-      <UnitMonitorType ID="AP.F5.UnitMonitor.Device.DiskPartitionFreeSpace" Accessibility="Public">
+      <UnitMonitorType ID="AP.F5.UnitMonitor.Device.DiskPartition.FreeSpace" Accessibility="Public">
         <MonitorTypeStates>
           <MonitorTypeState ID="DiskPartitionFreeSpaceHealthy" NoDetection="false"/>
           <MonitorTypeState ID="DiskPartitionFreeSpaceWarning" NoDetection="false"/>
@@ -267,7 +267,7 @@
         </OverrideableParameters>
         <MonitorImplementation>
           <MemberModules>
-            <DataSource ID="DS" TypeID="AP.F5.DataSource.Monitor.Device.DiskPartitionInfo.Filtered">
+            <DataSource ID="DS" TypeID="AP.F5.DataSource.Device.DiskPartition.Info.Filtered">
               <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
               <SyncTime>$Config/SyncTime$</SyncTime>
               <Debug>$Config/Debug$</Debug>
@@ -284,7 +284,7 @@
               <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
               <DiskPartitionPath>$Config/DiskPartitionPath$</DiskPartitionPath>
             </DataSource>
-            <ProbeAction ID="Probe" TypeID="AP.F5.Probe.Device.DiskPartitionInfo">
+            <ProbeAction ID="Probe" TypeID="AP.F5.Probe.Device.DiskPartition.Info">
               <Debug>$Config/Debug$</Debug>
               <SNMPAddress>$Config/SNMPAddress$</SNMPAddress>
               <SNMPPort>$Config/SNMPPort$</SNMPPort>
@@ -381,66 +381,66 @@
 
       <DisplayStrings>
 
-        <!-- AP.F5.DataSource.Monitor.Device.DiskPartitionInfo.Filtered -->
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.DiskPartitionInfo.Filtered">
-          <Name>Filtered Disk Partitioon Info Monitor DataSource</Name>
-          <Description>Runs AP.F5.DataSource.Monitor.Device.DiskPartitionInfo, filters out the Disk Partition needed</Description>
+        <!-- AP.F5.DataSource.Device.DiskPartition.Info.Filtered -->
+        <DisplayString ElementID="AP.F5.DataSource.Device.DiskPartition.Info.Filtered">
+          <Name>Filtered Disk Partitioon Info DataSource</Name>
+          <Description>Runs AP.F5.DataSource.Device.DiskPartition.Info, filters out the Disk Partition needed</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.DiskPartitionInfo.Filtered" SubElementID="IntervalSeconds">
+        <DisplayString ElementID="AP.F5.DataSource.Device.DiskPartition.Info.Filtered" SubElementID="IntervalSeconds">
           <Name>Interval Seconds</Name>
           <Description>Frequency in seconds that module is run.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.DiskPartitionInfo.Filtered" SubElementID="SyncTime">
+        <DisplayString ElementID="AP.F5.DataSource.Device.DiskPartition.Info.Filtered" SubElementID="SyncTime">
           <Name>Synchronisation Time</Name>
           <Description>Offset that this module is started from.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.DiskPartitionInfo.Filtered" SubElementID="Debug">
+        <DisplayString ElementID="AP.F5.DataSource.Device.DiskPartition.Info.Filtered" SubElementID="Debug">
           <Name>Debug</Name>
           <Description>Debug Flag, if true then additional info is posted to event log.</Description>
         </DisplayString>
 
-        <!-- AP.F5.DataSource.Monitor.Device.DiskPartitionInfo -->
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.DiskPartitionInfo">
-          <Name>DiskPartition Info Monitor DataSource</Name>
-          <Description>Wraps DiskPartition Info Probe in scheduler and returns as PropertyBag for Monitors</Description>
+        <!-- AP.F5.DataSource.Device.DiskPartition.Info -->
+        <DisplayString ElementID="AP.F5.DataSource.Device.DiskPartition.Info">
+          <Name>DiskPartition Info DataSource</Name>
+          <Description>Wraps DiskPartition Info Probe in scheduler and returns as PropertyBag</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.DiskPartitionInfo" SubElementID="IntervalSeconds">
+        <DisplayString ElementID="AP.F5.DataSource.Device.DiskPartition.Info" SubElementID="IntervalSeconds">
           <Name>Interval Seconds</Name>
           <Description>Frequency in seconds that module is run.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.DiskPartitionInfo" SubElementID="SyncTime">
+        <DisplayString ElementID="AP.F5.DataSource.Device.DiskPartition.Info" SubElementID="SyncTime">
           <Name>Synchronisation Time</Name>
           <Description>Offset that this module is started from.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.DataSource.Monitor.Device.DiskPartitionInfo" SubElementID="Debug">
+        <DisplayString ElementID="AP.F5.DataSource.Device.DiskPartition.Info" SubElementID="Debug">
           <Name>Debug</Name>
           <Description>Debug Flag, if true then additional info is posted to event log.</Description>
         </DisplayString>
 
-        <!-- AP.F5.Probe.Device.DiskPartitionInfo -->
-        <DisplayString ElementID="AP.F5.Probe.Device.DiskPartitionInfo">
+        <!-- AP.F5.Probe.Device.DiskPartition.Info -->
+        <DisplayString ElementID="AP.F5.Probe.Device.DiskPartition.Info">
           <Name>Powershell DiskPartition Probe</Name>
           <Description>Runs Powershell SNMP Script to collect DiskPartition Info</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.Probe.Device.DiskPartitionInfo" SubElementID="Debug">
+        <DisplayString ElementID="AP.F5.Probe.Device.DiskPartition.Info" SubElementID="Debug">
           <Name>Debug</Name>
           <Description>Debug Flag, if true then additional info is posted to event log.</Description>
         </DisplayString>
 
-        <!-- AP.F5.UnitMonitor.Device.DiskPartitionFreeSpace -->
-        <DisplayString ElementID="AP.F5.UnitMonitor.Device.DiskPartitionFreeSpace">
+        <!-- AP.F5.UnitMonitor.Device.DiskPartition.FreeSpace -->
+        <DisplayString ElementID="AP.F5.UnitMonitor.Device.DiskPartition.FreeSpace">
           <Name>Device DiskPartition Free Space Health Monitor</Name>
           <Description>Compares Disk Partition Free Space Percentage against given thresholds</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.UnitMonitor.Device.DiskPartitionFreeSpace" SubElementID="IntervalSeconds">
+        <DisplayString ElementID="AP.F5.UnitMonitor.Device.DiskPartition.FreeSpace" SubElementID="IntervalSeconds">
           <Name>Interval Seconds</Name>
           <Description>Frequency in seconds that module is run.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.UnitMonitor.Device.DiskPartitionFreeSpace" SubElementID="SyncTime">
+        <DisplayString ElementID="AP.F5.UnitMonitor.Device.DiskPartition.FreeSpace" SubElementID="SyncTime">
           <Name>Synchronisation Time</Name>
           <Description>Offset that this module is started from.</Description>
         </DisplayString>
-        <DisplayString ElementID="AP.F5.UnitMonitor.Device.DiskPartitionFreeSpace" SubElementID="Debug">
+        <DisplayString ElementID="AP.F5.UnitMonitor.Device.DiskPartition.FreeSpace" SubElementID="Debug">
           <Name>Debug</Name>
           <Description>Debug Flag, if true then additional info is posted to event log.</Description>
         </DisplayString>
