@@ -163,6 +163,7 @@
 					<WriteAction ID="CollectToDW" TypeID="MSDL!Microsoft.SystemCenter.DataWarehouse.PublishPerformanceData" />
 				</WriteActions>
 			</Rule>
+			
 		</Rules>
     </Monitoring>
     <LanguagePacks>

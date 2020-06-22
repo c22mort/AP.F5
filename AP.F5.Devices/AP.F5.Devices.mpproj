@@ -247,6 +247,8 @@
     <EmbeddedResource Include="Scripts\MonitorsAndRules\Get-ProcessorInfo.ps1" />
     <EmbeddedResource Include="Scripts\MonitorsAndRules\Get-TempSensorInfo.ps1" />
     <EmbeddedResource Include="Scripts\Test.ps1" />
+    <EmbeddedResource Include="Scripts\Test2.ps1" />
+    <EmbeddedResource Include="Scripts\Test3.ps1" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Images\TemperatureSensor-80.png">

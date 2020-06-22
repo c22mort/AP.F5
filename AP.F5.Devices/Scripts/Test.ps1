@@ -1,18 +1,7 @@
-﻿#==================================================================================
-# Script: 	Get-ProcessorInfo.ps1
-# Date:		05/06/20
-# Author: 	Andi Patrick
-# Purpose:	Gets F5 Device Processor Info via SNMP returns all as Property Bag
-#==================================================================================
-
-# Get the named parameters
-Param(
-	$Debug,
+﻿Param(
 	$SharpSnmpLocation,
-	$SNMPAddress,
-	$PortNumber,
-	$SNMPVersion,
-	$SNMPv3UserName,
+	$iControlLocation,
+   	$SNMPv3UserName,
 	$SNMPv3AuthProtocol,
 	$SNMPv3AuthPassword,
 	$SNMPv3PrivProtocol,
@@ -28,19 +17,19 @@ $StartTime = (GET-DATE)
 $Timeout = 10000
 
 #Constants used for event logging
-$SCRIPT_NAME			= 'Get-ProcessorInfo.ps1'
+$SCRIPT_NAME            = 'Get-DeviceGroups.ps1'
 $EVENT_LEVEL_ERROR      = 1
 $EVENT_LEVEL_WARNING    = 2
 $EVENT_LEVEL_INFO       = 4
 
-$SCRIPT_STARTED             = 14611
-$SCRIPT_PROPERTYBAG_CREATED	= 14612
-$SCRIPT_EVENT               = 14613
-$SCRIPT_ERROR               = 14614
-$SCRIPT_ERROR_NOSNMP        = 14615
-$SCRIPT_ERROR_SNMP2         = 14616
-$SCRIPT_ERROR_SNMP3         = 14617
-$SCRIPT_ENDED               = 14618
+$SCRIPT_STARTED             = 14601
+$SCRIPT_PROPERTYBAG_CREATED	= 14602
+$SCRIPT_EVENT               = 14603
+$SCRIPT_ERROR               = 14604
+$SCRIPT_ERROR_NOSNMP        = 14605
+$SCRIPT_ERROR_SNMP2         = 14606
+$SCRIPT_ERROR_SNMP3         = 14607
+$SCRIPT_ENDED               = 14608
 
 #==================================================================================
 # Function:	Get-SnmpV2
@@ -68,14 +57,15 @@ function Get-SnmpV2
 
     } Catch {
 		# Write Error to Event Log
-        $message = "SNMP Error : " + $_
-   		Log-Event $SCRIPT_ERROR_SNMP2 $EVENT_LEVEL_INFO $message $true
+        $message = "SNMP2 Error : " + $_
+   		Log-Event $SCRIPT_ERROR_SNMP2 $EVENT_LEVEL_ERROR $message $true
 	}
 }
+
 #==================================================================================
 # Function:	Get-SnmpV3
 # Purpose:	Gets a single SNMP Value
-#			Returns Single ObjectIdentifier (Id & Data)
+#			      Returns Single ObjectIdentifier (Id & Data)
 #==================================================================================
 function Get-SnmpV3
 {
@@ -143,11 +133,12 @@ function Get-SnmpV3
         # Get Results
         $reply = [Lextm.SharpSnmpLib.Messaging.SnmpMessageExtension]::GetResponse($request, 3500, $reciever)
     } Catch {
-		# Write Error to Event Log
+    	# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   		Log-Event $SCRIPT_ERROR_SNMP3 $EVENT_LEVEL_INFO $message $true
+   		Log-Event $SCRIPT_ERROR_SNMP3 $EVENT_LEVEL_ERROR $message $true
     }
 }
+
 #==================================================================================
 # Function:	Walk-SnmpV2
 # Purpose:	Walks an SNMP MIB
@@ -175,9 +166,10 @@ function Walk-SnmpV2
     } Catch {
 		# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   		Log-Event $SCRIPT_ERROR_SNMP2 $EVENT_LEVEL_INFO $message $true
+   		Log-Event $SCRIPT_ERROR_SNMP2 $EVENT_LEVEL_ERROR $message $true
     }
 }
+
 #==================================================================================
 # Function:	BulkGet-SnmpV3
 # Purpose:	Gets a single SNMP Value
@@ -246,7 +238,7 @@ function BulkGet-SnmpV3
     } Catch {
 		# Write Error to Event Log
         $message = "SNMP Error : " + $_
-   		Log-Event $SCRIPT_ERROR_SNMP3 $EVENT_LEVEL_INFO $message $true
+   		Log-Event $SCRIPT_ERROR_SNMP3 $EVENT_LEVEL_ERROR $message $true
     }                   
 }
 
@@ -275,91 +267,177 @@ function Log-Event
 $api = New-Object -comObject 'MOM.ScriptAPI'
 
 # Log Startup Message
-Log-Event $SCRIPT_STARTED $EVENT_LEVEL_INFO "Collecting Processor Info from F5 Device"
+Log-Event $SCRIPT_STARTED $EVENT_LEVEL_INFO "Collecting Device Groups from F5 Devices" $true
 
 # Load SharpSNMPLib
 [void][reflection.assembly]::LoadFrom( (Resolve-Path $SharpSnmpLocation) )
-$walkMode = [Lextm.SharpSnmpLib.Messaging.WalkMode]::WithinSubtree
+[void][reflection.assembly]::LoadFrom( (Resolve-Path $iControlLocation) )
 
-# Create endpoint for SNMP server
-$connection = New-Object System.Net.IpEndPoint ([System.Net.IPAddress]::Parse($SNMPAddress), $PortNumber)
+$walkMode = [Lextm.SharpSnmpLib.Messaging.WalkMode]::Default
 
-# bigipTrafficMgmt.bigipSystem.sysHostInfoStat.sysMultiHostCpu.sysMultiHostCpuNumber
-$sysMultiHostCpuNumber = New-Object Lextm.SharpSnmpLib.ObjectIdentifier(".1.3.6.1.4.1.3375.2.1.7.5.1.0")
-# bigipTrafficMgmt.bigipSystem.sysHostInfoStat.sysMultiHostCpu.sysMultiHostCpuTable.sysMultiHostCpuEntry.sysMultiHostCpuUsageRatio5m
-$sysMultiHostCpuUsageRatio5m = New-Object Lextm.SharpSnmpLib.ObjectIdentifier(".1.3.6.1.4.1.3375.2.1.7.5.2.1.35")
+# Get F5 Devices from SCOM
+$scom_f5_devices = Get-SCOMClass -name "AP.F5.Device" | Get-SCOMClassInstance
+$message = "Found " + $scom_f5_devices.Count + " F5 Devices"
+Log-Event $SCRIPT_EVENT $EVENT_LEVEL_INFO $message $true
 
-# Get SNMP Data (Version Dependant)
-$CpuCount = 0
-If ($SNMPVersion -eq "3") {
-	Try {
+# bigipTrafficMgmt.bigipSystem.sysNetwork.sysDevice.sysSysDevice.sysSysDeviceNumber
+$sysSysDeviceNumber =  New-Object Lextm.SharpSnmpLib.ObjectIdentifier(".1.3.6.1.4.1.3375.2.1.2.14.1.1.0")
+# bigipTrafficMgmt.bigipSystem.sysNetwork.sysDevice.sysSysDevice.sysSysDeviceTable.sysSysDeviceEntry.sysSysDeviceHostname
+$sysSysDeviceHostname =  New-Object Lextm.SharpSnmpLib.ObjectIdentifier(".1.3.6.1.4.1.3375.2.1.2.14.1.2.1.4")
+# bigipTrafficMgmt.bigipSystem.sysNetwork.sysDevice.sysSysDevice.sysSysDeviceTable.sysSysDeviceEntry.sysSysDeviceChassisId
+$sysSysDeviceChassisId =  New-Object Lextm.SharpSnmpLib.ObjectIdentifier(".1.3.6.1.4.1.3375.2.1.2.14.1.2.1.18")
+# bigipTrafficMgmt.bigipSystem.sysCM.sysCmSyncStatusDetails.sysCmSyncStatusDetailsNumber
+$sysCmSyncStatusDetailsNumber =  New-Object Lextm.SharpSnmpLib.ObjectIdentifier(".1.3.6.1.4.1.3375.2.1.14.2.1.0")
+# bigipTrafficMgmt.bigipSystem.sysCM.sysCmSyncStatusDetails.sysCmSyncStatusDetailsTable.sysCmSyncStatusDetailsEntry.sysCmSyncStatusDetailsDetails
+$sysCmSyncStatusDetailsDetails =  New-Object Lextm.SharpSnmpLib.ObjectIdentifier(".1.3.6.1.4.1.3375.2.1.14.2.2.1.2")
 
-		# Get Count of Processors
-		$CpuCount = (Get-SnmpV3 $connection $sysMultiHostCpuNumber).Data
-		
-		# Did we Get a Reply
-        If ($CpuCount -eq $null) 
-		{
-		    # Write Warning to Event Log
+
+# Loop Through Devices
+Foreach ($f5_device in $scom_f5_devices) {
+	$ip = ($f5_device|Select-Object -ExpandProperty *.SNMPAddress).Value
+	$port = ($f5_device|Select-Object -ExpandProperty *.SNMPPort).Value
+	$version = ($f5_device|Select-Object -ExpandProperty *.SNMPVersion).Value
+    $ip
+	# Create endpoint for SNMP server
+	$connection = New-Object System.Net.IpEndPoint ([System.Net.IPAddress]::Parse($ip), $port)
+
+	If ($version -eq "3") 
+	{
+		# Try To get Count of Devices
+        $deviceCount = (Get-SnmpV3 $connection $sysSysDeviceNumber).Data
+        # Did we Get a Reply
+        If ($deviceCount -eq $null) 
+        {
+            # Write Warning to Event Log
             Log-Event $SCRIPT_ERROR_NOSNMP $EVENT_LEVEL_WARNING "No SNMP Response" $true
-		}
-		else
-		{
-			[int]$CpuCount = $CpuCount.ToInt32()
-			# Get Processor Usage (SNMPv3 0 Based Array)
-			$CpuUsage = BulkGet-SnmpV3 $connection $CpuCount $sysMultiHostCpuUsageRatio5m
-			For ($i=0; $i -lt $CpuCount;$i++){
-				[int]$index = $i + 1
-				$message = "Created Processor Info Property Bag for CPU-"+ $index + "`r`n"
-				$message = $message + "CPU Usage : " + $CpuUsage[$i].Data.ToUInt32()
-				Log-Event $SCRIPT_PROPERTYBAG_CREATED $EVENT_LEVEL_INFO $message
-				$bag = $api.CreatePropertyBag()
-				$bag.AddValue("Index", [int]$index)
-				$bag.AddValue("UsedPercentage", $CpuUsage[$i].Data.ToUInt32())
-				$bag
+		} else 
+        {
+            $deviceCount = $deviceCount.ToInt32()
+            # Get Hostnames
+            $deviceHostNames = BulkGet-SnmpV3 $connection $deviceCount $sysSysDeviceHostname
+            # Get SerialNumbers
+            $deviceSerialNumbers = BulkGet-SnmpV3 $connection $deviceCount $sysSysDeviceChassisId
+
+            $deviceArray = @()
+            # Create deviceObjects
+            For ($i=0;$i -lt $deviceCount;$i++)
+            {
+                # Get DeviceInfo
+                $deviceInfo = @{
+                    HostName = $deviceHostNames[$i].Data.ToString();
+                    SerialNumber = $deviceSerialNumbers[$i].Data.ToString()                    
+				}
+                # Create an Object
+                $device = New-Object -TypeName PSObject -Property $deviceInfo
+                $deviceArray += $device
+            }
+
+            # Get Device Groups
+            $deviceGroupCount = (Get-SnmpV3 $connection $sysCmSyncStatusDetailsNumber).Data.ToInt32()
+            $deviceGroupCount
+            $deviceGroups = BulkGet-SnmpV3 $connection $deviceGroupCount $sysCmSyncStatusDetailsDetails
+            For ($i=0;$i -lt $deviceGroupCount;$i++) {
+                $addToArray = $true
+                # Get Device Group Name
+                $deviceGroupName =  $deviceGroups[$i].Data.ToString()
+                $deviceGroupName = $deviceGroupName.Split(':')[0]
+                $deviceGroupName =  $deviceGroupName.Split(' ')[0]
+                # Don't Add "device_trust_group"
+                If ($deviceGroupName -eq "device_trust_group") 
+                {
+                    $addToArray = $false
+				}
+                # Don't Add Device Only
+                Foreach ($device in $deviceArray) {
+                    If ($device.HostName -eq $deviceGroupName) 
+                    {
+                        $addToArray = $false                
+					}
+				}
+
+                If ($addToArray) 
+                {
+                    $deviceGroup = @{
+                        Name = $deviceGroupName;
+                        Devices = $deviceArray
+			        }               
+				}
+                
 			}
+
 		}
-
-	} Catch {
-		# Log Finished Message
-		$message = "SNMPv3 Error : " + $_
-		Log-Event $SCRIPT_ERROR_SNMP3 $EVENT_LEVEL_ERROR $message
+        $deviceGroup
+    
 	}
-} else {
-	Try {
-
-		# Get Count of Processors
-		$CpuCount = (Get-SnmpV2 $connection $sysMultiHostCpuNumber).Data
-		
-		# Did we Get a Reply
-        If ($CpuCount -eq $null) 
-		{
-		    # Write Warning to Event Log
+	else 
+	{
+		# Try To get System Name
+        $deviceCount = (Get-SnmpV2 $connection $sysSysDeviceNumber).Data
+        # Did we Get a Reply
+        If ($deviceCount -eq $null) 
+        {
+            # Write Warning to Event Log
             Log-Event $SCRIPT_ERROR_NOSNMP $EVENT_LEVEL_WARNING "No SNMP Response" $true
-		}
-		else
-		{
-			[int]$CpuCount = $CpuCount.ToInt32()
-			# Get Processor Usage (SNMPv2 1 Based Array)
-			$CpuUsage = Walk-SnmpV2 $connection $sysMultiHostCpuUsageRatio5m
-			For ($i=1; $i -le $CpuCount;$i++){
-				$message = "Created Processor Info Property Bag for CPU-"+ $i + "`r`n"
-				$message = $message + "CPU Usage : " + $CpuUsage[$i].Data.ToUInt32()
-				Log-Event $SCRIPT_PROPERTYBAG_CREATED $EVENT_LEVEL_INFO $message
-				$bag = $api.CreatePropertyBag()
-				$bag.AddValue("Index", [int]$i)
-				$bag.AddValue("UsedPercentage", $CpuUsage[$i].Data.ToUInt32())
-				$bag
-			}
-		}
+		} else 
+        {
+            $deviceCount = $deviceCount.ToInt32()
+            # Get Hostnames
+            $deviceHostNames = Walk-SnmpV2 $connection $sysSysDeviceHostname
+            # Get SerialNumbers
+            $deviceSerialNumbers = Walk-SnmpV2 $connection $sysSysDeviceChassisId
 
-	} Catch {
-		# Log error Message
-		$message = "SNMPv2 Error : " + $Error + " : " + $_
-		Log-Event $SCRIPT_ERROR_SNMP2 $EVENT_LEVEL_ERROR $message
+            $deviceArray = @()
+            # Create deviceObjects
+            For ($i=1;$i -le $deviceCount;$i++)
+            {
+                # Get DeviceInfo
+                $deviceInfo = @{
+                    HostName = $deviceHostNames[$i].Data.ToString();
+                    SerialNumber = $deviceSerialNumbers[$i].Data.ToString()                    
+				}
+                # Create an Object
+                $device = New-Object -TypeName PSObject -Property $deviceInfo
+                $deviceArray += $device
+            }
+
+            # Get Device Groups
+            $deviceGroupCount = (Get-SnmpV2 $connection $sysCmSyncStatusDetailsNumber).Data.ToInt32()
+            $deviceGroupCount
+            $deviceGroups = Walk-SnmpV2 $connection $sysCmSyncStatusDetailsDetails
+            For ($i=1;$i -le $deviceGroupCount;$i++) {
+                $addToArray = $true
+                # Get Device Group Name
+                $deviceGroupName =  $deviceGroups[$i].Data.ToString()
+                $deviceGroupName = $deviceGroupName.Split(':')[0]
+                $deviceGroupName =  $deviceGroupName.Split(' ')[0]
+                # Don't Add "device_trust_group"
+                If ($deviceGroupName -eq "device_trust_group") 
+                {
+                    $addToArray = $false
+				}
+                # Don't Add Device Only
+                Foreach ($device in $deviceArray) {
+                    If ($device.HostName -eq $deviceGroupName) 
+                    {
+                        $addToArray = $false                
+					}
+				}
+
+                If ($addToArray) 
+                {
+                    $deviceGroup = @{
+                        Name = $deviceGroupName;
+                        Devices = $deviceArray
+			        }               
+				}
+                
+			}
+
+		}
+        $deviceGroup
 	}
+
 }
-
 
 # Get End Time For Script
 $EndTime = (GET-DATE)
@@ -367,4 +445,6 @@ $TimeTaken = NEW-TIMESPAN -Start $StartTime -End $EndTime
 $Seconds = [math]::Round($TimeTaken.TotalSeconds, 2)
 
 # Log Finished Message
-Log-Event $SCRIPT_ENDED $EVENT_LEVEL_INFO "Script Finished. Took $Seconds Seconds to Complete!"
+$message = "Script Finished. Took $Seconds Seconds to Complete!"
+Log-Event $SCRIPT_ENDED $EVENT_LEVEL_INFO $message $true
+
