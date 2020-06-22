@@ -7,6 +7,12 @@ Project("{D4B43EB3-688B-4EEE-86BD-088F0B28ABB3}") = "AP.F5.Devices", "AP.F5.Devi
 EndProject
 Project("{D4B43EB3-688B-4EEE-86BD-088F0B28ABB3}") = "AP.F5.Overrides", "AP.F5.Overrides\AP.F5.Overrides.mpproj", "{3C76971B-B920-4565-8DE5-ABFA0B09E5B6}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Management Packs", "Management Packs", "{63A193FD-5EEF-4AD1-A6BD-5B0203DEAF27}"
+	ProjectSection(SolutionItems) = preProject
+		AP.F5.Devices\bin\Debug\AP.F5.Devices.mpb = AP.F5.Devices\bin\Debug\AP.F5.Devices.mpb
+		AP.F5.Overrides\bin\Debug\AP.F5.Overrides.mpb = AP.F5.Overrides\bin\Debug\AP.F5.Overrides.mpb
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
